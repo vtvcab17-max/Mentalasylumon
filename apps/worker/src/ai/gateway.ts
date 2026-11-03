@@ -1,13 +1,19 @@
 /**
  * Gọi model qua Cloudflare AI Gateway (T028, research.md §R6, Constitution: mọi lời gọi AI qua Gateway).
- * Khi chưa cấu hình AI_GATEWAY_ACCOUNT_ID (chỉ ở dev), gọi thẳng Anthropic.
+ * - Model "@cf/…" → Workers AI qua binding `AI` (không cần khóa), đi qua AI Gateway `AI_GATEWAY_ID`
+ *   (mặc định "default", tự tạo ở lần gọi đầu).
+ * - Model khác (ví dụ "claude-…") → Anthropic, cần ANTHROPIC_API_KEY.
  */
 
 export interface GatewayEnv {
-  ANTHROPIC_API_KEY: string;
-  AI_GATEWAY_ACCOUNT_ID: string;
-  AI_GATEWAY_ID: string;
+  AI?: Ai;
+  ANTHROPIC_API_KEY?: string;
+  AI_GATEWAY_ACCOUNT_ID?: string;
+  AI_GATEWAY_ID?: string;
   APP_ENV?: string;
+  /** Chỉ cho script eval chạy ngoài Worker (không có binding AI): gọi Workers AI qua REST. */
+  CLOUDFLARE_ACCOUNT_ID?: string;
+  CLOUDFLARE_API_TOKEN?: string;
 }
 
 export interface ChatMessage {
@@ -50,6 +56,50 @@ function body(opts: CompleteOptions, stream: boolean) {
   });
 }
 
+/** Bỏ phần suy nghĩ nếu model trả kèm (<think>…</think>). */
+function stripThinking(s: string) {
+  return s.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+}
+
+async function runWorkersAi(env: GatewayEnv, opts: CompleteOptions): Promise<string> {
+  const run: (m: string, i: unknown, o: unknown) => Promise<unknown> = env.AI
+    ? (env.AI.run as unknown as (m: string, i: unknown, o: unknown) => Promise<unknown>).bind(env.AI)
+    : env.CLOUDFLARE_API_TOKEN && env.CLOUDFLARE_ACCOUNT_ID
+      ? async (m, input) => {
+          const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/ai/run/${m}`, {
+            method: "POST",
+            headers: { authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`, "content-type": "application/json" },
+            body: JSON.stringify(input),
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return ((await res.json()) as { result: unknown }).result;
+        }
+      : () => Promise.reject(new Error("Workers AI binding is not configured"));
+  let out: unknown;
+  try {
+    out = await Promise.race([
+      run(
+        opts.model,
+        {
+          messages: [{ role: "system", content: opts.system }, ...opts.messages],
+          max_tokens: opts.maxTokens,
+          temperature: opts.temperature ?? 0.7,
+          chat_template_kwargs: { enable_thinking: false },
+        },
+        { gateway: { id: env.AI_GATEWAY_ID || "default" } },
+      ),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), opts.timeoutMs ?? 25_000)),
+    ]);
+  } catch (e) {
+    throw new AiUnavailableError(`Workers AI failed: ${(e as Error).message}`);
+  }
+  // Model cũ trả {response}; model mới trả dạng OpenAI {choices:[{message:{content}}]}.
+  const o = out as { response?: unknown; choices?: { message?: { content?: string } }[] };
+  const text = typeof o.response === "string" ? o.response : (o.choices?.[0]?.message?.content ?? "");
+  if (!text) throw new AiUnavailableError("Workers AI returned no text");
+  return stripThinking(text);
+}
+
 async function post(env: GatewayEnv, opts: CompleteOptions, stream: boolean): Promise<Response> {
   if (!env.ANTHROPIC_API_KEY) throw new AiUnavailableError("ANTHROPIC_API_KEY is not set");
   let res: Response;
@@ -72,6 +122,7 @@ async function post(env: GatewayEnv, opts: CompleteOptions, stream: boolean): Pr
 }
 
 export async function complete(env: GatewayEnv, opts: CompleteOptions): Promise<string> {
+  if (opts.model.startsWith("@cf/")) return runWorkersAi(env, opts);
   const res = await post(env, opts, false);
   const data = (await res.json()) as { content?: { type: string; text?: string }[] };
   return (data.content ?? [])

@@ -30,8 +30,8 @@ jobs:
         if: hashFiles('evals/run-safety.mjs') != ''
         run: pnpm eval:safety --lang vi,en
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          AI_GATEWAY_ACCOUNT_ID: ${{ secrets.AI_GATEWAY_ACCOUNT_ID }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       - name: Moderation eval (SC-006)
         if: hashFiles('evals/run-moderation.mjs') != ''
         run: pnpm eval:moderation

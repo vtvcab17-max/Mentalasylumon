@@ -20,6 +20,9 @@
   // R2 tạm tắt: tài khoản chưa bật R2 (Dashboard → R2). Bật lại khi cần tài sản 3D/audio (T057, T091).
   // "r2_buckets": [{ "binding": "ASSETS_BUCKET", "bucket_name": "benh-vien-assets-dev" }],
 
+  // Workers AI cho bác sĩ AI (không cần khóa API).
+  "ai": { "binding": "AI" },
+
   "durable_objects": {
     "bindings": [
       { "name": "WORLD_ZONE", "class_name": "WorldZone" },

@@ -4,6 +4,7 @@ export interface Env {
   AI_GATEWAY_ID: string;
 
   DB: D1Database;
+  AI?: Ai;
   ASSETS: Fetcher;
   ASSETS_BUCKET?: R2Bucket; // tạm tắt cho tới khi bật R2
 
@@ -15,7 +16,7 @@ export interface Env {
 
   // Secrets
   GOOGLE_CLIENT_ID: string; // công khai, nằm trong vars
-  ANTHROPIC_API_KEY: string;
+  ANTHROPIC_API_KEY?: string; // chỉ khi dùng model Claude
   ELEVENLABS_API_KEY: string;
   CHAT_ENCRYPTION_KEY?: string; // tùy chọn; không đặt thì KeyVault tự tạo
 }

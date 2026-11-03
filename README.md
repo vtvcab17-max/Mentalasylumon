@@ -43,6 +43,6 @@ pnpm test
 4. **Đăng nhập Google không cần secret** (giống Vạn Linh Đảo): chỉ dùng `GOOGLE_CLIENT_ID` (đã có trong
    `wrangler.jsonc`). Google Cloud → OAuth client → **Authorized JavaScript origins** phải có link web.
    Khóa mã hóa lịch sử chat tự tạo trong Durable Object `KeyVault` (không cần đặt).
-   Secret duy nhất còn cần cho bác sĩ AI: `ANTHROPIC_API_KEY`.
+   Bác sĩ AI chạy bằng **Workers AI** (binding `AI`), không cần khóa API nào.
 5. Trên GitHub: **Settings → Secrets → Actions**, thêm `ANTHROPIC_API_KEY` và
    `AI_GATEWAY_ACCOUNT_ID` để CI chạy bộ kiểm thử an toàn.

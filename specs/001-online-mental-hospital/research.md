@@ -98,34 +98,18 @@ không phải tư vấn luật.
 
 ## R6. "Bộ não" của bác sĩ AI
 
-- **Decision**: Dùng model có sẵn qua **Cloudflare AI Gateway**. Bản đầu dùng **Claude Haiku 5.5**
-  (`claude-haiku-5-5`) cho cả việc trò chuyện lẫn phân loại an toàn. **Claude Sonnet 5.5**
-  (`claude-sonnet-5-5`) được thử song song trên cùng bộ kiểm thử; nếu Haiku không đạt SC-003
-  hoặc chất lượng tiếng Việt thì chuyển phần trò chuyện sang Sonnet. Chọn model qua biến cấu
-  hình, không cần sửa code.
-- **Rationale**:
-  - Haiku 5.5 nhanh và rẻ nhất trong dòng hiện tại, hợp với SC-002 (bắt đầu trả lời trong 5
-    giây).
-  - Mọi model Claude hiện tại đều hỗ trợ đa ngôn ngữ.
-  - AI Gateway hỗ trợ Anthropic lẫn Workers AI. Nó cho log, cache, rate limit và chuyển hướng
-    model, nên đổi nhà cung cấp mà không phải viết lại.
-- **Alternatives considered**:
-  - **Tự huấn luyện model từ đầu**: bị loại. Việc này cần lượng dữ liệu và máy tính cực lớn, và
-    không thể đạt mức an toàn cần thiết cho người đang gặp khó khăn.
-  - **Fine-tune một model mở** (LoRA trên Workers AI): để sau. Cần bộ dữ liệu tư vấn tiếng Việt có
-    bản quyền rõ ràng và có chuyên gia duyệt.
-  - **Model mở trên Workers AI** (dòng Llama, Qwen…): rẻ, dữ liệu ở lại Cloudflare, nhưng chất
-    lượng tiếng Việt và cách xử lý khủng hoảng phải qua cùng bộ kiểm thử. Có thể làm dự phòng.
-  - **Gemini, GPT**: mạnh về đa ngôn ngữ, cũng đi qua AI Gateway được. Quyết định cuối cùng nên
-    dựa vào kết quả bộ kiểm thử, không dựa vào cảm tính.
-- **Ước tính chi phí** (giả định mỗi lượt khoảng 3.000 token vào và 300 token ra, chưa tính
-  prompt caching):
-  - Haiku 5.5 ở mức giá thấp nhất ($0,10 / $0,50 mỗi triệu token): khoảng $0,0005 mỗi tin nhắn.
-  - Sonnet 5.5 ($2 / $10): khoảng $0,009 mỗi tin nhắn.
-
-  Với giới hạn 20 tin nhắn/ngày/người (FR-020), 1.000 người hỏi hết lượt mỗi ngày tốn khoảng
-  $10/ngày với Haiku, hoặc khoảng $180/ngày với Sonnet. Con số thật phụ thuộc vào bảng giá bậc
-  của Haiku và độ dài hội thoại.
+- **Decision (cập nhật 2026-11-04 theo yêu cầu của chủ dự án: không dùng khóa API)**: Dùng **Workers AI** qua
+  binding `AI`, đi qua AI Gateway `default`. Không cần khóa API nào.
+  - Trò chuyện: `@cf/aisingapore/gemma-sea-lion-v4-27b-it` (SEA-LION v4, huấn luyện cho các ngôn ngữ Đông Nam Á,
+    gồm tiếng Việt).
+  - Phân loại an toàn: `@cf/google/gemma-4-26b-a4b-it` (Gemma 4, hơn 140 ngôn ngữ), tắt suy luận để nhanh.
+  - Đổi model bằng `settings.model_chat` / `settings.model_classifier`. Model không bắt đầu bằng `@cf/` (ví dụ
+    Claude) vẫn dùng được nếu đặt `ANTHROPIC_API_KEY`.
+- **Rationale**: Không phải quản lý khóa, dữ liệu ở lại trong Cloudflare, chi phí thấp.
+- **Rủi ro**: chất lượng tiếng Việt và cách xử lý khủng hoảng của model mở chưa được kiểm. **Bắt buộc** chạy
+  `pnpm eval:safety` (Constitution I) trước khi mời người thử; không đạt thì đổi model trong settings.
+- **Alternatives considered**: Claude Haiku/Sonnet 5.5 qua AI Gateway (cần khóa Anthropic); tự huấn luyện model
+  (bị loại); fine-tune LoRA trên Workers AI (để sau, cần dữ liệu có chuyên gia duyệt).
 
 ## R7. Cơ chế an toàn cho lời bác sĩ
 

@@ -15,8 +15,9 @@ export const DEFAULT_SETTINGS: Settings = {
   daily_message_limit: 20,
   zone_capacity: 150,
   lecture_capacity: 200,
-  model_chat: "claude-haiku-5-5",
-  model_classifier: "claude-haiku-5-5",
+  // Workers AI (không cần khóa). SEA-LION được huấn luyện cho tiếng Đông Nam Á, gồm tiếng Việt.
+  model_chat: "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+  model_classifier: "@cf/google/gemma-4-26b-a4b-it",
   terms_version: "2026-11-v1",
   default_locale: "vi",
   admin_webhook_url: "",

@@ -40,13 +40,17 @@ function load(dir: string): Case[] {
 export async function run(opts: { root: string; langs: Lang[]; allowSeed: boolean; concurrency: number }) {
   const ai: GatewayEnv = {
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? "",
+    CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID ?? "",
+    CLOUDFLARE_API_TOKEN: process.env.CLOUDFLARE_API_TOKEN ?? "",
     AI_GATEWAY_ACCOUNT_ID: process.env.AI_GATEWAY_ACCOUNT_ID ?? "",
     AI_GATEWAY_ID: process.env.AI_GATEWAY_ID ?? "benh-vien",
   };
-  const chatModel = process.env.MODEL_CHAT ?? "claude-haiku-5-5";
-  const classifierModel = process.env.MODEL_CLASSIFIER ?? "claude-haiku-5-5";
-  if (!ai.ANTHROPIC_API_KEY) {
-    console.error("✗ ANTHROPIC_API_KEY chưa đặt — không chạy được eval an toàn (Constitution I).");
+  const chatModel = process.env.MODEL_CHAT ?? "@cf/aisingapore/gemma-sea-lion-v4-27b-it";
+  const classifierModel = process.env.MODEL_CLASSIFIER ?? "@cf/google/gemma-4-26b-a4b-it";
+  const needsCf = [chatModel, classifierModel].some((m) => m.startsWith("@cf/"));
+  const needsAnthropic = [chatModel, classifierModel].some((m) => !m.startsWith("@cf/"));
+  if ((needsCf && !(ai.CLOUDFLARE_API_TOKEN && ai.CLOUDFLARE_ACCOUNT_ID)) || (needsAnthropic && !ai.ANTHROPIC_API_KEY)) {
+    console.error("✗ Thiếu thông tin gọi model (CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN cho Workers AI) — không chạy được eval an toàn (Constitution I).");
     return 1;
   }
 
