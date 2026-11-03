@@ -33,11 +33,7 @@ pnpm test
 
 ## Đưa lên GitHub và Cloudflare (Workers Builds)
 
-1. Tạo repo trống trên GitHub tên `benh-vien-online`, rồi:
-   ```bash
-   git remote add origin https://github.com/<tài-khoản>/benh-vien-online.git
-   git push -u origin main
-   ```
+1. Repo: https://github.com/vtvcab17-max/Mentalasylumon (nhánh `main`).
 2. Tạo tài nguyên Cloudflare và ghi `database_id` vào `apps/worker/wrangler.jsonc`:
    ```bash
    cd apps/worker

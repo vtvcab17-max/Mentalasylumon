@@ -25,7 +25,7 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 
 **Purpose**: Repo, công cụ, môi trường Cloudflare
 
-- [ ] T001 Tạo repo GitHub `benh-vien-online` với workspace pnpm (`pnpm-workspace.yaml` gồm `apps/*`, `packages/*`) và `README.md`
+- [X] T001 Tạo repo GitHub `vtvcab17-max/Mentalasylumon` với workspace pnpm (`pnpm-workspace.yaml` gồm `apps/*`, `packages/*`) và `README.md`
 - [X] T002 Khởi tạo `apps/worker` (TypeScript, Hono, zod) với `apps/worker/wrangler.jsonc` khai báo D1 `benh-vien`, R2 `benh-vien-assets`, Durable Objects `WorldZone`, `CircleRoom`, `LectureHall`, `PatientRecord`, static assets trỏ tới `apps/client/dist`, ba môi trường dev/staging/production
 - [X] T003 [P] Khởi tạo `apps/client` (Vite + TypeScript + Three.js) với `apps/client/index.html` và `apps/client/src/main.ts`
 - [X] T004 [P] Khởi tạo `packages/shared` (zod) với `packages/shared/src/index.ts`
