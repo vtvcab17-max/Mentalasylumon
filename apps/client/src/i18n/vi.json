@@ -1,5 +1,7 @@
 {
-  "app": { "title": "Bệnh viện tâm thần online" },
+  "app": {
+    "title": "Bệnh viện tâm thần online"
+  },
   "lang": {
     "pickerTitle": "Chọn ngôn ngữ",
     "pickerHint": "Bạn có thể đổi lại bất cứ lúc nào trong phần cài đặt.",
@@ -17,6 +19,90 @@
     "offline": "Đang dùng danh sách lưu sẵn vì không kết nối được máy chủ.",
     "close": "Đóng"
   },
-  "quality": { "label": "Chất lượng đồ họa", "low": "Thấp", "medium": "Vừa", "high": "Cao" },
-  "errors": { "network": "Không kết nối được. Vui lòng thử lại." }
+  "quality": {
+    "label": "Chất lượng đồ họa",
+    "low": "Thấp",
+    "medium": "Vừa",
+    "high": "Cao"
+  },
+  "errors": {
+    "network": "Không kết nối được. Vui lòng thử lại."
+  },
+  "login": {
+    "welcome": "Chào mừng tới Bệnh viện tâm thần online",
+    "intro": "Một không gian để được lắng nghe. Các bác sĩ ở đây là AI, không phải bác sĩ thật.",
+    "google": "Đăng nhập bằng Google",
+    "adultsOnly": "Chỉ dành cho người từ 18 tuổi."
+  },
+  "age": {
+    "title": "Bạn từ 18 tuổi trở lên chứ?",
+    "yes": "Có, tôi từ 18 tuổi trở lên",
+    "no": "Chưa, tôi dưới 18 tuổi",
+    "underageTitle": "Dịch vụ này chỉ dành cho người từ 18 tuổi",
+    "underageBody": "Nếu bạn đang gặp khó khăn, bạn có thể gọi:"
+  },
+  "terms": {
+    "title": "Trước khi vào viện",
+    "agree": "Đồng ý và tiếp tục",
+    "needAll": "Bạn cần tick đủ các ô để tiếp tục."
+  },
+  "avatar": {
+    "title": "Tạo nhân vật của bạn",
+    "nickname": "Biệt danh",
+    "nicknameHint": "2–20 ký tự. Người khác chỉ thấy biệt danh, không thấy tên thật hay email.",
+    "head": "Khuôn mặt",
+    "hair": "Kiểu tóc",
+    "outfit": "Trang phục",
+    "accessory": "Phụ kiện",
+    "none": "Không",
+    "skin": "Màu da",
+    "hairColor": "Màu tóc",
+    "outfitColor": "Màu áo",
+    "done": "Vào phòng của tôi",
+    "taken": "Biệt danh này đã có người dùng.",
+    "invalid": "Biệt danh chưa hợp lệ."
+  },
+  "room": {
+    "label": "Phòng {wing}-{floor}{room}",
+    "callDoctor": "Gọi bác sĩ",
+    "settings": "Cài đặt"
+  },
+  "chat": {
+    "chooseDoctor": "Chọn bác sĩ để trò chuyện",
+    "aiLabel": "AI",
+    "placeholder": "Viết điều bạn muốn kể…",
+    "send": "Gửi",
+    "thinking": "Bác sĩ đang trả lời…",
+    "usage": "Còn {left}/{limit} lượt hôm nay",
+    "limit": "Bạn đã dùng hết lượt hỏi hôm nay. Lượt mới có lúc 0:00.",
+    "unavailable": "Bác sĩ AI đang tạm thời không trả lời được. Nút \"Cần giúp đỡ ngay\" vẫn luôn dùng được.",
+    "resources": "Nếu bạn cần nói chuyện với người thật:",
+    "back": "Đổi bác sĩ",
+    "history": "Cuộc trò chuyện trước",
+    "new": "Cuộc mới",
+    "deleteConv": "Xóa cuộc này",
+    "confirmDeleteConv": "Xóa vĩnh viễn cuộc trò chuyện này?",
+    "close": "Đóng",
+    "disclaimer": "Bác sĩ là AI, không chẩn đoán và không kê thuốc."
+  },
+  "feedback": {
+    "question": "Bạn có cảm thấy được lắng nghe không?",
+    "yes": "Có",
+    "somewhat": "Một phần",
+    "no": "Không",
+    "skip": "Bỏ qua",
+    "thanks": "Cảm ơn bạn!"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "language": "Ngôn ngữ",
+    "deleteHistory": "Xóa toàn bộ lịch sử trò chuyện",
+    "confirmDeleteHistory": "Xóa vĩnh viễn toàn bộ lịch sử trò chuyện?",
+    "deleteAccount": "Xóa tài khoản",
+    "confirmDeleteAccount": "Gõ XOA để xác nhận xóa vĩnh viễn tài khoản và dữ liệu:",
+    "confirmWord": "XOA",
+    "logout": "Đăng xuất",
+    "done": "Đã xong",
+    "close": "Đóng"
+  }
 }

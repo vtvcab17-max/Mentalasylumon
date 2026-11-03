@@ -117,13 +117,13 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 - [X] T051 [US1] Viết `GET /api/doctors`, `GET /api/usage`, CRUD `/api/conversations`, `POST /api/conversations/:id/messages` (SSE `meta`/`token`/`crisis`/`done`/`error`, nhãn "AI") trong `apps/worker/src/api/conversations.ts`
 - [X] T052 [US1] Viết `POST /api/feedback` trong `apps/worker/src/api/feedback.ts` (SC-007)
 - [X] T053 [US1] Viết `DELETE /api/me` trong `apps/worker/src/api/account.ts`: ẩn ngay, `deleteAll` PatientRecord, giải phóng phòng, đặt lịch xóa hẳn ≤ 30 ngày (SC-008)
-- [ ] T054 [P] [US1] Viết màn chọn ngôn ngữ đầu tiên (gợi ý theo ngôn ngữ trình duyệt) trong `apps/client/src/features/onboarding/language-picker.ts` (FR-036)
-- [ ] T055 [US1] Viết màn đăng nhập, xác nhận 18+, điều khoản với từng ô tick riêng không tick sẵn trong `apps/client/src/features/onboarding/onboarding.ts`
-- [ ] T056 [P] [US1] Dựng nhân vật chibi ghép bộ phận, 3 animation đứng/đi/ngồi, trong `apps/client/src/avatar/avatar.ts` và màn tạo nhân vật `apps/client/src/features/onboarding/create-avatar.ts`
+- [X] T054 [P] [US1] Viết màn chọn ngôn ngữ đầu tiên (gợi ý theo ngôn ngữ trình duyệt) trong `apps/client/src/features/onboarding/language-picker.ts` (FR-036)
+- [X] T055 [US1] Viết màn đăng nhập, xác nhận 18+, điều khoản với từng ô tick riêng không tick sẵn trong `apps/client/src/features/onboarding/onboarding.ts`
+- [X] T056 [P] [US1] Dựng nhân vật chibi ghép bộ phận, 3 animation đứng/đi/ngồi, trong `apps/client/src/avatar/avatar.ts` và màn tạo nhân vật `apps/client/src/features/onboarding/create-avatar.ts`
 - [ ] T057 [P] [US1] Làm model phòng riêng chibi (GLB ≤ 2 MB) trong `assets-src/room/` và xuất ra `apps/client/public/models/room.glb`
-- [ ] T058 [US1] Viết cảnh phòng riêng trong `apps/client/src/world/private-room.ts`
-- [ ] T059 [US1] Viết giao diện trò chuyện với bác sĩ (chọn bác sĩ, luồng SSE, nhãn "AI", khối đường dây nóng khi `crisis`, đếm lượt, xem/xóa lịch sử, hỏi "được lắng nghe?") trong `apps/client/src/features/doctor-chat/doctor-chat.ts`
-- [ ] T060 [US1] Viết trang cài đặt (đổi ngôn ngữ, đổi mức đồ họa, xóa lịch sử, xóa tài khoản, đăng xuất) trong `apps/client/src/ui/settings.ts`
+- [X] T058 [US1] Viết cảnh phòng riêng trong `apps/client/src/world/private-room.ts`
+- [X] T059 [US1] Viết giao diện trò chuyện với bác sĩ (chọn bác sĩ, luồng SSE, nhãn "AI", khối đường dây nóng khi `crisis`, đếm lượt, xem/xóa lịch sử, hỏi "được lắng nghe?") trong `apps/client/src/features/doctor-chat/doctor-chat.ts`
+- [X] T060 [US1] Viết trang cài đặt (đổi ngôn ngữ, đổi mức đồ họa, xóa lịch sử, xóa tài khoản, đăng xuất) trong `apps/client/src/ui/settings.ts`
 - [X] T061 [US1] Viết trang admin tối thiểu cho cờ khủng hoảng (danh sách không kèm nội dung; mở chi tiết thì ghi `flag_access_log` trước; resolve) trong `apps/worker/src/admin/flags.ts`, bảo vệ bằng Cloudflare Access + danh sách email admin (FR-018, research.md §R12)
 - [ ] T062 [US1] Chạy `pnpm eval:safety --lang vi,en` với Haiku 5.5 và Sonnet 5.5, ghi kết quả và model đã chọn vào `evals/RESULTS.md` (research.md §R6)
 

@@ -1,5 +1,7 @@
 {
-  "app": { "title": "Online Mental Hospital" },
+  "app": {
+    "title": "Online Mental Hospital"
+  },
   "lang": {
     "pickerTitle": "Choose your language",
     "pickerHint": "You can change this anytime in settings.",
@@ -17,6 +19,90 @@
     "offline": "Showing a saved list because the server can't be reached.",
     "close": "Close"
   },
-  "quality": { "label": "Graphics quality", "low": "Low", "medium": "Medium", "high": "High" },
-  "errors": { "network": "Couldn't connect. Please try again." }
+  "quality": {
+    "label": "Graphics quality",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "errors": {
+    "network": "Couldn't connect. Please try again."
+  },
+  "login": {
+    "welcome": "Welcome to the Online Mental Hospital",
+    "intro": "A place to be heard. The doctors here are AI, not real doctors.",
+    "google": "Sign in with Google",
+    "adultsOnly": "For people aged 18 and over only."
+  },
+  "age": {
+    "title": "Are you 18 or older?",
+    "yes": "Yes, I'm 18 or older",
+    "no": "No, I'm under 18",
+    "underageTitle": "This service is only for people aged 18 and over",
+    "underageBody": "If you're going through a hard time, you can call:"
+  },
+  "terms": {
+    "title": "Before you enter",
+    "agree": "Agree and continue",
+    "needAll": "Please tick every box to continue."
+  },
+  "avatar": {
+    "title": "Create your character",
+    "nickname": "Nickname",
+    "nicknameHint": "2–20 characters. Others only see your nickname, never your real name or email.",
+    "head": "Face",
+    "hair": "Hair",
+    "outfit": "Outfit",
+    "accessory": "Accessory",
+    "none": "None",
+    "skin": "Skin",
+    "hairColor": "Hair colour",
+    "outfitColor": "Outfit colour",
+    "done": "Go to my room",
+    "taken": "That nickname is taken.",
+    "invalid": "That nickname isn't valid."
+  },
+  "room": {
+    "label": "Room {wing}-{floor}{room}",
+    "callDoctor": "Call a doctor",
+    "settings": "Settings"
+  },
+  "chat": {
+    "chooseDoctor": "Choose a doctor to talk to",
+    "aiLabel": "AI",
+    "placeholder": "Write what's on your mind…",
+    "send": "Send",
+    "thinking": "The doctor is replying…",
+    "usage": "{left}/{limit} messages left today",
+    "limit": "You've used all of today's messages. New ones arrive at midnight (Vietnam time).",
+    "unavailable": "The AI doctor can't reply right now. The \"Get help now\" button always works.",
+    "resources": "If you'd like to talk to a real person:",
+    "back": "Change doctor",
+    "history": "Earlier conversations",
+    "new": "New conversation",
+    "deleteConv": "Delete this conversation",
+    "confirmDeleteConv": "Permanently delete this conversation?",
+    "close": "Close",
+    "disclaimer": "The doctor is an AI — no diagnosis, no prescriptions."
+  },
+  "feedback": {
+    "question": "Did you feel heard?",
+    "yes": "Yes",
+    "somewhat": "Somewhat",
+    "no": "No",
+    "skip": "Skip",
+    "thanks": "Thank you!"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "deleteHistory": "Delete all chat history",
+    "confirmDeleteHistory": "Permanently delete all chat history?",
+    "deleteAccount": "Delete account",
+    "confirmDeleteAccount": "Type DELETE to permanently delete your account and data:",
+    "confirmWord": "DELETE",
+    "logout": "Sign out",
+    "done": "Done",
+    "close": "Close"
+  }
 }

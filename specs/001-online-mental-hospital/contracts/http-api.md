@@ -75,7 +75,7 @@ Thông báo lỗi trả theo `users.locale`. Khi chưa đăng nhập, ngôn ng�
 event: meta     data: {"messageId":"…","lang":"vi","label":"AI"}
 event: token    data: {"text":"…"}                       # lặp lại, chỉ khi không khủng hoảng
 event: crisis   data: {"message":"…mẫu cố định…","resources":[…],"lang":"vi"}   # thay cho token
-event: done     data: {"usage":{"used":7,"limit":20}}
+event: done     data: {"usage":{"used":7,"limit":20},"resources":[…] | null}   # resources khi mức concern
 event: error    data: {"code":"AI_UNAVAILABLE"}
 ```
 
