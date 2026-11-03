@@ -78,15 +78,15 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 - [X] T031 Viết `apps/worker/src/safety/output-check.ts` theo contracts/doctor-ai.md §5
 - [X] T032 Viết `apps/worker/src/safety/pipeline.ts` ghép 4 lớp (từ khóa → phân loại → mẫu khủng hoảng hoặc gọi model → kiểm tra đầu ra) dùng chung cho chat, vòng và hỏi đáp
 - [X] T033 Viết migration `apps/worker/migrations/0002_flags.sql` (`crisis_flags` với excerpt mã hóa, status `open`|`in_review`|`resolved`; `flag_access_log`) và `apps/worker/src/safety/flags.ts` tạo cờ và gửi webhook admin
-- [ ] T034 Viết script chạy bộ kiểm thử `evals/run-safety.ts` (`pnpm eval:safety --lang vi,en`) với ngưỡng contracts/doctor-ai.md §7, trả mã lỗi khác 0 khi không đạt
+- [X] T034 Viết script chạy bộ kiểm thử `evals/run-safety.ts` (`pnpm eval:safety --lang vi,en`) với ngưỡng contracts/doctor-ai.md §7, trả mã lỗi khác 0 khi không đạt
 - [X] T035 [P] Viết `GET /api/support-resources?lang=` (công khai, cache 5 phút) trong `apps/worker/src/api/support.ts`
 
 ### Client nền
 
-- [ ] T036 [P] Tạo `apps/client/src/i18n/vi.json`, `apps/client/src/i18n/en.json`, `apps/client/src/i18n/index.ts` và script `scripts/i18n-check.ts` (`pnpm i18n:check`) làm build thất bại khi thiếu khóa (SC-011, Constitution V)
-- [ ] T037 [P] Viết `apps/client/src/ui/help-button.ts`: nút "Cần giúp đỡ ngay" luôn hiện, gọi `/api/support-resources`, có danh sách dự phòng nhúng sẵn khi mất mạng (FR-021)
-- [ ] T038 Viết `apps/client/src/engine/renderer.ts`: Three.js, loader GLB, 3 mức đồ họa thấp/vừa/cao lưu trong trình duyệt (FR-006a, research.md §R5)
-- [ ] T039 [P] Viết `apps/client/src/net/api.ts`: fetch có header `X-Requested-With`, xử lý mã lỗi chung, đọc SSE
+- [X] T036 [P] Tạo `apps/client/src/i18n/vi.json`, `apps/client/src/i18n/en.json`, `apps/client/src/i18n/index.ts` và script `scripts/i18n-check.ts` (`pnpm i18n:check`) làm build thất bại khi thiếu khóa (SC-011, Constitution V)
+- [X] T037 [P] Viết `apps/client/src/ui/help-button.ts`: nút "Cần giúp đỡ ngay" luôn hiện, gọi `/api/support-resources`, có danh sách dự phòng nhúng sẵn khi mất mạng (FR-021)
+- [X] T038 Viết `apps/client/src/engine/renderer.ts`: Three.js, loader GLB, 3 mức đồ họa thấp/vừa/cao lưu trong trình duyệt (FR-006a, research.md §R5)
+- [X] T039 [P] Viết `apps/client/src/net/api.ts`: fetch có header `X-Requested-With`, xử lý mã lỗi chung, đọc SSE
 
 **Checkpoint**: Foundation ready — `pnpm test` xanh cho crypto và safety, `pnpm eval:safety` chạy được
 

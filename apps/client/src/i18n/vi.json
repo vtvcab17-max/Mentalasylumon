@@ -1,0 +1,22 @@
+{
+  "app": { "title": "Bệnh viện tâm thần online" },
+  "lang": {
+    "pickerTitle": "Chọn ngôn ngữ",
+    "pickerHint": "Bạn có thể đổi lại bất cứ lúc nào trong phần cài đặt.",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "help": {
+    "button": "Cần giúp đỡ ngay",
+    "title": "Bạn không phải đối mặt một mình",
+    "emergency": "Nếu bạn đang gặp nguy hiểm ngay lúc này, hãy gọi {number} hoặc đến phòng cấp cứu gần nhất.",
+    "onDuty": "Đang trực",
+    "offDuty": "Ngoài giờ",
+    "call": "Gọi",
+    "open": "Mở trang",
+    "offline": "Đang dùng danh sách lưu sẵn vì không kết nối được máy chủ.",
+    "close": "Đóng"
+  },
+  "quality": { "label": "Chất lượng đồ họa", "low": "Thấp", "medium": "Vừa", "high": "Cao" },
+  "errors": { "network": "Không kết nối được. Vui lòng thử lại." }
+}

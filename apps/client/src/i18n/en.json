@@ -1,0 +1,22 @@
+{
+  "app": { "title": "Online Mental Hospital" },
+  "lang": {
+    "pickerTitle": "Choose your language",
+    "pickerHint": "You can change this anytime in settings.",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "help": {
+    "button": "Get help now",
+    "title": "You don't have to face this alone",
+    "emergency": "If you are in danger right now, call {number} or go to the nearest emergency room.",
+    "onDuty": "Open now",
+    "offDuty": "Closed now",
+    "call": "Call",
+    "open": "Open",
+    "offline": "Showing a saved list because the server can't be reached.",
+    "close": "Close"
+  },
+  "quality": { "label": "Graphics quality", "low": "Low", "medium": "Medium", "high": "High" },
+  "errors": { "network": "Couldn't connect. Please try again." }
+}

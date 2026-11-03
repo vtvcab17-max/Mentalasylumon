@@ -1,32 +1,28 @@
 import * as THREE from "three";
+import { Engine } from "./engine/renderer";
+import { getLocale, onLocaleChange, t } from "./i18n";
+import { mountHelpButton } from "./ui/help-button";
 
-// Setup (T003): cảnh 3D tối thiểu để kiểm tra build. Renderer thật ở T038.
-const canvas = document.querySelector<HTMLCanvasElement>("#scene")!;
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+// Nút hỗ trợ khẩn cấp gắn trước tiên, độc lập với mọi phần khác (Constitution I).
+mountHelpButton();
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color("#f4efe6");
-const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-camera.position.set(0, 2, 5);
+document.documentElement.lang = getLocale();
+const setTitle = () => (document.title = t("app.title"));
+setTitle();
+onLocaleChange(setTitle);
 
-scene.add(new THREE.HemisphereLight("#ffffff", "#c9b89a", 1.2));
+// Cảnh tạm cho tới khi có thế giới thật (US1/US2).
+const engine = new Engine(document.querySelector<HTMLCanvasElement>("#scene")!);
+engine.camera.position.set(0, 2, 5);
+engine.camera.lookAt(0, 0.8, 0);
+engine.scene.add(new THREE.HemisphereLight("#ffffff", "#c9b89a", 1.2));
+const sun = new THREE.DirectionalLight("#ffffff", 1);
+sun.position.set(3, 6, 4);
+engine.scene.add(sun);
 const placeholder = new THREE.Mesh(
   new THREE.CapsuleGeometry(0.4, 0.4, 8, 16),
   new THREE.MeshStandardMaterial({ color: "#8fc1b5" }),
 );
 placeholder.position.y = 0.8;
-scene.add(placeholder);
-
-function resize() {
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-}
-window.addEventListener("resize", resize);
-resize();
-
-renderer.setAnimationLoop((t) => {
-  placeholder.rotation.y = t / 1500;
-  renderer.render(scene, camera);
-});
+engine.scene.add(placeholder);
+engine.onFrame((dt) => (placeholder.rotation.y += dt * 0.7));
