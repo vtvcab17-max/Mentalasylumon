@@ -125,7 +125,7 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 - [X] T059 [US1] Viết giao diện trò chuyện với bác sĩ (chọn bác sĩ, luồng SSE, nhãn "AI", khối đường dây nóng khi `crisis`, đếm lượt, xem/xóa lịch sử, hỏi "được lắng nghe?") trong `apps/client/src/features/doctor-chat/doctor-chat.ts`
 - [X] T060 [US1] Viết trang cài đặt (đổi ngôn ngữ, đổi mức đồ họa, xóa lịch sử, xóa tài khoản, đăng xuất) trong `apps/client/src/ui/settings.ts`
 - [X] T061 [US1] Viết trang admin tối thiểu cho cờ khủng hoảng (danh sách không kèm nội dung; mở chi tiết thì ghi `flag_access_log` trước; resolve) trong `apps/worker/src/admin/flags.ts`, bảo vệ bằng Cloudflare Access + danh sách email admin (FR-018, research.md §R12)
-- [ ] T062 [US1] Chạy `pnpm eval:safety --lang vi,en` với Haiku 5.5 và Sonnet 5.5, ghi kết quả và model đã chọn vào `evals/RESULTS.md` (research.md §R6)
+- [ ] T062 [US1] Chạy `pnpm eval:safety --lang vi,en` với model Workers AI đang cấu hình (research.md §R6), ghi kết quả và model đã chọn vào `evals/RESULTS.md` (research.md §R6)
 
 **Checkpoint**: US1 chạy độc lập và đạt SC-001, SC-002, SC-003, SC-007, SC-008 — đây là bản MVP có thể mời thử nghiệm kín
 
