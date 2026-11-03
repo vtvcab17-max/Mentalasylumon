@@ -1,22 +1,24 @@
 {
   // Bệnh viện tâm thần online — một Worker: client 3D (static assets) + API + Durable Objects
-  "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "benh-vien-online",
-  "main": "src/index.ts",
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Tên phải trùng với Worker trên Cloudflare (Workers Builds).
+  "name": "mentalasylumon",
+  "main": "apps/worker/src/index.ts",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat"],
 
   "assets": {
-    "directory": "../client/dist",
+    "directory": "apps/client/dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*", "/auth/*", "/ws/*", "/admin/*"]
   },
 
   "d1_databases": [
-    { "binding": "DB", "database_name": "benh-vien-dev", "database_id": "REPLACE_WITH_DEV_DATABASE_ID", "migrations_dir": "migrations" }
+    { "binding": "DB", "database_name": "benh-vien-dev", "database_id": "1c8ae363-563b-4881-9f5d-8ba99adec4ce", "migrations_dir": "apps/worker/migrations" }
   ],
-  "r2_buckets": [{ "binding": "ASSETS_BUCKET", "bucket_name": "benh-vien-assets-dev" }],
+  // R2 tạm tắt: tài khoản chưa bật R2 (Dashboard → R2). Bật lại khi cần tài sản 3D/audio (T057, T091).
+  // "r2_buckets": [{ "binding": "ASSETS_BUCKET", "bucket_name": "benh-vien-assets-dev" }],
 
   "durable_objects": {
     "bindings": [
@@ -40,14 +42,14 @@
     "staging": {
       "vars": { "APP_ENV": "staging", "AI_GATEWAY_ACCOUNT_ID": "", "AI_GATEWAY_ID": "benh-vien" },
       "d1_databases": [
-        { "binding": "DB", "database_name": "benh-vien-staging", "database_id": "REPLACE_WITH_STAGING_DATABASE_ID", "migrations_dir": "migrations" }
+        { "binding": "DB", "database_name": "benh-vien-staging", "database_id": "REPLACE_WITH_STAGING_DATABASE_ID", "migrations_dir": "apps/worker/migrations" }
       ],
       "r2_buckets": [{ "binding": "ASSETS_BUCKET", "bucket_name": "benh-vien-assets-staging" }]
     },
     "production": {
       "vars": { "APP_ENV": "production", "AI_GATEWAY_ACCOUNT_ID": "", "AI_GATEWAY_ID": "benh-vien" },
       "d1_databases": [
-        { "binding": "DB", "database_name": "benh-vien", "database_id": "REPLACE_WITH_PRODUCTION_DATABASE_ID", "migrations_dir": "migrations" }
+        { "binding": "DB", "database_name": "benh-vien", "database_id": "REPLACE_WITH_PRODUCTION_DATABASE_ID", "migrations_dir": "apps/worker/migrations" }
       ],
       "r2_buckets": [{ "binding": "ASSETS_BUCKET", "bucket_name": "benh-vien-assets" }]
     }

@@ -5,7 +5,7 @@ export interface Env {
 
   DB: D1Database;
   ASSETS: Fetcher;
-  ASSETS_BUCKET: R2Bucket;
+  ASSETS_BUCKET?: R2Bucket; // tạm tắt cho tới khi bật R2
 
   WORLD_ZONE: DurableObjectNamespace;
   CIRCLE_ROOM: DurableObjectNamespace;

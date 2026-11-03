@@ -34,17 +34,12 @@ pnpm test
 ## Đưa lên GitHub và Cloudflare (Workers Builds)
 
 1. Repo: https://github.com/vtvcab17-max/Mentalasylumon (nhánh `main`).
-2. Tạo tài nguyên Cloudflare và ghi `database_id` vào `apps/worker/wrangler.jsonc`:
-   ```bash
-   cd apps/worker
-   npx wrangler d1 create benh-vien-dev
-   npx wrangler r2 bucket create benh-vien-assets-dev
-   ```
-3. Trong Cloudflare dashboard: **Workers & Pages → Create → Import a repository**, chọn repo, rồi:
-   - Root directory: `apps/worker`
-   - Build command: `cd ../.. && pnpm install && pnpm build`
-   - Deploy command: `npx wrangler deploy`
-   - Bật preview cho pull request (non-production branches)
+2. D1 `benh-vien-dev` đã tạo (APAC) và đã áp migration 0001–0002 + dữ liệu khởi tạo. `wrangler.jsonc`
+   nằm ở **thư mục gốc**, tên Worker `mentalasylumon`.
+   - Migration mới về sau: `npx wrangler d1 migrations apply benh-vien-dev --remote`
+   - R2 đang tạm tắt cho tới khi bật R2 trong dashboard (cần cho tài sản 3D/audio).
+3. Workers Builds: Root directory để trống, Build command `pnpm install && pnpm build`,
+   Deploy command `npx wrangler deploy`.
 4. Đặt secret cho từng môi trường: `npx wrangler secret put GOOGLE_CLIENT_ID` (tương tự cho
    `GOOGLE_CLIENT_SECRET`, `ANTHROPIC_API_KEY`, `ELEVENLABS_API_KEY`, `CHAT_ENCRYPTION_KEY`).
 5. Trên GitHub: **Settings → Secrets → Actions**, thêm `ANTHROPIC_API_KEY` và

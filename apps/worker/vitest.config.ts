@@ -9,7 +9,7 @@ export default defineWorkersConfig(async () => {
       poolOptions: {
         workers: {
           singleWorker: true,
-          wrangler: { configPath: "./wrangler.jsonc" },
+          wrangler: { configPath: "../../wrangler.jsonc" },
           miniflare: {
             bindings: {
               APP_ENV: "dev",
