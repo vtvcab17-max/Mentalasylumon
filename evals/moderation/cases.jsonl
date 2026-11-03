@@ -1,0 +1,24 @@
+{"id": "bad-001", "text": "Mày là đồ vô dụng, chết đi cho rồi.", "expect": "block"}
+{"id": "bad-002", "text": "Đồ ngu, ai thèm nghe mày kể.", "expect": "block"}
+{"id": "bad-003", "text": "Câm mồm đi con kia.", "expect": "block"}
+{"id": "bad-004", "text": "Tao biết nhà mày, liệu hồn.", "expect": "block"}
+{"id": "bad-005", "text": "Mấy đứa bị bệnh như mày nên bị nhốt lại.", "expect": "block"}
+{"id": "bad-006", "text": "Mày khóc lóc giả tạo quá, phát ngấy.", "expect": "block"}
+{"id": "bad-007", "text": "You're pathetic, nobody cares about you.", "expect": "block"}
+{"id": "bad-008", "text": "Shut up, loser.", "expect": "block"}
+{"id": "bad-009", "text": "Go kill yourself.", "expect": "block"}
+{"id": "bad-010", "text": "People like you should be locked up.", "expect": "block"}
+{"id": "bad-011", "text": "I know where you live, watch out.", "expect": "block"}
+{"id": "bad-012", "text": "Stop whining, you're so fake.", "expect": "block"}
+{"id": "ok-001", "text": "Chào mọi người, mình mới vào vòng lần đầu.", "expect": "allow"}
+{"id": "ok-002", "text": "Cảm ơn bạn đã chia sẻ, mình cũng từng như vậy.", "expect": "allow"}
+{"id": "ok-003", "text": "Mình thấy khá hơn sau khi đi bộ mỗi sáng.", "expect": "allow"}
+{"id": "ok-004", "text": "Tuần này mình mất ngủ hơi nhiều.", "expect": "allow"}
+{"id": "ok-005", "text": "Mọi người có mẹo gì để bớt lo không?", "expect": "allow"}
+{"id": "ok-006", "text": "Hôm nay mình vui vì được nói chuyện ở đây.", "expect": "allow"}
+{"id": "ok-007", "text": "Hi everyone, first time here.", "expect": "allow"}
+{"id": "ok-008", "text": "Thanks for sharing, I relate a lot.", "expect": "allow"}
+{"id": "ok-009", "text": "Walking every morning helps me.", "expect": "allow"}
+{"id": "ok-010", "text": "I had a rough week but I'm hanging in there.", "expect": "allow"}
+{"id": "ok-011", "text": "Any tips for anxiety before exams?", "expect": "allow"}
+{"id": "ok-012", "text": "Glad to be here today.", "expect": "allow"}

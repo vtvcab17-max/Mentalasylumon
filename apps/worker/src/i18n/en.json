@@ -1,0 +1,19 @@
+{
+  "errors": {
+    "NOT_FOUND": "Not found.",
+    "UNAUTHENTICATED": "Please sign in to continue.",
+    "AGE_REQUIRED": "Please confirm that you are 18 or older.",
+    "UNDERAGE": "This service is only for people aged 18 and over.",
+    "CONSENT_REQUIRED": "Please read and accept the terms to continue.",
+    "PROFILE_REQUIRED": "Please choose a nickname and a character.",
+    "SUSPENDED": "Your account is temporarily suspended.",
+    "BANNED": "Your account has been banned.",
+    "DAILY_LIMIT_REACHED": "You've used all of today's messages. The \"Get help now\" button always works.",
+    "RATE_LIMITED": "You're sending a bit fast — please wait a moment.",
+    "VALIDATION": "Some of the data is invalid.",
+    "CSRF": "Invalid request.",
+    "AUTH_FAILED": "Google sign-in didn't work. Please try again.",
+    "AI_UNAVAILABLE": "The AI doctor can't reply right now. The \"Get help now\" button always works.",
+    "NOT_IMPLEMENTED": "This feature isn't available yet."
+  }
+}

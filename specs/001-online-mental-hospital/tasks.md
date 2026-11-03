@@ -46,40 +46,40 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 
 ### Dữ liệu và cấu hình
 
-- [ ] T011 Viết migration D1 `apps/worker/migrations/0001_core.sql`: `users` (locale `vi`|`en`; nickname 2–20 ký tự, UNIQUE không phân biệt hoa thường; status `active`|`suspended`|`banned`|`deleted`), `consents`, `sessions`, `blocks`, `settings`, `support_resources` (name_vi, name_en, phone, url, scope `emergency`|`crisis`|`youth`|`violence`|`international`, schedule JSON, locales, verified_at NOT NULL)
-- [ ] T012 [P] Viết `apps/worker/src/db/settings.ts` đọc `settings` có giá trị mặc định (daily_message_limit 20, zone_capacity 150, lecture_capacity 200, model_chat `claude-haiku-5-5`, model_classifier `claude-haiku-5-5`, terms_version, default_locale `vi`)
-- [ ] T013 [P] Viết seed `apps/worker/seed/dev.sql` cho đường dây nóng theo research.md §R8 (115, 113, Ngày Mai 096 306 1414 thứ 4–CN 13:00–20:30, HOPE 086 50 444 00 16:30–20:30, 111, Find A Helpline chỉ `en`) và script `pnpm seed:dev`
+- [X] T011 Viết migration D1 `apps/worker/migrations/0001_core.sql`: `users` (locale `vi`|`en`; nickname 2–20 ký tự, UNIQUE không phân biệt hoa thường; status `active`|`suspended`|`banned`|`deleted`), `consents`, `sessions`, `blocks`, `settings`, `support_resources` (name_vi, name_en, phone, url, scope `emergency`|`crisis`|`youth`|`violence`|`international`, schedule JSON, locales, verified_at NOT NULL)
+- [X] T012 [P] Viết `apps/worker/src/db/settings.ts` đọc `settings` có giá trị mặc định (daily_message_limit 20, zone_capacity 150, lecture_capacity 200, model_chat `claude-haiku-5-5`, model_classifier `claude-haiku-5-5`, terms_version, default_locale `vi`)
+- [X] T013 [P] Viết seed `apps/worker/seed/dev.sql` cho đường dây nóng theo research.md §R8 (115, 113, Ngày Mai 096 306 1414 thứ 4–CN 13:00–20:30, HOPE 086 50 444 00 16:30–20:30, 111, Find A Helpline chỉ `en`) và script `pnpm seed:dev`
 
 ### Bảo mật và đăng nhập
 
-- [ ] T014 [P] Viết test mã hóa (round-trip, IV khác nhau mỗi lần, sai khóa thì lỗi) trong `apps/worker/test/crypto.test.ts`
-- [ ] T015 Viết `apps/worker/src/crypto/aes.ts`: AES-GCM dùng `CHAT_ENCRYPTION_KEY`
-- [ ] T016 Viết `apps/worker/src/auth/google.ts`: luồng OIDC Authorization Code + PKCE bằng `arctic`, `/auth/google/start?lang=` và `/auth/google/callback`, chỉ lưu `google_sub` và email đã xác minh (research.md §R4)
-- [ ] T017 Viết `apps/worker/src/auth/session.ts`: cookie `sid` HttpOnly/Secure/SameSite=Lax, lưu hash token trong `sessions`, hết hạn 30 ngày, middleware kiểm `X-Requested-With: bvo`
-- [ ] T018 Viết `apps/worker/src/api/guards.ts`: middleware trả mã lỗi `UNAUTHENTICATED`, `AGE_REQUIRED`, `CONSENT_REQUIRED`, `PROFILE_REQUIRED`, `SUSPENDED`, `BANNED` theo contracts/http-api.md
-- [ ] T019 [P] Viết `apps/worker/src/identity/identity-store.ts`: interface `IdentityStore` cùng bản cài D1, để sau chuyển sang Postgres VN qua Hyperdrive (research.md §R13, Constitution IV)
+- [X] T014 [P] Viết test mã hóa (round-trip, IV khác nhau mỗi lần, sai khóa thì lỗi) trong `apps/worker/test/crypto.test.ts`
+- [X] T015 Viết `apps/worker/src/crypto/aes.ts`: AES-GCM dùng `CHAT_ENCRYPTION_KEY`
+- [X] T016 Viết `apps/worker/src/auth/google.ts`: luồng OIDC Authorization Code + PKCE bằng `arctic`, `/auth/google/start?lang=` và `/auth/google/callback`, chỉ lưu `google_sub` và email đã xác minh (research.md §R4)
+- [X] T017 Viết `apps/worker/src/auth/session.ts`: cookie `sid` HttpOnly/Secure/SameSite=Lax, lưu hash token trong `sessions`, hết hạn 30 ngày, middleware kiểm `X-Requested-With: bvo`
+- [X] T018 Viết `apps/worker/src/api/guards.ts`: middleware trả mã lỗi `UNAUTHENTICATED`, `AGE_REQUIRED`, `CONSENT_REQUIRED`, `PROFILE_REQUIRED`, `SUSPENDED`, `BANNED` theo contracts/http-api.md
+- [X] T019 [P] Viết `apps/worker/src/identity/identity-store.ts`: interface `IdentityStore` cùng bản cài D1, để sau chuyển sang Postgres VN qua Hyperdrive (research.md §R13, Constitution IV)
 
 ### Router và schema dùng chung
 
-- [ ] T020 Viết `apps/worker/src/index.ts`: router Hono, phục vụ static assets, định dạng lỗi chung `{error:{code,message}}` theo locale, nâng cấp WebSocket tới các Durable Object
-- [ ] T021 [P] Định nghĩa schema zod cho tin WebSocket và body HTTP trong `packages/shared/src/protocol.ts` và `packages/shared/src/api.ts` theo contracts/
+- [X] T020 Viết `apps/worker/src/index.ts`: router Hono, phục vụ static assets, định dạng lỗi chung `{error:{code,message}}` theo locale, nâng cấp WebSocket tới các Durable Object
+- [X] T021 [P] Định nghĩa schema zod cho tin WebSocket và body HTTP trong `packages/shared/src/protocol.ts` và `packages/shared/src/api.ts` theo contracts/
 
 ### An toàn (lõi dùng chung, Constitution I) — test trước
 
 - [ ] T022 [P] Tạo bộ mẫu an toàn `evals/safety/vi/` (≥ 200 khủng hoảng, 100 dụ chẩn đoán/kê thuốc, 50 jailbreak, 200 bình thường) và `evals/safety/en/` (100 / 50 / 25 / 100) dạng JSONL có nhãn mong đợi
 - [ ] T023 [P] Tạo bộ mẫu kiểm duyệt `evals/moderation/` (≥ 200 tin xấu và 200 tin bình thường, vi và en)
-- [ ] T024 [P] Viết test cho bộ lọc từ khóa (có dấu, không dấu, teencode, tiếng Anh) trong `apps/worker/test/safety/keywords.test.ts`
-- [ ] T025 [P] Viết test cho mẫu khủng hoảng: số điện thoại chỉ đến từ `support_resources`, chọn đường dây đang trực, câu thay thế khi ngoài giờ, bản `en` có đường dẫn quốc tế, trong `apps/worker/test/safety/crisis-template.test.ts`
-- [ ] T026 [P] Viết test kiểm tra đầu ra (chặn tên thuốc kèm liều, câu chẩn đoán, xóa số điện thoại do AI viết) trong `apps/worker/test/safety/output-check.test.ts`
-- [ ] T027 Viết `apps/worker/src/safety/keywords.ts` với danh sách `vi` và `en` (research.md §R7 lớp 1)
-- [ ] T028 Viết `apps/worker/src/ai/gateway.ts`: gọi model qua AI Gateway, đọc model từ `settings`, có timeout
-- [ ] T029 Viết `apps/worker/src/safety/classifier.ts`: trả `{level, category, asks_diagnosis, asks_medication, lang}` theo contracts/doctor-ai.md §3; lỗi hoặc hết thời gian thì mặc định `concern`
-- [ ] T030 Viết `apps/worker/src/safety/crisis-template.ts`: mẫu `vi`/`en` theo contracts/doctor-ai.md §4, đọc `support_resources` và tính `onDutyNow` theo giờ Asia/Ho_Chi_Minh
-- [ ] T031 Viết `apps/worker/src/safety/output-check.ts` theo contracts/doctor-ai.md §5
-- [ ] T032 Viết `apps/worker/src/safety/pipeline.ts` ghép 4 lớp (từ khóa → phân loại → mẫu khủng hoảng hoặc gọi model → kiểm tra đầu ra) dùng chung cho chat, vòng và hỏi đáp
-- [ ] T033 Viết migration `apps/worker/migrations/0002_flags.sql` (`crisis_flags` với excerpt mã hóa, status `open`|`in_review`|`resolved`; `flag_access_log`) và `apps/worker/src/safety/flags.ts` tạo cờ và gửi webhook admin
+- [X] T024 [P] Viết test cho bộ lọc từ khóa (có dấu, không dấu, teencode, tiếng Anh) trong `apps/worker/test/safety/keywords.test.ts`
+- [X] T025 [P] Viết test cho mẫu khủng hoảng: số điện thoại chỉ đến từ `support_resources`, chọn đường dây đang trực, câu thay thế khi ngoài giờ, bản `en` có đường dẫn quốc tế, trong `apps/worker/test/safety/crisis-template.test.ts`
+- [X] T026 [P] Viết test kiểm tra đầu ra (chặn tên thuốc kèm liều, câu chẩn đoán, xóa số điện thoại do AI viết) trong `apps/worker/test/safety/output-check.test.ts`
+- [X] T027 Viết `apps/worker/src/safety/keywords.ts` với danh sách `vi` và `en` (research.md §R7 lớp 1)
+- [X] T028 Viết `apps/worker/src/ai/gateway.ts`: gọi model qua AI Gateway, đọc model từ `settings`, có timeout
+- [X] T029 Viết `apps/worker/src/safety/classifier.ts`: trả `{level, category, asks_diagnosis, asks_medication, lang}` theo contracts/doctor-ai.md §3; lỗi hoặc hết thời gian thì mặc định `concern`
+- [X] T030 Viết `apps/worker/src/safety/crisis-template.ts`: mẫu `vi`/`en` theo contracts/doctor-ai.md §4, đọc `support_resources` và tính `onDutyNow` theo giờ Asia/Ho_Chi_Minh
+- [X] T031 Viết `apps/worker/src/safety/output-check.ts` theo contracts/doctor-ai.md §5
+- [X] T032 Viết `apps/worker/src/safety/pipeline.ts` ghép 4 lớp (từ khóa → phân loại → mẫu khủng hoảng hoặc gọi model → kiểm tra đầu ra) dùng chung cho chat, vòng và hỏi đáp
+- [X] T033 Viết migration `apps/worker/migrations/0002_flags.sql` (`crisis_flags` với excerpt mã hóa, status `open`|`in_review`|`resolved`; `flag_access_log`) và `apps/worker/src/safety/flags.ts` tạo cờ và gửi webhook admin
 - [ ] T034 Viết script chạy bộ kiểm thử `evals/run-safety.ts` (`pnpm eval:safety --lang vi,en`) với ngưỡng contracts/doctor-ai.md §7, trả mã lỗi khác 0 khi không đạt
-- [ ] T035 [P] Viết `GET /api/support-resources?lang=` (công khai, cache 5 phút) trong `apps/worker/src/api/support.ts`
+- [X] T035 [P] Viết `GET /api/support-resources?lang=` (công khai, cache 5 phút) trong `apps/worker/src/api/support.ts`
 
 ### Client nền
 

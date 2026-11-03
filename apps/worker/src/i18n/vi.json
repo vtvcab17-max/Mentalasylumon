@@ -1,0 +1,19 @@
+{
+  "errors": {
+    "NOT_FOUND": "Không tìm thấy.",
+    "UNAUTHENTICATED": "Bạn cần đăng nhập để tiếp tục.",
+    "AGE_REQUIRED": "Bạn cần xác nhận mình từ 18 tuổi trở lên.",
+    "UNDERAGE": "Dịch vụ này chỉ dành cho người từ 18 tuổi trở lên.",
+    "CONSENT_REQUIRED": "Bạn cần đọc và đồng ý điều khoản để tiếp tục.",
+    "PROFILE_REQUIRED": "Bạn cần chọn biệt danh và nhân vật.",
+    "SUSPENDED": "Tài khoản của bạn đang bị khóa tạm thời.",
+    "BANNED": "Tài khoản của bạn đã bị khóa.",
+    "DAILY_LIMIT_REACHED": "Bạn đã dùng hết lượt hỏi hôm nay. Nút \"Cần giúp đỡ ngay\" vẫn luôn dùng được.",
+    "RATE_LIMITED": "Bạn gửi hơi nhanh, hãy chờ một chút.",
+    "VALIDATION": "Dữ liệu chưa hợp lệ.",
+    "CSRF": "Yêu cầu không hợp lệ.",
+    "AUTH_FAILED": "Đăng nhập Google không thành công. Vui lòng thử lại.",
+    "AI_UNAVAILABLE": "Bác sĩ AI đang tạm thời không trả lời được. Nút \"Cần giúp đỡ ngay\" vẫn luôn dùng được.",
+    "NOT_IMPLEMENTED": "Tính năng này chưa có."
+  }
+}
