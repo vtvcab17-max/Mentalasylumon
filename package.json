@@ -1,0 +1,33 @@
+{
+  "name": "benh-vien-online",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "pnpm --filter client build && pnpm --filter worker dev",
+    "build": "pnpm --filter client build",
+    "deploy": "pnpm build && pnpm --filter worker deploy",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "pnpm --filter worker test",
+    "test:e2e": "playwright test",
+    "i18n:check": "node scripts/i18n-check.mjs",
+    "eval:safety": "node evals/run-safety.mjs",
+    "eval:moderation": "node evals/run-moderation.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.48.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd",
+      "sharp"
+    ]
+  }
+}

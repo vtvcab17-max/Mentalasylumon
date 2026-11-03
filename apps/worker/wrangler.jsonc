@@ -1,0 +1,55 @@
+{
+  // Bệnh viện tâm thần online — một Worker: client 3D (static assets) + API + Durable Objects
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "benh-vien-online",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "assets": {
+    "directory": "../client/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/auth/*", "/ws/*", "/admin/*"]
+  },
+
+  "d1_databases": [
+    { "binding": "DB", "database_name": "benh-vien-dev", "database_id": "REPLACE_WITH_DEV_DATABASE_ID", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [{ "binding": "ASSETS_BUCKET", "bucket_name": "benh-vien-assets-dev" }],
+
+  "durable_objects": {
+    "bindings": [
+      { "name": "WORLD_ZONE", "class_name": "WorldZone" },
+      { "name": "CIRCLE_ROOM", "class_name": "CircleRoom" },
+      { "name": "LECTURE_HALL", "class_name": "LectureHall" },
+      { "name": "PATIENT_RECORD", "class_name": "PatientRecord" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["WorldZone", "CircleRoom", "LectureHall", "PatientRecord"] }
+  ],
+
+  "vars": { "APP_ENV": "dev", "AI_GATEWAY_ACCOUNT_ID": "", "AI_GATEWAY_ID": "benh-vien" },
+  // Secrets (wrangler secret put): GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, ANTHROPIC_API_KEY,
+  // ELEVENLABS_API_KEY, CHAT_ENCRYPTION_KEY. Không bao giờ ghi vào file này (Constitution).
+
+  "triggers": { "crons": ["17 19 * * *"] },
+
+  "env": {
+    "staging": {
+      "vars": { "APP_ENV": "staging", "AI_GATEWAY_ACCOUNT_ID": "", "AI_GATEWAY_ID": "benh-vien" },
+      "d1_databases": [
+        { "binding": "DB", "database_name": "benh-vien-staging", "database_id": "REPLACE_WITH_STAGING_DATABASE_ID", "migrations_dir": "migrations" }
+      ],
+      "r2_buckets": [{ "binding": "ASSETS_BUCKET", "bucket_name": "benh-vien-assets-staging" }]
+    },
+    "production": {
+      "vars": { "APP_ENV": "production", "AI_GATEWAY_ACCOUNT_ID": "", "AI_GATEWAY_ID": "benh-vien" },
+      "d1_databases": [
+        { "binding": "DB", "database_name": "benh-vien", "database_id": "REPLACE_WITH_PRODUCTION_DATABASE_ID", "migrations_dir": "migrations" }
+      ],
+      "r2_buckets": [{ "binding": "ASSETS_BUCKET", "bucket_name": "benh-vien-assets" }]
+    }
+  }
+}

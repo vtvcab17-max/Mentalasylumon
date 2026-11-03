@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm --filter worker typecheck
+      - run: pnpm build
+      - run: pnpm test
+
+      # Constitution I và V: các cổng dưới đây chặn merge.
+      # Script được thêm ở Phase 2 (T034, T036) và Phase 5 (T077); trước đó bước tự bỏ qua.
+      - name: i18n check (SC-011)
+        if: hashFiles('scripts/i18n-check.mjs') != ''
+        run: pnpm i18n:check
+      - name: Safety eval vi + en (SC-003)
+        if: hashFiles('evals/run-safety.mjs') != ''
+        run: pnpm eval:safety --lang vi,en
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AI_GATEWAY_ACCOUNT_ID: ${{ secrets.AI_GATEWAY_ACCOUNT_ID }}
+      - name: Moderation eval (SC-006)
+        if: hashFiles('evals/run-moderation.mjs') != ''
+        run: pnpm eval:moderation
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AI_GATEWAY_ACCOUNT_ID: ${{ secrets.AI_GATEWAY_ACCOUNT_ID }}
