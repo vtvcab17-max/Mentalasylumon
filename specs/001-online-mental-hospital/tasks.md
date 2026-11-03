@@ -100,23 +100,23 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 
 ### Tests for User Story 1
 
-- [ ] T040 [P] [US1] Viết test cấp phòng (lấy phòng trống nhỏ nhất, hết phòng thì mở tầng, đủ 10 tầng thì mở khu, chạy song song không trùng phòng) trong `apps/worker/test/rooms.test.ts`
-- [ ] T041 [P] [US1] Viết test `PatientRecord` (mã hóa khi lưu, giới hạn 20 tin/ngày theo giờ VN, xử lý tuần tự, `deleteAll`) trong `apps/worker/test/patient-record.test.ts`
-- [ ] T042 [P] [US1] Viết test onboarding (dưới 18 → `UNDERAGE` kèm nguồn cho người trẻ; ô đồng ý bắt buộc phải `true`; đổi `terms_version` thì phải đồng ý lại) trong `apps/worker/test/onboarding.test.ts`
+- [X] T040 [P] [US1] Viết test cấp phòng (lấy phòng trống nhỏ nhất, hết phòng thì mở tầng, đủ 10 tầng thì mở khu, chạy song song không trùng phòng) trong `apps/worker/test/rooms.test.ts`
+- [X] T041 [P] [US1] Viết test `PatientRecord` (mã hóa khi lưu, giới hạn 20 tin/ngày theo giờ VN, xử lý tuần tự, `deleteAll`) trong `apps/worker/test/patient-record.test.ts`
+- [X] T042 [P] [US1] Viết test onboarding (dưới 18 → `UNDERAGE` kèm nguồn cho người trẻ; ô đồng ý bắt buộc phải `true`; đổi `terms_version` thì phải đồng ý lại) trong `apps/worker/test/onboarding.test.ts`
 - [ ] T043 [P] [US1] Viết test e2e luồng US1 bằng tiếng Việt và tiếng Anh trong `e2e/us1-private-room.spec.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T044 [US1] Viết migration `apps/worker/migrations/0003_world_doctors.sql`: `wings`, `floors` UNIQUE(wing_id, floor_number), `rooms` (40 phòng/tầng, owner_user_id UNIQUE), `doctors` (display JSON `{vi,en}`), `feedback` (không có user_id)
-- [ ] T045 [P] [US1] Seed 4 bác sĩ AI (căng thẳng, giấc ngủ, các mối quan hệ, mất mát) có `display` vi/en trong `apps/worker/seed/dev.sql`
-- [ ] T046 [US1] Viết `apps/worker/src/world/rooms.ts`: cấp phòng trong transaction (FR-007, FR-008)
-- [ ] T047 [US1] Viết `GET /api/me`, `PUT /api/me/locale`, `GET /api/terms?lang=` trong `apps/worker/src/api/me.ts`
-- [ ] T048 [US1] Viết `POST /api/onboarding/age`, `/consent`, `/profile` (nickname 2–20 ký tự, lọc từ cấm) trong `apps/worker/src/api/onboarding.ts`
-- [ ] T049 [US1] Viết Durable Object `apps/worker/src/do/patient-record.ts`: bảng `conversations`, `messages` (content mã hóa, lang, safety_level), `usage_daily`
-- [ ] T050 [US1] Viết `apps/worker/src/ai/doctor.ts`: quy tắc chung (contracts/doctor-ai.md §2) + `persona_prompt` + locale + 20 tin gần nhất, trả lời tối đa khoảng 400 token
-- [ ] T051 [US1] Viết `GET /api/doctors`, `GET /api/usage`, CRUD `/api/conversations`, `POST /api/conversations/:id/messages` (SSE `meta`/`token`/`crisis`/`done`/`error`, nhãn "AI") trong `apps/worker/src/api/conversations.ts`
-- [ ] T052 [US1] Viết `POST /api/feedback` trong `apps/worker/src/api/feedback.ts` (SC-007)
-- [ ] T053 [US1] Viết `DELETE /api/me` trong `apps/worker/src/api/account.ts`: ẩn ngay, `deleteAll` PatientRecord, giải phóng phòng, đặt lịch xóa hẳn ≤ 30 ngày (SC-008)
+- [X] T044 [US1] Viết migration `apps/worker/migrations/0003_world_doctors.sql`: `wings`, `floors` UNIQUE(wing_id, floor_number), `rooms` (40 phòng/tầng, owner_user_id UNIQUE), `doctors` (display JSON `{vi,en}`), `feedback` (không có user_id)
+- [X] T045 [P] [US1] Seed 4 bác sĩ AI (căng thẳng, giấc ngủ, các mối quan hệ, mất mát) có `display` vi/en trong `apps/worker/seed/dev.sql`
+- [X] T046 [US1] Viết `apps/worker/src/world/rooms.ts`: cấp phòng trong transaction (FR-007, FR-008)
+- [X] T047 [US1] Viết `GET /api/me`, `PUT /api/me/locale`, `GET /api/terms?lang=` trong `apps/worker/src/api/me.ts`
+- [X] T048 [US1] Viết `POST /api/onboarding/age`, `/consent`, `/profile` (nickname 2–20 ký tự, lọc từ cấm) trong `apps/worker/src/api/onboarding.ts`
+- [X] T049 [US1] Viết Durable Object `apps/worker/src/do/patient-record.ts`: bảng `conversations`, `messages` (content mã hóa, lang, safety_level), `usage_daily`
+- [X] T050 [US1] Viết `apps/worker/src/ai/doctor.ts`: quy tắc chung (contracts/doctor-ai.md §2) + `persona_prompt` + locale + 20 tin gần nhất, trả lời tối đa khoảng 400 token
+- [X] T051 [US1] Viết `GET /api/doctors`, `GET /api/usage`, CRUD `/api/conversations`, `POST /api/conversations/:id/messages` (SSE `meta`/`token`/`crisis`/`done`/`error`, nhãn "AI") trong `apps/worker/src/api/conversations.ts`
+- [X] T052 [US1] Viết `POST /api/feedback` trong `apps/worker/src/api/feedback.ts` (SC-007)
+- [X] T053 [US1] Viết `DELETE /api/me` trong `apps/worker/src/api/account.ts`: ẩn ngay, `deleteAll` PatientRecord, giải phóng phòng, đặt lịch xóa hẳn ≤ 30 ngày (SC-008)
 - [ ] T054 [P] [US1] Viết màn chọn ngôn ngữ đầu tiên (gợi ý theo ngôn ngữ trình duyệt) trong `apps/client/src/features/onboarding/language-picker.ts` (FR-036)
 - [ ] T055 [US1] Viết màn đăng nhập, xác nhận 18+, điều khoản với từng ô tick riêng không tick sẵn trong `apps/client/src/features/onboarding/onboarding.ts`
 - [ ] T056 [P] [US1] Dựng nhân vật chibi ghép bộ phận, 3 animation đứng/đi/ngồi, trong `apps/client/src/avatar/avatar.ts` và màn tạo nhân vật `apps/client/src/features/onboarding/create-avatar.ts`
@@ -124,7 +124,7 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 - [ ] T058 [US1] Viết cảnh phòng riêng trong `apps/client/src/world/private-room.ts`
 - [ ] T059 [US1] Viết giao diện trò chuyện với bác sĩ (chọn bác sĩ, luồng SSE, nhãn "AI", khối đường dây nóng khi `crisis`, đếm lượt, xem/xóa lịch sử, hỏi "được lắng nghe?") trong `apps/client/src/features/doctor-chat/doctor-chat.ts`
 - [ ] T060 [US1] Viết trang cài đặt (đổi ngôn ngữ, đổi mức đồ họa, xóa lịch sử, xóa tài khoản, đăng xuất) trong `apps/client/src/ui/settings.ts`
-- [ ] T061 [US1] Viết trang admin tối thiểu cho cờ khủng hoảng (danh sách không kèm nội dung; mở chi tiết thì ghi `flag_access_log` trước; resolve) trong `apps/worker/src/admin/flags.ts`, bảo vệ bằng Cloudflare Access + danh sách email admin (FR-018, research.md §R12)
+- [X] T061 [US1] Viết trang admin tối thiểu cho cờ khủng hoảng (danh sách không kèm nội dung; mở chi tiết thì ghi `flag_access_log` trước; resolve) trong `apps/worker/src/admin/flags.ts`, bảo vệ bằng Cloudflare Access + danh sách email admin (FR-018, research.md §R12)
 - [ ] T062 [US1] Chạy `pnpm eval:safety --lang vi,en` với Haiku 5.5 và Sonnet 5.5, ghi kết quả và model đã chọn vào `evals/RESULTS.md` (research.md §R6)
 
 **Checkpoint**: US1 chạy độc lập và đạt SC-001, SC-002, SC-003, SC-007, SC-008 — đây là bản MVP có thể mời thử nghiệm kín

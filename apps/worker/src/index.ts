@@ -2,6 +2,11 @@ import { Hono } from "hono";
 import { apiError } from "./api/errors";
 import { requireOnboarded, requireUser } from "./api/guards";
 import { registerSupport } from "./api/support";
+import { registerMe } from "./api/me";
+import { registerOnboarding } from "./api/onboarding";
+import { registerConversations } from "./api/conversations";
+import { registerAccount } from "./api/account";
+import { registerAdminFlags } from "./admin/flags";
 import { registerGoogleAuth } from "./auth/google";
 import { loadUser, requireCsrfHeader } from "./auth/session";
 import type { Env } from "./env";
@@ -23,6 +28,11 @@ app.use("/ws/*", loadUser);
 app.get("/api/health", (c) => c.json({ ok: true, env: c.env.APP_ENV }));
 registerSupport(app);
 registerGoogleAuth(app);
+registerMe(app);
+registerOnboarding(app);
+registerConversations(app);
+registerAccount(app);
+registerAdminFlags(app);
 
 // WebSocket → Durable Object. Người chơi phải đăng nhập và đã qua onboarding.
 const WS_ROUTES: Record<string, keyof Pick<Env, "WORLD_ZONE" | "CIRCLE_ROOM" | "LECTURE_HALL">> = {

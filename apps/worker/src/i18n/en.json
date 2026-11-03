@@ -14,6 +14,8 @@
     "CSRF": "Invalid request.",
     "AUTH_FAILED": "Google sign-in didn't work. Please try again.",
     "AI_UNAVAILABLE": "The AI doctor can't reply right now. The \"Get help now\" button always works.",
-    "NOT_IMPLEMENTED": "This feature isn't available yet."
+    "NOT_IMPLEMENTED": "This feature isn't available yet.",
+    "NICKNAME_TAKEN": "That nickname is taken — please choose another.",
+    "CONFLICT": "This has already been done."
   }
 }
