@@ -11,11 +11,11 @@ export interface Env {
   CIRCLE_ROOM: DurableObjectNamespace;
   LECTURE_HALL: DurableObjectNamespace;
   PATIENT_RECORD: DurableObjectNamespace;
+  KEY_VAULT: DurableObjectNamespace;
 
   // Secrets
-  GOOGLE_CLIENT_ID: string;
-  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_CLIENT_ID: string; // công khai, nằm trong vars
   ANTHROPIC_API_KEY: string;
   ELEVENLABS_API_KEY: string;
-  CHAT_ENCRYPTION_KEY: string;
+  CHAT_ENCRYPTION_KEY?: string; // tùy chọn; không đặt thì KeyVault tự tạo
 }

@@ -5,7 +5,32 @@ import { h, screen } from "../../ui/dom";
 
 /** Đăng nhập, xác nhận 18+, điều khoản với từng ô tick riêng không tick sẵn (T055, FR-002, FR-004, R14). */
 
-export function showLogin(root: HTMLElement) {
+/** Nút "Sign in with Google" (Google Identity Services) — chỉ cần Client ID, giống Vạn Linh Đảo. */
+interface Gis {
+  accounts: {
+    id: {
+      initialize(o: { client_id: string; callback: (r: { credential: string }) => void; ux_mode?: string; use_fedcm_for_button?: boolean }): void;
+      renderButton(el: HTMLElement, o: Record<string, unknown>): void;
+    };
+  };
+}
+
+function loadGis(): Promise<Gis> {
+  const w = window as unknown as { google?: Gis };
+  if (w.google?.accounts) return Promise.resolve(w.google);
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "https://accounts.google.com/gsi/client";
+    s.async = true;
+    s.onload = () => (w.google ? resolve(w.google) : reject(new Error("gis")));
+    s.onerror = () => reject(new Error("gis"));
+    document.head.append(s);
+  });
+}
+
+export async function showLogin(root: HTMLElement) {
+  const slot = h("div", { style: "display:flex;justify-content:center;min-height:44px;margin:16px 0" });
+  const err = h("p", { class: "bvo-error" });
   screen(
     root,
     h(
@@ -13,10 +38,31 @@ export function showLogin(root: HTMLElement) {
       {},
       h("h1", {}, t("login.welcome")),
       h("p", {}, t("login.intro")),
-      h("a", { class: "bvo-btn", href: `/auth/google/start?lang=${getLocale()}`, style: "text-align:center;text-decoration:none" }, t("login.google")),
+      slot,
+      err,
       h("p", { class: "bvo-muted" }, t("login.adultsOnly")),
     ),
   );
+  try {
+    const { googleClientId } = await api<{ googleClientId: string | null }>("/api/config");
+    if (!googleClientId) throw new Error("no client id");
+    const gis = await loadGis();
+    gis.accounts.id.initialize({
+      client_id: googleClientId,
+      use_fedcm_for_button: true,
+      callback: async ({ credential }) => {
+        try {
+          await api("/auth/google/token", { body: { credential, locale: getLocale() } });
+          location.reload();
+        } catch {
+          err.textContent = t("login.failed");
+        }
+      },
+    });
+    gis.accounts.id.renderButton(slot, { theme: "filled_blue", size: "large", shape: "pill", text: "signin_with", locale: getLocale() });
+  } catch {
+    err.textContent = t("login.failed");
+  }
 }
 
 export function showAgeGate(root: HTMLElement): Promise<void> {

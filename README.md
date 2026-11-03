@@ -40,7 +40,9 @@ pnpm test
    - R2 đang tạm tắt cho tới khi bật R2 trong dashboard (cần cho tài sản 3D/audio).
 3. Workers Builds: Root directory để trống, Build command `pnpm install && pnpm build`,
    Deploy command `npx wrangler deploy`.
-4. Đặt secret cho từng môi trường: `npx wrangler secret put GOOGLE_CLIENT_ID` (tương tự cho
-   `GOOGLE_CLIENT_SECRET`, `ANTHROPIC_API_KEY`, `ELEVENLABS_API_KEY`, `CHAT_ENCRYPTION_KEY`).
+4. **Đăng nhập Google không cần secret** (giống Vạn Linh Đảo): chỉ dùng `GOOGLE_CLIENT_ID` (đã có trong
+   `wrangler.jsonc`). Google Cloud → OAuth client → **Authorized JavaScript origins** phải có link web.
+   Khóa mã hóa lịch sử chat tự tạo trong Durable Object `KeyVault` (không cần đặt).
+   Secret duy nhất còn cần cho bác sĩ AI: `ANTHROPIC_API_KEY`.
 5. Trên GitHub: **Settings → Secrets → Actions**, thêm `ANTHROPIC_API_KEY` và
    `AI_GATEWAY_ACCOUNT_ID` để CI chạy bộ kiểm thử an toàn.

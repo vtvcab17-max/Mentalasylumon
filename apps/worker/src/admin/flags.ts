@@ -3,6 +3,7 @@ import { z } from "zod";
 import { apiError } from "../api/errors";
 import { requireAdmin } from "../api/guards";
 import { decrypt } from "../crypto/aes";
+import { chatKey } from "../do/key-vault";
 import { nowIso, type AppEnv } from "../types";
 
 /**
@@ -34,7 +35,7 @@ export function registerAdminFlags(app: Hono<AppEnv>) {
       ),
       c.env.DB.prepare("UPDATE crisis_flags SET status = 'in_review' WHERE id = ? AND status = 'open'").bind(flag.id),
     ]);
-    const excerpt = flag.excerpt ? JSON.parse(await decrypt(c.env.CHAT_ENCRYPTION_KEY, flag.excerpt)) : null;
+    const excerpt = flag.excerpt ? JSON.parse(await decrypt(await chatKey(c.env), flag.excerpt)) : null;
     // Không trả user_id: quản trị viên chỉ cần nội dung để đánh giá (tối thiểu hóa dữ liệu).
     const { user_id: _u, excerpt: _e, ...rest } = flag;
     return c.json({ ...rest, status: flag.status === "open" ? "in_review" : flag.status, excerpt });

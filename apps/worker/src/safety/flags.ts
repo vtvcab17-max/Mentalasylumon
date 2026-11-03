@@ -1,4 +1,5 @@
 import { encrypt } from "../crypto/aes";
+import { chatKey } from "../do/key-vault";
 import { getSettings } from "../db/settings";
 import type { Env } from "../env";
 import { nowIso } from "../types";
@@ -17,7 +18,7 @@ export interface NewFlag {
   excerpt: { previous?: { role: string; text: string }[]; message: string; reply: string };
 }
 
-export async function createFlag(env: Pick<Env, "DB" | "CHAT_ENCRYPTION_KEY">, flag: NewFlag): Promise<string> {
+export async function createFlag(env: Pick<Env, "DB" | "CHAT_ENCRYPTION_KEY" | "KEY_VAULT">, flag: NewFlag): Promise<string> {
   const id = crypto.randomUUID();
   const excerpt = {
     previous: (flag.excerpt.previous ?? []).slice(-2),
@@ -27,7 +28,7 @@ export async function createFlag(env: Pick<Env, "DB" | "CHAT_ENCRYPTION_KEY">, f
   await env.DB.prepare(
     "INSERT INTO crisis_flags (id, user_id, source, level, category, excerpt, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'open', ?)",
   )
-    .bind(id, flag.userId, flag.source, flag.level, flag.category, await encrypt(env.CHAT_ENCRYPTION_KEY, JSON.stringify(excerpt)), nowIso())
+    .bind(id, flag.userId, flag.source, flag.level, flag.category, await encrypt(await chatKey(env), JSON.stringify(excerpt)), nowIso())
     .run();
   return id;
 }

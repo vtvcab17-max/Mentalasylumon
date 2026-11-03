@@ -31,8 +31,8 @@
   "login": {
     "welcome": "Welcome to the Online Mental Hospital",
     "intro": "A place to be heard. The doctors here are AI, not real doctors.",
-    "google": "Sign in with Google",
-    "adultsOnly": "For people aged 18 and over only."
+    "adultsOnly": "For people aged 18 and over only.",
+    "failed": "Couldn't sign in with Google. Please try again."
   },
   "age": {
     "title": "Are you 18 or older?",

@@ -6,6 +6,7 @@ import { doctorReply, HISTORY_LIMIT, type DoctorRow } from "../ai/doctor";
 import { AiUnavailableError, type ChatMessage } from "../ai/gateway";
 import { decrypt, encrypt } from "../crypto/aes";
 import type { PatientRecord } from "../do/patient-record";
+import { chatKey } from "../do/key-vault";
 import { getSettings } from "../db/settings";
 import { createFlag, notifyAdmins } from "../safety/flags";
 import { respondSafely, type SafetyDeps } from "../safety/pipeline";
@@ -71,11 +72,12 @@ export function registerConversations(app: Hono<AppEnv>) {
     const conv = await rec.getConversation(c.req.param("id"));
     if (!conv) return apiError(c, "NOT_FOUND", 404);
     const rows = await rec.pageMessages(conv.id, c.req.query("before") ?? null, 50);
+    const key = await chatKey(c.env);
     const messages = await Promise.all(
       rows.map(async (m) => ({
         id: m.id,
         role: m.role,
-        text: await decrypt(c.env.CHAT_ENCRYPTION_KEY, m.content),
+        text: await decrypt(key, m.content),
         lang: m.lang,
         createdAt: m.created_at,
         ...(m.role !== "user" ? { label: "AI" } : {}),
@@ -110,11 +112,12 @@ export function registerConversations(app: Hono<AppEnv>) {
     const slot = await rec.reserveMessage(today, settings.daily_message_limit);
     if (!slot.ok) return apiError(c, "DAILY_LIMIT_REACHED", 429, { resetsAt: vnMidnightIso() });
 
+    const key = await chatKey(c.env);
     // Lịch sử đã giải mã để làm ngữ cảnh (chỉ cuộc hiện tại, tối đa 20 tin).
     const history: ChatMessage[] = await Promise.all(
       (await rec.recentMessages(conv.id, HISTORY_LIMIT)).map(async (m) => ({
         role: m.role === "user" ? ("user" as const) : ("assistant" as const),
-        content: await decrypt(c.env.CHAT_ENCRYPTION_KEY, m.content),
+        content: await decrypt(key, m.content),
       })),
     );
 
@@ -143,11 +146,11 @@ export function registerConversations(app: Hono<AppEnv>) {
           doctorReply(c.env, settings.model_chat, doctor, user.locale, history, text, extra),
         );
         const reply = result.kind === "crisis" ? result.message : result.text;
-        await rec.appendMessage(conv.id, "user", await encrypt(c.env.CHAT_ENCRYPTION_KEY, text), result.lang, result.level);
+        await rec.appendMessage(conv.id, "user", await encrypt(key, text), result.lang, result.level);
         await rec.appendMessage(
           conv.id,
           result.kind === "crisis" ? "safety" : "doctor",
-          await encrypt(c.env.CHAT_ENCRYPTION_KEY, reply),
+          await encrypt(key, reply),
           result.lang,
           result.level,
         );

@@ -10,7 +10,7 @@ test("màn đầu cho chọn ngôn ngữ, chọn English thì giao diện tiến
   await page.goto("/");
   await expect(page.getByRole("button", { name: "English" })).toBeVisible();
   await page.getByRole("button", { name: "English" }).click();
-  await expect(page.getByRole("link", { name: "Sign in with Google" })).toBeVisible();
+  await expect(page.getByText("Welcome to the Online Mental Hospital")).toBeVisible();
   await expect(page.getByRole("button", { name: /Get help now/ })).toBeVisible();
 });
 

@@ -16,6 +16,7 @@ export { WorldZone } from "./do/world-zone";
 export { CircleRoom } from "./do/circle-room";
 export { LectureHall } from "./do/lecture-hall";
 export { PatientRecord } from "./do/patient-record";
+export { KeyVault } from "./do/key-vault";
 
 /** Router (T020). Các nhóm route của từng user story được đăng ký ở Phase 3+. */
 const app = new Hono<AppEnv>();

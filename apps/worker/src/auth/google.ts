@@ -1,84 +1,37 @@
-import { Google, generateCodeVerifier, generateState, decodeIdToken } from "arctic";
 import type { Hono } from "hono";
-import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import { apiError, requestLocale } from "../api/errors";
+import { z } from "zod";
+import { apiError } from "../api/errors";
 import { nowIso, type AppEnv } from "../types";
-import { createSession, destroySession } from "./session";
+import { verifyGoogleIdToken, type JwksFetcher } from "./google-id-token";
+import { createSession, destroySession, requireCsrfHeader } from "./session";
 
 /**
- * Đăng nhập Google — OIDC Authorization Code + PKCE (T016, research.md §R4).
- * Chỉ lưu `sub` và email đã xác minh. ID token nhận trực tiếp từ token endpoint của Google qua TLS,
- * vẫn kiểm iss/aud/exp/email_verified.
+ * Đăng nhập Google kiểu "Sign in with Google" (giống Vạn Linh Đảo) — chỉ cần GOOGLE_CLIENT_ID (công khai),
+ * không cần Client secret. Trình duyệt gửi ID token; server kiểm chữ ký bằng khóa công khai của Google,
+ * rồi chỉ lưu `sub` và email đã xác minh (research.md §R4).
  */
 
-const OAUTH_COOKIE = "oauth";
-const ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
+const TokenBody = z.object({ credential: z.string().min(20).max(4096), locale: z.enum(["vi", "en"]).default("vi") });
 
-interface GoogleClaims {
-  iss: string;
-  aud: string;
-  sub: string;
-  exp: number;
-  email?: string;
-  email_verified?: boolean;
-}
+export function registerGoogleAuth(app: Hono<AppEnv>, opts: { jwks?: JwksFetcher } = {}) {
+  app.get("/api/config", (c) => c.json({ googleClientId: c.env.GOOGLE_CLIENT_ID || null }));
 
-function client(env: AppEnv["Bindings"], origin: string) {
-  return new Google(env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_SECRET, `${origin}/auth/google/callback`);
-}
-
-export function registerGoogleAuth(app: Hono<AppEnv>) {
-  app.get("/auth/google/start", (c) => {
-    const origin = new URL(c.req.url).origin;
-    const state = generateState();
-    const verifier = generateCodeVerifier();
-    const lang = requestLocale(c);
-    const url = client(c.env, origin).createAuthorizationURL(state, verifier, ["openid", "email"]);
-    url.searchParams.set("prompt", "select_account");
-    setCookie(c, OAUTH_COOKIE, JSON.stringify({ state, verifier, lang }), {
-      httpOnly: true,
-      secure: origin.startsWith("https:"),
-      sameSite: "Lax",
-      path: "/auth/google",
-      maxAge: 600,
-    });
-    return c.redirect(url.toString(), 302);
-  });
-
-  app.get("/auth/google/callback", async (c) => {
-    const origin = new URL(c.req.url).origin;
-    const raw = getCookie(c, OAUTH_COOKIE);
-    deleteCookie(c, OAUTH_COOKIE, { path: "/auth/google" });
-    const code = c.req.query("code");
-    let saved: { state: string; verifier: string; lang: "vi" | "en" } | null = null;
+  app.post("/auth/google/token", requireCsrfHeader, async (c) => {
+    if (!c.env.GOOGLE_CLIENT_ID) return apiError(c, "AUTH_FAILED", 503);
+    const parsed = TokenBody.safeParse(await c.req.json().catch(() => null));
+    if (!parsed.success) return apiError(c, "AUTH_FAILED", 400);
+    let claims;
     try {
-      saved = raw ? JSON.parse(raw) : null;
+      claims = await verifyGoogleIdToken(parsed.data.credential, c.env.GOOGLE_CLIENT_ID, { jwks: opts.jwks });
     } catch {
-      saved = null;
+      return apiError(c, "AUTH_FAILED", 401);
     }
-    if (!code || !saved || c.req.query("state") !== saved.state) return apiError(c, "AUTH_FAILED", 400);
-
-    let claims: GoogleClaims;
-    try {
-      const tokens = await client(c.env, origin).validateAuthorizationCode(code, saved.verifier);
-      claims = decodeIdToken(tokens.idToken()) as GoogleClaims;
-    } catch {
-      return apiError(c, "AUTH_FAILED", 400);
-    }
-    const valid =
-      ISSUERS.includes(claims.iss) &&
-      claims.aud === c.env.GOOGLE_CLIENT_ID &&
-      claims.exp * 1000 > Date.now() &&
-      claims.email_verified === true &&
-      typeof claims.email === "string";
-    if (!valid) return apiError(c, "AUTH_FAILED", 400);
-
-    const userId = await findOrCreateUser(c.env.DB, claims.sub, claims.email!, saved.lang);
+    const userId = await findOrCreateUser(c.env.DB, claims.sub, claims.email!, parsed.data.locale);
     await createSession(c, userId);
-    return c.redirect("/play", 302);
+    return c.json({ ok: true });
   });
 
-  app.post("/auth/logout", async (c) => {
+  app.post("/auth/logout", requireCsrfHeader, async (c) => {
     await destroySession(c);
     return c.body(null, 204);
   });

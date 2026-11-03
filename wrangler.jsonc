@@ -25,11 +25,13 @@
       { "name": "WORLD_ZONE", "class_name": "WorldZone" },
       { "name": "CIRCLE_ROOM", "class_name": "CircleRoom" },
       { "name": "LECTURE_HALL", "class_name": "LectureHall" },
-      { "name": "PATIENT_RECORD", "class_name": "PatientRecord" }
+      { "name": "PATIENT_RECORD", "class_name": "PatientRecord" },
+      { "name": "KEY_VAULT", "class_name": "KeyVault" }
     ]
   },
   "migrations": [
-    { "tag": "v1", "new_sqlite_classes": ["WorldZone", "CircleRoom", "LectureHall", "PatientRecord"] }
+    { "tag": "v1", "new_sqlite_classes": ["WorldZone", "CircleRoom", "LectureHall", "PatientRecord"] },
+    { "tag": "v2", "new_sqlite_classes": ["KeyVault"] }
   ],
 
   "vars": {
@@ -39,8 +41,8 @@
     // OAuth Client ID là công khai (hiện trong URL đăng nhập); Client SECRET đặt bằng secret, không ghi ở đây.
     "GOOGLE_CLIENT_ID": "48256280382-0l8nrv2s52ga660fe0u1leni5dobtfke.apps.googleusercontent.com"
   },
-  // Secrets (wrangler secret put): GOOGLE_CLIENT_SECRET, ANTHROPIC_API_KEY,
-  // ELEVENLABS_API_KEY, CHAT_ENCRYPTION_KEY. Không bao giờ ghi vào file này (Constitution).
+  // Secrets (wrangler secret put): ANTHROPIC_API_KEY, ELEVENLABS_API_KEY. Không cần Google secret
+  // (đăng nhập bằng ID token). CHAT_ENCRYPTION_KEY tùy chọn: không đặt thì KeyVault tự tạo. Không bao giờ ghi vào file này (Constitution).
 
   "triggers": { "crons": ["17 19 * * *"] },
 

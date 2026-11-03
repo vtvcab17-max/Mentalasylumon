@@ -16,7 +16,6 @@ export default defineWorkersConfig(async () => {
               TEST_MIGRATIONS: migrations,
               CHAT_ENCRYPTION_KEY: "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
               GOOGLE_CLIENT_ID: "test-client",
-              GOOGLE_CLIENT_SECRET: "test-secret",
               ANTHROPIC_API_KEY: "",
             },
           },

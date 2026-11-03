@@ -46,18 +46,23 @@ describe("bảo vệ request (T017, T018)", () => {
     expect(await res.json()).toMatchObject({ error: { code: "UNAUTHENTICATED", message: "Please sign in to continue." } });
   });
 
-  it("bắt đầu đăng nhập Google chuyển hướng kèm PKCE", async () => {
-    const res = await SELF.fetch("https://x.test/auth/google/start?lang=en", { redirect: "manual" });
-    expect(res.status).toBe(302);
-    const loc = new URL(res.headers.get("Location")!);
-    expect(loc.hostname).toBe("accounts.google.com");
-    expect(loc.searchParams.get("code_challenge_method")).toBe("S256");
-    expect(res.headers.get("Set-Cookie")).toMatch(/HttpOnly/i);
+  it("/api/config trả Client ID công khai (không có secret nào)", async () => {
+    const res = await SELF.fetch("https://x.test/api/config");
+    expect(await res.json()).toEqual({ googleClientId: "test-client" });
   });
 
-  it("callback sai state bị từ chối", async () => {
-    const res = await SELF.fetch("https://x.test/auth/google/callback?code=abc&state=wrong", { redirect: "manual" });
-    expect(res.status).toBe(400);
+  it("ID token giả bị từ chối", async () => {
+    const res = await SELF.fetch("https://x.test/auth/google/token", {
+      method: "POST",
+      headers: { "X-Requested-With": "bvo", "content-type": "application/json" },
+      body: JSON.stringify({ credential: "eyJhbGciOiJSUzI1NiJ9.e30.c2lnbmF0dXJlLWdpYS1tYW8tcGhvbmc", locale: "vi" }),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("đăng nhập bằng token phải có header chống CSRF", async () => {
+    const res = await SELF.fetch("https://x.test/auth/google/token", { method: "POST", body: "{}" });
+    expect(res.status).toBe(403);
   });
 });
 
@@ -79,7 +84,7 @@ describe("tài khoản và cờ (T016, T033)", () => {
     });
     const row = await env.DB.prepare("SELECT excerpt FROM crisis_flags WHERE id = ?").bind(id).first<{ excerpt: string }>();
     expect(row!.excerpt).not.toContain("tin nhắn gốc");
-    expect(JSON.parse(await decrypt(env.CHAT_ENCRYPTION_KEY, row!.excerpt)).message).toBe("tin nhắn gốc");
+    expect(JSON.parse(await decrypt(env.CHAT_ENCRYPTION_KEY!, row!.excerpt)).message).toBe("tin nhắn gốc");
 
     await env.DB.prepare("INSERT INTO flag_access_log (id, flag_id, admin_user_id, action, at) VALUES ('l1', ?, ?, 'view', '2026-11-04')")
       .bind(id, userId)
