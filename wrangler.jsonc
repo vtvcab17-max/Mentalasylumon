@@ -32,8 +32,14 @@
     { "tag": "v1", "new_sqlite_classes": ["WorldZone", "CircleRoom", "LectureHall", "PatientRecord"] }
   ],
 
-  "vars": { "APP_ENV": "dev", "AI_GATEWAY_ACCOUNT_ID": "", "AI_GATEWAY_ID": "benh-vien" },
-  // Secrets (wrangler secret put): GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, ANTHROPIC_API_KEY,
+  "vars": {
+    "APP_ENV": "dev",
+    "AI_GATEWAY_ACCOUNT_ID": "",
+    "AI_GATEWAY_ID": "benh-vien",
+    // OAuth Client ID là công khai (hiện trong URL đăng nhập); Client SECRET đặt bằng secret, không ghi ở đây.
+    "GOOGLE_CLIENT_ID": "48256280382-0l8nrv2s52ga660fe0u1leni5dobtfke.apps.googleusercontent.com"
+  },
+  // Secrets (wrangler secret put): GOOGLE_CLIENT_SECRET, ANTHROPIC_API_KEY,
   // ELEVENLABS_API_KEY, CHAT_ENCRYPTION_KEY. Không bao giờ ghi vào file này (Constitution).
 
   "triggers": { "crons": ["17 19 * * *"] },
