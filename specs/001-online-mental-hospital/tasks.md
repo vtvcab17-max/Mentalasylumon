@@ -139,13 +139,13 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 
 ### Tests for User Story 2
 
-- [ ] T063 [P] [US2] Viết test `WorldZone` (welcome/join/leave, giới hạn 5 tin/giây, snapshot 10 Hz chỉ trong 30 m, `zone_full` ở 150 người) trong `apps/worker/test/world-zone.test.ts`
+- [X] T063 [P] [US2] Viết test `WorldZone` (welcome/join/leave, giới hạn 5 tin/giây, snapshot 10 Hz chỉ trong 30 m, `zone_full` ở 150 người) trong `apps/worker/test/world-zone.test.ts`
 - [ ] T064 [P] [US2] Viết script tải `scripts/load-zones.ts` (`pnpm load:zones --users 500`) đo SC-004
 
 ### Implementation for User Story 2
 
-- [ ] T065 [US2] Viết Durable Object `apps/worker/src/do/world-zone.ts` với WebSocket Hibernation, tag `userId`, auto-response ping (research.md §R2)
-- [ ] T066 [US2] Viết `GET /api/world/layout`, `POST /api/world/join` (chọn bản sao còn chỗ), `GET /api/avatar-catalog` trong `apps/worker/src/api/world.ts`
+- [X] T065 [US2] Viết Durable Object `apps/worker/src/do/world-zone.ts` với WebSocket Hibernation, tag `userId`, auto-response ping (research.md §R2)
+- [X] T066 [US2] Viết `GET /api/world/layout`, `POST /api/world/join` (chọn bản sao còn chỗ), `GET /api/avatar-catalog` trong `apps/worker/src/api/world.ts`
 - [ ] T067 [P] [US2] Làm bộ khối module chibi (sảnh, hành lang, cửa phòng có biển số, cầu thang, vườn, phòng tròn bên ngoài) trong `assets-src/modules/` và xuất `apps/client/public/models/modules/*.glb`; biển hiệu không nướng chữ cứng (Constitution V)
 - [ ] T068 [US2] Viết `apps/client/src/world/hospital-builder.ts` dựng khu/tầng từ khối module theo `/api/world/layout`
 - [ ] T069 [US2] Viết `apps/client/src/net/zone-client.ts`: gửi `move` khi có thay đổi, nội suy snapshot, đổi zone khi `zone_full`

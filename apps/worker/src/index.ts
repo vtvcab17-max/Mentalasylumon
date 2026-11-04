@@ -7,6 +7,8 @@ import { registerOnboarding } from "./api/onboarding";
 import { registerConversations } from "./api/conversations";
 import { registerAccount } from "./api/account";
 import { registerAdminFlags } from "./admin/flags";
+import { registerWorld, ZONE_RE } from "./api/world";
+import { getSettings } from "./db/settings";
 import { registerGoogleAuth } from "./auth/google";
 import { loadUser, requireCsrfHeader } from "./auth/session";
 import type { Env } from "./env";
@@ -34,6 +36,7 @@ registerOnboarding(app);
 registerConversations(app);
 registerAccount(app);
 registerAdminFlags(app);
+registerWorld(app);
 
 // WebSocket → Durable Object. Người chơi phải đăng nhập và đã qua onboarding.
 const WS_ROUTES: Record<string, keyof Pick<Env, "WORLD_ZONE" | "CIRCLE_ROOM" | "LECTURE_HALL">> = {
@@ -44,15 +47,22 @@ const WS_ROUTES: Record<string, keyof Pick<Env, "WORLD_ZONE" | "CIRCLE_ROOM" | "
 
 app.get("/ws/:kind/:id{.+}", requireUser, requireOnboarded, async (c) => {
   if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") return apiError(c, "VALIDATION", 426);
-  const binding = WS_ROUTES[c.req.param("kind")];
+  const kind = c.req.param("kind");
+  const id = c.req.param("id");
+  const binding = WS_ROUTES[kind];
   if (!binding) return apiError(c, "NOT_FOUND", 404);
+  if (kind === "zone" && !ZONE_RE.test(id)) return apiError(c, "NOT_FOUND", 404);
   const ns = c.env[binding];
-  const stub = ns.get(ns.idFromName(c.req.param("id")));
+  const stub = ns.get(ns.idFromName(id));
   const user = c.get("user")!;
-  // Danh tính đi qua header nội bộ; DO không bao giờ tin header từ client vì request chỉ tới từ Worker.
+  // Danh tính đi qua header nội bộ (ghi đè mọi header cùng tên từ client); DO chỉ nhận request từ Worker.
   const req = new Request(c.req.raw);
   req.headers.set("X-User-Id", user.id);
   req.headers.set("X-User-Locale", user.locale);
+  req.headers.set("X-User-Nickname", encodeURIComponent(user.nickname ?? ""));
+  req.headers.set("X-User-Avatar", user.avatar ?? "null");
+  req.headers.set("X-Zone-Id", id);
+  req.headers.set("X-Zone-Capacity", String((await getSettings(c.env.DB)).zone_capacity));
   return stub.fetch(req);
 });
 

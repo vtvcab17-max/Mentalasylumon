@@ -21,9 +21,11 @@ describe("GET /api/support-resources (T035)", () => {
   it("trả theo ngôn ngữ; danh bạ quốc tế chỉ có ở bản tiếng Anh", async () => {
     const vi = (await (await SELF.fetch("https://x.test/api/support-resources?lang=vi")).json()) as { resources: { id: string; name: string }[] };
     const en = (await (await SELF.fetch("https://x.test/api/support-resources?lang=en")).json()) as { resources: { id: string; name: string }[] };
-    expect(vi.resources.map((r) => r.id)).toEqual(["emergency-115"]);
-    expect(vi.resources[0].name).toBe("Cấp cứu y tế");
-    expect(en.resources.map((r) => r.id)).toEqual(["emergency-115", "find-a-helpline"]);
+    // Storage dùng chung giữa các file test, nên chỉ kiểm các mục của test này.
+    expect(vi.resources.map((r) => r.id)).toContain("emergency-115");
+    expect(vi.resources.map((r) => r.id)).not.toContain("find-a-helpline");
+    expect(vi.resources.find((r) => r.id === "emergency-115")!.name).toBe("Cấp cứu y tế");
+    expect(en.resources.map((r) => r.id)).toEqual(expect.arrayContaining(["emergency-115", "find-a-helpline"]));
   });
 
   it("không cần đăng nhập và cho phép cache", async () => {

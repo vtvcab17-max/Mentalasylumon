@@ -9,6 +9,8 @@ export default defineWorkersConfig(async () => {
       poolOptions: {
         workers: {
           singleWorker: true,
+          // Isolated storage không hỗ trợ WebSocket hibernation (WorldZone); các test tự dùng id riêng.
+          isolatedStorage: false,
           wrangler: { configPath: "../../wrangler.jsonc" },
           miniflare: {
             bindings: {
