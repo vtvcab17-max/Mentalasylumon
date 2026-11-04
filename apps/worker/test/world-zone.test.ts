@@ -82,20 +82,27 @@ describe("WorldZone (T063)", () => {
     const B = await connect(b.cookie, "lobby-21", "?x=1&z=1");
     await B.waitFor((m) => m.t === "welcome");
 
+    // Người mới vào: cả hai bên nhận snapshot thấy nhau.
+    expect((await A.waitFor((m) => m.t === "snapshot")).players).toEqual([{ id: b.id, p: [1, 0, 1], r: 0, a: "idle" }]);
+    expect((await B.waitFor((m) => m.t === "snapshot")).players).toEqual([{ id: a.id, p: [0, 0, 0], r: 0, a: "idle" }]);
+
     B.send({ t: "move", p: [3, 0, 3], r: 0.5, a: "walk" });
     const near = await A.waitFor((m) => m.t === "snapshot");
-    expect(near.players).toEqual([{ id: b.id, p: [3, 0, 3], r: 0.5, a: "walk" }]);
+    expect(near).toMatchObject({ players: [{ id: b.id, p: [3, 0, 3], r: 0.5, a: "walk" }], gone: [] });
 
     B.send({ t: "move", p: [90, 0, 90], r: 0.5, a: "walk" });
     const far = await A.waitFor((m) => m.t === "snapshot");
-    expect(far.players).toEqual([]);
+    expect(far).toMatchObject({ players: [], gone: [b.id] });
+    // A đứng yên: không gửi lại cho A những gì A đã biết.
+    await sleep(250);
+    expect(A.inbox.filter((m) => m.t === "snapshot")).toHaveLength(0);
   });
 
-  it("gửi quá 5 tin/giây → bị bỏ qua và nhận cảnh báo", async () => {
+  it("gửi dồn quá giới hạn → bị bỏ qua và nhận cảnh báo", async () => {
     const a = await login({ onboarded: true });
     const A = await connect(a.cookie, "lobby-31");
     await A.waitFor((m) => m.t === "welcome");
-    for (let i = 0; i < 12; i++) A.send({ t: "move", p: [i * 0.1, 0, 0], r: 0, a: "walk" });
+    for (let i = 0; i < 20; i++) A.send({ t: "move", p: [i * 0.1, 0, 0], r: 0, a: "walk" });
     expect(await A.waitFor((m) => m.t === "warn")).toEqual({ t: "warn", code: "RATE_LIMITED" });
   });
 

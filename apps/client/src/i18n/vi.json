@@ -63,7 +63,7 @@
     "invalid": "Biệt danh chưa hợp lệ."
   },
   "room": {
-    "label": "Phòng {wing}-{floor}{room}",
+    "label": "Phòng {wing}-{floor}-{room}",
     "callDoctor": "Gọi bác sĩ",
     "settings": "Cài đặt"
   },
@@ -103,6 +103,33 @@
     "confirmWord": "XOA",
     "logout": "Đăng xuất",
     "done": "Đã xong",
+    "close": "Đóng"
+  },
+  "world": {
+    "lobby": "Sảnh chính",
+    "garden": "Vườn",
+    "floor": "Khu {wing} · Tầng {floor}",
+    "room": "Phòng của tôi",
+    "circle": "Phòng sinh hoạt",
+    "comingSoon": "sắp mở",
+    "elevator": "Thang máy",
+    "map": "Bản đồ",
+    "mapTitle": "Đi đến",
+    "youAreHere": "Bạn đang ở đây",
+    "myFloor": "Hành lang tầng của tôi",
+    "otherFloors": "Các tầng khác",
+    "leaveRoom": "Ra hành lang",
+    "enterRoom": "Vào phòng của bạn",
+    "lockedDoor": "Phòng {room} — cửa khóa, chỉ chủ phòng vào được.",
+    "goGarden": "Ra vườn",
+    "goLobby": "Về sảnh",
+    "useElevator": "Đi thang máy",
+    "online": "{n} người ở đây",
+    "wave": "Vẫy tay",
+    "reconnecting": "Đang kết nối lại…",
+    "kicked": "Bạn vừa mở game ở một tab khác. Tải lại trang để chơi ở đây.",
+    "moveHint": "Di chuyển: W A S D hoặc phím mũi tên",
+    "redirected": "Khu này đông quá, bạn được chuyển sang khu bên cạnh.",
     "close": "Đóng"
   }
 }

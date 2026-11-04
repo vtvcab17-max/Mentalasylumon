@@ -5,9 +5,13 @@ import type { Env } from "../env";
 /**
  * WorldZone — một không gian chung (sảnh, vườn, hành lang một tầng) (T065, research.md §R2, ws-protocol.md).
  * - WebSocket Hibernation: socket gắn tag = userId; trạng thái người chơi lưu bằng serializeAttachment
- *   (≤ 2 KB) để sống qua lúc object ngủ.
- * - Client gửi `move` tối đa 5 lần/giây; server gộp và gửi `snapshot` tối đa 10 lần/giây, mỗi người chỉ nhận
- *   người trong bán kính 30 m. Không ai di chuyển thì không có timer, object được ngủ.
+ *   (≤ 2 KB) để sống qua lúc object ngủ — tối đa 2 giây/lần mỗi người (mất vài giây vị trí khi ngủ là chấp nhận được).
+ * - Giới hạn tốc độ kiểu "xô token": trung bình ≤ 6 tin/giây, cho phép dồn ngắn hạn tới 10 tin.
+ * - Client gửi `move` tối đa 5 lần/giây (server cho lệch tới 6 vì đồng hồ client không đều); server gộp và gửi
+ *   `snapshot` tối đa 10 lần/giây (5 lần/giây khi zone > 80 người).
+ * - Snapshot là phần thay đổi: chỉ người vừa di chuyển hoặc vừa vào tầm nhìn, cộng danh sách `gone` (vừa ra khỏi
+ *   tầm nhìn). Tầm nhìn = tối đa 80 người gần nhất trong bán kính 30 m.
+ * - Không ai di chuyển thì không có timer, object được ngủ.
  * - Đầy (zone_capacity) thì báo `zone_full` kèm bản sao kế tiếp.
  * Danh tính (X-User-*) do Worker gắn sau khi kiểm phiên; DO chỉ nhận request từ Worker.
  */
@@ -22,15 +26,26 @@ interface PlayerState {
   p: Vec3;
   r: number;
   a: Anim;
-  moves: number[]; // thời điểm các tin move trong 1 giây gần nhất
-  drops: number;
-  lastWarn: number;
   lastEmote: number;
 }
 
-export const MOVE_PER_SECOND = 5;
+/** Trạng thái chỉ giữ trong bộ nhớ (không lưu khi ngủ). */
+interface Volatile {
+  tokens: number;
+  refillAt: number;
+  drops: number;
+  lastWarn: number;
+  persistedAt: number;
+}
+
+export const MOVE_PER_SECOND = 6; // client gửi ≤ 5; +1 cho độ lệch đồng hồ
+export const MOVE_BURST = 10;
+const PERSIST_MS = 2000;
 export const SNAPSHOT_MS = 100;
+export const SNAPSHOT_MS_CROWDED = 200;
+export const CROWDED = 80;
 export const VIEW_RADIUS = 30;
+export const MAX_VIEW = 60;
 const BOUND = 200;
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -46,7 +61,8 @@ export class WorldZone extends DurableObject<Env> {
   private dirty = new Set<string>();
   private timer: ReturnType<typeof setTimeout> | null = null;
   private tick = 0;
-  private lastSent = new WeakMap<WebSocket, string>();
+  private views = new WeakMap<WebSocket, Set<string>>();
+  private vol = new WeakMap<WebSocket, Volatile>();
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -73,6 +89,16 @@ export class WorldZone extends DurableObject<Env> {
   private save(ws: WebSocket, s: PlayerState) {
     this.players.set(ws, s);
     ws.serializeAttachment(s);
+    this.volatile(ws).persistedAt = Date.now();
+  }
+
+  private volatile(ws: WebSocket): Volatile {
+    let v = this.vol.get(ws);
+    if (!v) {
+      v = { tokens: MOVE_BURST, refillAt: Date.now(), drops: 0, lastWarn: 0, persistedAt: 0 };
+      this.vol.set(ws, v);
+    }
+    return v;
   }
 
   private send(ws: WebSocket, msg: ZoneServerMsg) {
@@ -148,7 +174,7 @@ export class WorldZone extends DurableObject<Env> {
     }
 
     this.ctx.acceptWebSocket(server, [userId]);
-    const me: PlayerState = { id: userId, nickname, avatar, p, r: 0, a: "idle", moves: [], drops: 0, lastWarn: 0, lastEmote: 0 };
+    const me: PlayerState = { id: userId, nickname, avatar, p, r: 0, a: "idle", lastEmote: 0 };
     this.save(server, me);
 
     const others = this.sockets()
@@ -158,6 +184,9 @@ export class WorldZone extends DurableObject<Env> {
       .map((s) => ({ id: s.id, nickname: s.nickname, avatar: s.avatar, p: s.p, r: s.r, a: s.a }));
     this.send(server, { t: "welcome", selfId: userId, zoneId, players: others });
     this.broadcast({ t: "join", player: { id: me.id, nickname: me.nickname, avatar: me.avatar, p: me.p, r: me.r, a: me.a } }, server);
+    // Snapshot đầu tiên cho người mới (ai đang ở gần) và cho người khác (người mới xuất hiện).
+    this.dirty.add(userId);
+    this.schedule();
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -176,21 +205,23 @@ export class WorldZone extends DurableObject<Env> {
     const now = Date.now();
 
     if (msg.t === "move") {
-      s.moves = s.moves.filter((t) => now - t < 1000);
-      if (s.moves.length >= MOVE_PER_SECOND) {
-        s.drops++;
-        if (s.drops > 3 && now - s.lastWarn > 1000) {
-          s.lastWarn = now;
+      const v = this.volatile(ws);
+      v.tokens = Math.min(MOVE_BURST, v.tokens + ((now - v.refillAt) / 1000) * MOVE_PER_SECOND);
+      v.refillAt = now;
+      if (v.tokens < 1) {
+        v.drops++;
+        if (v.drops > 3 && now - v.lastWarn > 1000) {
+          v.lastWarn = now;
           this.send(ws, { t: "warn", code: "RATE_LIMITED" });
         }
-        this.save(ws, s);
         return;
       }
-      s.moves.push(now);
+      v.tokens -= 1;
       s.p = [r2(clamp(msg.p[0], -BOUND, BOUND)), r2(clamp(msg.p[1], -1, 20)), r2(clamp(msg.p[2], -BOUND, BOUND))];
       s.r = r2(((msg.r % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI));
       s.a = msg.a;
-      this.save(ws, s);
+      this.players.set(ws, s);
+      if (now - v.persistedAt > PERSIST_MS) this.save(ws, s);
       this.dirty.add(s.id);
       this.schedule();
       return;
@@ -209,7 +240,9 @@ export class WorldZone extends DurableObject<Env> {
   }
 
   private schedule() {
-    if (!this.timer) this.timer = setTimeout(() => this.flush(), SNAPSHOT_MS);
+    if (this.timer) return;
+    const ms = this.ctx.getWebSockets().length > CROWDED ? SNAPSHOT_MS_CROWDED : SNAPSHOT_MS;
+    this.timer = setTimeout(() => this.flush(), ms);
   }
 
   private flush() {
@@ -220,16 +253,30 @@ export class WorldZone extends DurableObject<Env> {
       .map((ws) => [ws, this.state(ws)] as const)
       .filter((x): x is readonly [WebSocket, PlayerState] => !!x[1]);
     const R2 = VIEW_RADIUS * VIEW_RADIUS;
+    // Mỗi người chỉ được chuyển sang JSON một lần mỗi nhịp.
+    const cache = new Map<string, string>();
+    const entry = (o: PlayerState) => {
+      let e = cache.get(o.id);
+      if (!e) {
+        e = JSON.stringify({ id: o.id, p: o.p, r: o.r, a: o.a });
+        cache.set(o.id, e);
+      }
+      return e;
+    };
     for (const [ws, me] of all) {
-      const near = all.filter(([, o]) => o.id !== me.id && dist2(o.p, me.p) <= R2).map(([, o]) => o);
-      const sig = near
-        .map((o) => o.id)
-        .sort()
-        .join(",");
-      // Gửi khi có người gần đó vừa di chuyển, hoặc tập người xung quanh thay đổi (ai đó ra/vào bán kính).
-      if (!near.some((o) => this.dirty.has(o.id)) && sig === this.lastSent.get(ws)) continue;
-      this.lastSent.set(ws, sig);
-      this.send(ws, { t: "snapshot", tick: this.tick, players: near.map((o) => ({ id: o.id, p: o.p, r: o.r, a: o.a })) });
+      let near = all.map(([, o]) => o).filter((o) => o.id !== me.id && dist2(o.p, me.p) <= R2);
+      if (near.length > MAX_VIEW) near = near.sort((a, b) => dist2(a.p, me.p) - dist2(b.p, me.p)).slice(0, MAX_VIEW);
+      const prev = this.views.get(ws) ?? new Set<string>();
+      const view = new Set(near.map((o) => o.id));
+      const entries = near.filter((o) => this.dirty.has(o.id) || !prev.has(o.id)).map(entry);
+      const gone = [...prev].filter((id) => !view.has(id));
+      this.views.set(ws, view);
+      if (!entries.length && !gone.length) continue;
+      try {
+        ws.send(`{"t":"snapshot","tick":${this.tick},"players":[${entries.join(",")}],"gone":${JSON.stringify(gone)}}`);
+      } catch {
+        /* socket vừa đóng */
+      }
     }
     this.dirty.clear();
   }

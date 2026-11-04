@@ -28,7 +28,10 @@ export const ZoneServerMsg = z.discriminatedUnion("t", [
   z.object({
     t: z.literal("snapshot"),
     tick: z.number(),
+    /** Phần thay đổi: người vừa di chuyển hoặc vừa vào tầm nhìn. */
     players: z.array(z.object({ id: z.string(), p: Vec3, r: z.number(), a: Anim })),
+    /** Người vừa ra khỏi tầm nhìn (ngoài 30 m hoặc ngoài 80 người gần nhất). */
+    gone: z.array(z.string()).default([]),
   }),
   z.object({ t: z.literal("emote"), id: z.string(), e: z.string() }),
   z.object({ t: z.literal("zone_full"), redirectZoneId: z.string() }),

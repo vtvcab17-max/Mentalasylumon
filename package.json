@@ -14,16 +14,20 @@
     "i18n:check": "node scripts/i18n-check.mjs",
     "eval:safety": "node evals/run-safety.mjs",
     "eval:moderation": "node evals/run-moderation.mjs",
-    "seed:dev": "pnpm --filter worker exec wrangler d1 execute benh-vien-dev --local --config ../../wrangler.jsonc --file seed/dev.sql"
+    "seed:dev": "pnpm --filter worker exec wrangler d1 execute benh-vien-dev --local --config ../../wrangler.jsonc --file seed/dev.sql",
+    "sim:fill-rooms": "node scripts/sim-fill-rooms.mjs",
+    "load:zones": "node scripts/load-zones.mjs",
+    "dev:local": "pnpm build && node scripts/dev-local.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
-    "@playwright/test": "^1.48.0",
+    "@playwright/test": "^1.63.0",
     "esbuild": "^0.25.12",
     "eslint": "^9.0.0",
     "prettier": "^3.3.0",
     "typescript": "^5.6.0",
     "typescript-eslint": "^8.0.0",
+    "ws": "^8.21.0",
     "zod": "^3.25.76"
   },
   "pnpm": {

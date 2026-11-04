@@ -63,7 +63,7 @@
     "invalid": "That nickname isn't valid."
   },
   "room": {
-    "label": "Room {wing}-{floor}{room}",
+    "label": "Room {wing}-{floor}-{room}",
     "callDoctor": "Call a doctor",
     "settings": "Settings"
   },
@@ -103,6 +103,33 @@
     "confirmWord": "DELETE",
     "logout": "Sign out",
     "done": "Done",
+    "close": "Close"
+  },
+  "world": {
+    "lobby": "Main lobby",
+    "garden": "Garden",
+    "floor": "Wing {wing} · Floor {floor}",
+    "room": "My room",
+    "circle": "Circle room",
+    "comingSoon": "coming soon",
+    "elevator": "Elevator",
+    "map": "Map",
+    "mapTitle": "Go to",
+    "youAreHere": "You are here",
+    "myFloor": "My floor's hallway",
+    "otherFloors": "Other floors",
+    "leaveRoom": "Go to the hallway",
+    "enterRoom": "Enter your room",
+    "lockedDoor": "Room {room} — locked; only its owner can enter.",
+    "goGarden": "Go to the garden",
+    "goLobby": "Back to the lobby",
+    "useElevator": "Take the elevator",
+    "online": "{n} people here",
+    "wave": "Wave",
+    "reconnecting": "Reconnecting…",
+    "kicked": "You opened the game in another tab. Reload this page to play here.",
+    "moveHint": "Move: W A S D or arrow keys",
+    "redirected": "This area is busy, so you've been moved to the one next door.",
     "close": "Close"
   }
 }

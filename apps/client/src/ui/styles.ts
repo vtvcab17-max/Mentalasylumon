@@ -37,10 +37,11 @@ export const STYLES = `
 .bvo-msg.safety{border:2px solid #e3b3a8;background:#fff6f3}
 .bvo-ai{display:inline-block;font-size:11px;font-weight:700;background:#2b2b2b;color:#fff;border-radius:6px;padding:1px 6px;margin-right:6px;vertical-align:1px}
 .bvo-res{margin-top:8px;font-size:14px}.bvo-res a{color:var(--accent);font-weight:600}
-.bvo-compose{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+/* Chừa 72px dưới cùng cho nút "Cần giúp đỡ ngay" (luôn hiện, không được che nút khác). */
+.bvo-compose{display:flex;gap:8px;padding:10px 12px calc(72px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
 .bvo-compose textarea{flex:1;resize:none;height:44px;max-height:120px}
 .bvo-compose .bvo-btn{width:auto;margin:0}
-.bvo-doctors{padding:12px 16px;overflow:auto}
+.bvo-doctors{padding:12px 16px calc(80px + env(safe-area-inset-bottom));overflow:auto}
 .bvo-doctor{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px;margin:8px 0;cursor:pointer;font:inherit}
 .bvo-toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#2b2b2b;color:#fff;padding:10px 16px;border-radius:10px;z-index:2147482000}
 @media (max-width:600px){.bvo-panel{width:100%}}

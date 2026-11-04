@@ -103,7 +103,7 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 - [X] T040 [P] [US1] Viết test cấp phòng (lấy phòng trống nhỏ nhất, hết phòng thì mở tầng, đủ 10 tầng thì mở khu, chạy song song không trùng phòng) trong `apps/worker/test/rooms.test.ts`
 - [X] T041 [P] [US1] Viết test `PatientRecord` (mã hóa khi lưu, giới hạn 20 tin/ngày theo giờ VN, xử lý tuần tự, `deleteAll`) trong `apps/worker/test/patient-record.test.ts`
 - [X] T042 [P] [US1] Viết test onboarding (dưới 18 → `UNDERAGE` kèm nguồn cho người trẻ; ô đồng ý bắt buộc phải `true`; đổi `terms_version` thì phải đồng ý lại) trong `apps/worker/test/onboarding.test.ts`
-- [ ] T043 [P] [US1] Viết test e2e luồng US1 bằng tiếng Việt và tiếng Anh trong `e2e/us1-private-room.spec.ts`
+- [X] T043 [P] [US1] Viết test e2e luồng US1 bằng tiếng Việt và tiếng Anh trong `e2e/us1-private-room.spec.ts`
 
 ### Implementation for User Story 1
 
@@ -140,21 +140,21 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 ### Tests for User Story 2
 
 - [X] T063 [P] [US2] Viết test `WorldZone` (welcome/join/leave, giới hạn 5 tin/giây, snapshot 10 Hz chỉ trong 30 m, `zone_full` ở 150 người) trong `apps/worker/test/world-zone.test.ts`
-- [ ] T064 [P] [US2] Viết script tải `scripts/load-zones.ts` (`pnpm load:zones --users 500`) đo SC-004
+- [X] T064 [P] [US2] Viết script tải `scripts/load-zones.mjs` (`pnpm load:zones --users 500`) đo SC-004
 
 ### Implementation for User Story 2
 
 - [X] T065 [US2] Viết Durable Object `apps/worker/src/do/world-zone.ts` với WebSocket Hibernation, tag `userId`, auto-response ping (research.md §R2)
 - [X] T066 [US2] Viết `GET /api/world/layout`, `POST /api/world/join` (chọn bản sao còn chỗ), `GET /api/avatar-catalog` trong `apps/worker/src/api/world.ts`
 - [ ] T067 [P] [US2] Làm bộ khối module chibi (sảnh, hành lang, cửa phòng có biển số, cầu thang, vườn, phòng tròn bên ngoài) trong `assets-src/modules/` và xuất `apps/client/public/models/modules/*.glb`; biển hiệu không nướng chữ cứng (Constitution V)
-- [ ] T068 [US2] Viết `apps/client/src/world/hospital-builder.ts` dựng khu/tầng từ khối module theo `/api/world/layout`
-- [ ] T069 [US2] Viết `apps/client/src/net/zone-client.ts`: gửi `move` khi có thay đổi, nội suy snapshot, đổi zone khi `zone_full`
-- [ ] T070 [US2] Viết điều khiển nhân vật góc nhìn thứ ba (bàn phím + joystick cảm ứng) trong `apps/client/src/world/player-controller.ts`
-- [ ] T071 [US2] Viết instancing/LOD cho nhân vật ở xa và giới hạn 30 nhân vật vẽ đầy đủ ở mức thấp trong `apps/client/src/engine/crowd.ts` (SC-009)
-- [ ] T072 [US2] Viết cửa phòng: chỉ chủ phòng vào được, người khác chỉ thấy số phòng, trong `apps/client/src/world/doors.ts` (FR-010)
-- [ ] T073 [US2] Viết bản đồ, chỉ đường, nút "về phòng" và "tới phòng sinh hoạt" trong `apps/client/src/ui/map.ts` (FR-011)
-- [ ] T074 [US2] Viết script `scripts/sim-fill-rooms.ts` (`pnpm sim:fill-rooms`) để kiểm tra tự mở tầng/khu
-- [ ] T075 [US2] Viết test e2e US2 (hai trình duyệt thấy nhau, cửa khóa) trong `e2e/us2-walk.spec.ts` và đo trên điện thoại tầm trung ở mức thấp, ghi vào `docs/perf.md`
+- [X] T068 [US2] Viết `apps/client/src/world/hospital-builder.ts` dựng khu/tầng từ khối module theo `/api/world/layout`
+- [X] T069 [US2] Viết `apps/client/src/net/zone-client.ts`: gửi `move` khi có thay đổi, nội suy snapshot, đổi zone khi `zone_full`
+- [X] T070 [US2] Viết điều khiển nhân vật góc nhìn thứ ba (bàn phím + joystick cảm ứng) trong `apps/client/src/world/player-controller.ts`
+- [X] T071 [US2] Viết instancing/LOD cho nhân vật ở xa và giới hạn 30 nhân vật vẽ đầy đủ ở mức thấp trong `apps/client/src/engine/crowd.ts` (SC-009)
+- [X] T072 [US2] Viết cửa phòng: chỉ chủ phòng vào được, người khác chỉ thấy số phòng, trong `apps/client/src/world/doors.ts` (FR-010)
+- [X] T073 [US2] Viết bản đồ, chỉ đường, nút "về phòng" và "tới phòng sinh hoạt" trong `apps/client/src/ui/map.ts` (FR-011)
+- [X] T074 [US2] Viết script `scripts/sim-fill-rooms.mjs` (`pnpm sim:fill-rooms`) để kiểm tra tự mở tầng/khu
+- [X] T075 [US2] Viết test e2e US2 (hai trình duyệt thấy nhau, cửa khóa) trong `e2e/us2-walk.spec.ts` và đo trên điện thoại tầm trung ở mức thấp, ghi vào `docs/perf.md`
 
 **Checkpoint**: US1 và US2 chạy độc lập; đạt SC-004, SC-009
 

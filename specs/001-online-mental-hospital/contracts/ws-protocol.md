@@ -26,7 +26,7 @@ kết nối. Mỗi khung tin là JSON có trường `t` (loại tin). Schema đ�
 
 | t | Trường | Giới hạn |
 |---|---|---|
-| `move` | `p, r, a` | ≤ 5 lần/giây, chỉ gửi khi có thay đổi |
+| `move` | `p, r, a` | ≤ 5 lần/giây, chỉ gửi khi có thay đổi (server cho lệch tới 6/giây) |
 | `emote` | `e` (`wave` \| `heart` \| `nod`) | ≤ 1 lần mỗi 2 giây |
 
 **Server → Client**
@@ -35,7 +35,7 @@ kết nối. Mỗi khung tin là JSON có trường `t` (loại tin). Schema đ�
 |---|---|---|
 | `welcome` | `selfId, zoneId, players: [{id, nickname, avatar, p, r, a}]` | ngay sau khi kết nối |
 | `join` / `leave` | `player` / `id` | |
-| `snapshot` | `tick, players: [{id, p, r, a}]` | 10 lần/giây, chỉ người trong bán kính 30 m. Client nội suy giữa các snapshot |
+| `snapshot` | `tick, players: [{id, p, r, a}], gone: [id]` | Phần thay đổi, ≤ 10 lần/giây (5 lần/giây khi zone > 80 người). `players` = người vừa di chuyển hoặc vừa vào tầm nhìn; `gone` = người vừa ra khỏi tầm nhìn. Tầm nhìn = tối đa 80 người gần nhất trong 30 m. Người trong `welcome`/`join` chỉ hiện khi có trong snapshot. Client nội suy giữa các snapshot |
 | `emote` | `id, e` | |
 | `zone_full` | `redirectZoneId` | khi zone đã đủ người (mặc định 150) |
 

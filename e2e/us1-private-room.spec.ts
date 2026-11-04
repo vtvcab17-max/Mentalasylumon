@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
+import { testUsers } from "./helpers";
 
 /**
  * US1 e2e (T043). Cần: server đang chạy (BASE_URL), D1 đã seed, và một phiên đăng nhập thử
  * (E2E_SESSION = giá trị cookie `sid` của tài khoản test, vì đăng nhập Google không tự động hóa được).
  */
-const session = process.env.E2E_SESSION;
+let session: string | undefined = process.env.E2E_SESSION;
 
 test("màn đầu cho chọn ngôn ngữ, chọn English thì giao diện tiếng Anh", async ({ page }) => {
   await page.goto("/");
@@ -22,7 +23,9 @@ test("nút Cần giúp đỡ ngay luôn có và hiện số 115", async ({ page 
 });
 
 test.describe("đã đăng nhập", () => {
-  test.skip(!session, "đặt E2E_SESSION để chạy");
+  test.beforeAll(async () => {
+    session ??= (await testUsers(1))[0].token;
+  });
 
   test.beforeEach(async ({ context, baseURL }) => {
     await context.addCookies([{ name: "sid", value: session!, url: baseURL! }]);

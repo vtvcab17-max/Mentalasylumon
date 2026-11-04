@@ -7,7 +7,7 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   {
     files: ["scripts/**", "evals/**", "**/*.config.*"],
-    languageOptions: { globals: { process: "readonly", console: "readonly", __dirname: "readonly" } },
+    languageOptions: { globals: { process: "readonly", console: "readonly", __dirname: "readonly", fetch: "readonly", performance: "readonly", setTimeout: "readonly", setInterval: "readonly", clearInterval: "readonly" } },
     rules: { "no-console": "off" },
   },
   {
