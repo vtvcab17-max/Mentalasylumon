@@ -52,11 +52,18 @@ test("hành lang → sảnh → vườn cùng người khác; cửa người kh�
   await a.waitForTimeout(800);
   await a.screenshot({ path: `test-results/us2-${test.info().project.name}-lobby.png` });
 
-  // Từ cổng thang máy (đông) đi thẳng sang cổng vườn (tây).
-  const toGarden = a.getByRole("button", { name: /Ra vườn/ });
-  await walkUntil(a, "KeyA", toGarden);
-  await toGarden.click();
-  await expect(a.getByText(/Vườn ·/)).toBeVisible({ timeout: 15_000 });
+  // Từ chân cầu thang chính đi thẳng về phía nam ra cửa chính → sân trước (mặt tiền, portico, mái vòm).
+  const toCourt = a.getByRole("button", { name: /Ra sân trước/ });
+  await walkUntil(a, "KeyS", toCourt);
+  await toCourt.click();
+  await expect(a.getByText(/Sân trước ·/)).toBeVisible({ timeout: 15_000 });
+  await a.waitForTimeout(800);
+  await a.screenshot({ path: `test-results/us2-${test.info().project.name}-court.png` });
+
+  // Bản đồ → vườn sau (sân dạo có ao).
+  await a.getByRole("button", { name: /Bản đồ/ }).click();
+  await a.getByRole("button", { name: /Vườn sau/ }).click();
+  await expect(a.getByText(/Vườn sau ·/)).toBeVisible({ timeout: 15_000 });
   await a.waitForTimeout(800);
   await a.screenshot({ path: `test-results/us2-${test.info().project.name}-garden.png` });
 

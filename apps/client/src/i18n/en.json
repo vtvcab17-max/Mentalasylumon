@@ -107,12 +107,12 @@
   },
   "world": {
     "lobby": "Main lobby",
-    "garden": "Garden",
+    "garden": "Back garden",
     "floor": "Wing {wing} · Floor {floor}",
     "room": "My room",
     "circle": "Circle room",
     "comingSoon": "coming soon",
-    "elevator": "Elevator",
+    "elevator": "Main staircase",
     "map": "Map",
     "mapTitle": "Go to",
     "youAreHere": "You are here",
@@ -121,15 +121,17 @@
     "leaveRoom": "Go to the hallway",
     "enterRoom": "Enter your room",
     "lockedDoor": "Room {room} — locked; only its owner can enter.",
-    "goGarden": "Go to the garden",
+    "goGarden": "Go to the back garden",
     "goLobby": "Back to the lobby",
-    "useElevator": "Take the elevator",
+    "useElevator": "Take the main staircase",
     "online": "{n} people here",
     "wave": "Wave",
     "reconnecting": "Reconnecting…",
     "kicked": "You opened the game in another tab. Reload this page to play here.",
     "moveHint": "Move: W A S D or arrow keys",
     "redirected": "This area is busy, so you've been moved to the one next door.",
-    "close": "Close"
+    "close": "Close",
+    "court": "Front court",
+    "goCourt": "Go to the front court"
   }
 }

@@ -17,6 +17,7 @@ export function placeName(p: Place): string {
   if (p.kind === "room") return t("world.room");
   if (p.kind === "lobby") return t("world.lobby");
   if (p.kind === "garden") return t("world.garden");
+  if (p.kind === "court") return t("world.court");
   return t("world.floor", { wing: p.wing, floor: String(p.floor) });
 }
 
@@ -64,6 +65,7 @@ export function openMap(root: HTMLElement, opts: { layout: Layout; current: Plac
       my ? item({ kind: "room" }, `🛏 ${t("world.room")}`, `${my.wing}-${my.floor}-${String(my.roomNumber).padStart(2, "0")}`) : null,
       my ? item({ kind: "floor", wing: my.wing, floor: my.floor }, `🚪 ${t("world.myFloor")}`, placeName({ kind: "floor", wing: my.wing, floor: my.floor })) : null,
       item({ kind: "lobby" }, `🏥 ${t("world.lobby")}`),
+      item({ kind: "court" }, `🏛 ${t("world.court")}`),
       item({ kind: "garden" }, `🌳 ${t("world.garden")}`),
       item(null, `⭕ ${t("world.circle")}`, t("world.comingSoon")),
       others.length ? h("h3", { style: "margin:16px 0 4px" }, t("world.otherFloors")) : null,

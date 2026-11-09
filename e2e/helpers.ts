@@ -31,9 +31,9 @@ export async function openAs(browser: Browser, baseURL: string, token: string, l
 
 /** Vị trí đứng trước cửa phòng (giống apps/client/src/world/doors.ts). */
 export function doorStand(roomNumber: number): [number, number] {
-  const k = Math.floor((roomNumber - 1) / 2);
-  const side = roomNumber % 2 === 1 ? -1 : 1;
-  return [3 + k * 2.5, side * 1.1];
+  // Gallery một bên (apps/client/src/world/doors.ts): 1–20 phía tây, 21–40 phía đông, cửa ở phía bắc.
+  const x = roomNumber <= 20 ? -(7 + (20 - roomNumber) * 2.5) : 7 + (roomNumber - 21) * 2.5;
+  return [x, -1.1];
 }
 
 /** Giữ phím từng đoạn ngắn cho tới khi `until` hiện ra (trình duyệt không GPU chạy ít khung hình nên đi chậm). */

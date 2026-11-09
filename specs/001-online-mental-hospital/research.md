@@ -289,6 +289,24 @@ không phải tư vấn luật.
 
 ---
 
+## R18. Kiến trúc bệnh viện: lấy cảm hứng từ bản vẽ 1815
+
+**Quyết định**: Bố cục và mặt tiền 3D dựa theo bản vẽ mặt bằng và mặt đứng năm 1815 của tòa nhà St George's Fields
+(Wellcome Collection, tranh khắc thuộc phạm vi công cộng) do người dùng cung cấp. Chỉ mượn **kiến trúc**:
+
+- Sân trước (`court`): mặt tiền Georgian 3 tầng dài, khối giữa có portico 6 cột + trán tường tam giác, mái vòm đồng
+  có trống, đèn lồng và chóp; hai nhà gác cổng; đường vòng xe.
+- Sảnh chính sau cửa chính, cầu thang chính phía bắc dẫn lên các tầng.
+- Mỗi tầng: sảnh cầu thang ở giữa, gallery chạy sang tây/đông, phòng xếp **một bên** (bắc), bên kia là cửa sổ.
+  Phòng 1–20 gallery tây, 21–40 gallery đông (`apps/client/src/world/doors.ts`).
+- Vườn sau (`garden`) là sân dạo có tường gạch, lối chữ thập và ao phía đông.
+
+**Không** dùng tên, biểu tượng hay thương hiệu của bệnh viện thật; **không** dựng khu giam giữ hay chia khu theo
+giới tính như bản gốc — trái với nguyên tắc An toàn trên hết và với mục đích hỗ trợ của dự án.
+
+**Kỹ thuật**: zone mới `court-N` (`ZONE_RE`, `JoinBody`); mỗi khu có thể đặt góc camera riêng (`Area.view`) — sân
+trước dùng camera thấp nhìn về phía bắc với tầm nhìn tối thiểu 90 m để thấy cả mặt tiền ở mức đồ họa thấp.
+
 ## Sources
 
 - [Durable Objects – WebSockets (Hibernation)](https://developers.cloudflare.com/durable-objects/api/websockets)

@@ -171,6 +171,14 @@ describe("API thế giới (T066)", () => {
     expect((await call(a.cookie, "POST", "/api/world/join", { area: "floor", wing: "ZZ", floor: 9 })).status).toBe(400);
   });
 
+  it("join sân trước (bố cục 1815, R18)", async () => {
+    const a = await login({ onboarded: true });
+    const j = (await (await call(a.cookie, "POST", "/api/world/join", { area: "court" })).json()) as { zoneId: string };
+    expect(j.zoneId).toBe("court-1");
+    const A = await connect(a.cookie, j.zoneId);
+    expect(await A.waitFor((m) => m.t === "welcome")).toMatchObject({ zoneId: "court-1" });
+  });
+
   it("layout có khu/tầng và phòng của mình, không lộ chủ phòng khác", async () => {
     const a = await login({ onboarded: true });
     const layout = (await (await call(a.cookie, "GET", "/api/world/layout")).json()) as {

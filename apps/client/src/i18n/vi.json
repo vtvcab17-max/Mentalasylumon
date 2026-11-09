@@ -107,12 +107,12 @@
   },
   "world": {
     "lobby": "Sảnh chính",
-    "garden": "Vườn",
+    "garden": "Vườn sau",
     "floor": "Khu {wing} · Tầng {floor}",
     "room": "Phòng của tôi",
     "circle": "Phòng sinh hoạt",
     "comingSoon": "sắp mở",
-    "elevator": "Thang máy",
+    "elevator": "Cầu thang chính",
     "map": "Bản đồ",
     "mapTitle": "Đi đến",
     "youAreHere": "Bạn đang ở đây",
@@ -121,15 +121,17 @@
     "leaveRoom": "Ra hành lang",
     "enterRoom": "Vào phòng của bạn",
     "lockedDoor": "Phòng {room} — cửa khóa, chỉ chủ phòng vào được.",
-    "goGarden": "Ra vườn",
+    "goGarden": "Ra vườn sau",
     "goLobby": "Về sảnh",
-    "useElevator": "Đi thang máy",
+    "useElevator": "Lên cầu thang chính",
     "online": "{n} người ở đây",
     "wave": "Vẫy tay",
     "reconnecting": "Đang kết nối lại…",
     "kicked": "Bạn vừa mở game ở một tab khác. Tải lại trang để chơi ở đây.",
     "moveHint": "Di chuyển: W A S D hoặc phím mũi tên",
     "redirected": "Khu này đông quá, bạn được chuyển sang khu bên cạnh.",
-    "close": "Đóng"
+    "close": "Đóng",
+    "court": "Sân trước",
+    "goCourt": "Ra sân trước"
   }
 }

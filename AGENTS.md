@@ -46,18 +46,18 @@ specs/001-online-mental-hospital/
 Khi làm một task: đọc task trong `tasks.md` → viết test trước (bắt buộc cho phần an toàn) → code → chạy kiểm tra
 → đánh dấu `[X]` → commit. Không tự ý đổi spec/plan; chỗ nào mâu thuẫn thì hỏi người dùng.
 
-## Trạng thái (2026-11-04)
+## Trạng thái (2026-11-09)
 
-- **56/105 task xong.** Phase 1 (Setup), Phase 2 (Nền tảng), US1 (MVP: phòng riêng + bác sĩ AI) gần xong.
-- **Còn mở ở Phase 2/US1:**
-  - T022, T023 — bộ mẫu `evals/safety/` và `evals/moderation/` mới là bản khởi đầu, chưa đủ số tối thiểu
-    (vi: 200 khủng hoảng/100 dụ thuốc/50 jailbreak/200 bình thường; en: 100/50/25/100). Cần người có chuyên môn duyệt.
-  - T043 — test e2e Playwright đã viết (`e2e/us1-private-room.spec.ts`), chưa chạy (cần `E2E_SESSION`).
-  - T057 — model 3D phòng riêng (GLB). Hiện phòng và nhân vật dựng bằng khối hình trong code.
-  - T062 — chạy eval an toàn với model thật (Workers AI), ghi `evals/RESULTS.md`. Mô tả task còn ghi Haiku/Sonnet:
-    nay dùng Workers AI (xem research.md §R6).
-- **Tiếp theo:** US2 (T063–T075) đi dạo 3D nhiều người (`WorldZone` DO), rồi US3 vòng sinh hoạt, US4 thuyết trình,
-  Phase 7 hoàn thiện.
+- **69/105 task xong.** Phase 1–2, US1 (phòng riêng + bác sĩ AI) và US2 (đi dạo 3D nhiều người, `WorldZone` DO)
+  đã chạy; e2e desktop 4/4 xanh, 113 unit test xanh.
+- **Bố cục viện theo bản vẽ 1815** (research.md §R18): sân trước có mặt tiền + portico + mái vòm → sảnh chính →
+  cầu thang chính lên gallery các tầng (phòng một bên) → vườn sau có ao. Không dùng tên/thương hiệu bệnh viện thật.
+- **Còn mở:**
+  - T022, T023 — bộ mẫu eval an toàn/kiểm duyệt cần người có chuyên môn duyệt và bổ sung.
+  - T057, T067 — model 3D GLB (hiện dựng bằng khối hình trong code).
+  - T062 — chạy eval an toàn với Workers AI thật, ghi `evals/RESULTS.md`.
+  - SC-004 (500 người cùng lúc) chưa kiểm trên staging — xem `docs/perf.md`.
+- **Tiếp theo:** US3 vòng sinh hoạt (T076–T085), US4 thuyết trình (T086–T097), Phase 7 hoàn thiện.
 
 ## Kiến trúc nhanh
 
@@ -86,7 +86,7 @@ specs/          Spec Kit
 
 ```bash
 pnpm install
-pnpm test                 # Vitest trong môi trường Workers (101 test) — phải xanh
+pnpm test                 # Vitest trong môi trường Workers (113 test) — phải xanh
 pnpm lint && pnpm --filter worker typecheck
 pnpm build                # build client
 pnpm i18n:check

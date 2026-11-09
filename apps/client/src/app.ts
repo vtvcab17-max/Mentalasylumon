@@ -204,9 +204,10 @@ class Navigator {
       const portal = area.portals.find((p) => (p.x - x) ** 2 + (p.z - z) ** 2 <= p.radius ** 2);
       if (!portal) return setAction(null, null);
       if (portal.target === "garden") setAction(`🌳 ${t("world.goGarden")}`, () => this.go({ kind: "garden" }));
+      else if (portal.target === "court") setAction(`🏛 ${t("world.goCourt")}`, () => this.go({ kind: "court" }));
       else if (portal.target === "lobby") setAction(`🏥 ${t("world.goLobby")}`, () => this.go({ kind: "lobby" }));
-      else if (portal.target === "elevator")
-        setAction(`🛗 ${t("world.useElevator")}`, () => openMap(this.ui, { layout, current: place, go: (p) => this.go(p) }));
+      else if (portal.target === "stairs")
+        setAction(`🪜 ${t("world.useElevator")}`, () => openMap(this.ui, { layout, current: place, go: (p) => this.go(p) }));
       else setAction(`⭕ ${t("world.circle")} · ${t("world.comingSoon")}`, () => toast(t("world.comingSoon")), true);
     });
 
@@ -224,14 +225,19 @@ class Navigator {
   }
 }
 
-/** Chỗ xuất hiện khi vào khu: đi từ vườn vào sảnh thì đứng ở cổng vườn, từ thang máy thì ở cổng thang máy… */
+/**
+ * Chỗ xuất hiện khi vào khu (bố cục 1815, research.md §R18): từ sân trước vào sảnh thì đứng sau cửa chính,
+ * từ vườn sau thì ở cổng phía đông, từ tầng trên xuống thì ở chân cầu thang chính…
+ */
 function entrySpawn(area: Area, from: Place | null): [number, number] {
   const p = area.place;
   // Lệch ngẫu nhiên một chút để nhiều người vào cùng cổng không đứng đè lên nhau.
   const j = () => (Math.random() - 0.5) * 1.2;
-  if (p.kind === "lobby" && from?.kind === "garden") return [-9.6, j()];
-  if (p.kind === "lobby" && (from?.kind === "floor" || from?.kind === "room")) return [9.6, j()];
-  if (p.kind === "floor" && from?.kind !== "room") return [1.6, j() * 0.8];
+  if (p.kind === "lobby" && from?.kind === "court") return [j(), 6.4];
+  if (p.kind === "lobby" && from?.kind === "garden") return [9.2, j()];
+  if (p.kind === "lobby" && (from?.kind === "floor" || from?.kind === "room")) return [j(), -3.6];
+  if (p.kind === "court" && from?.kind === "lobby") return [j(), 2.4];
+  if (p.kind === "floor" && from?.kind !== "room") return [j() * 0.8, -1.4];
   if (p.kind === "floor") return area.spawn;
   return [area.spawn[0] + j(), area.spawn[1] + j()];
 }

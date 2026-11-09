@@ -1,40 +1,46 @@
 /**
- * Cửa phòng ở hành lang mỗi tầng (T072, FR-010). Chỉ chủ phòng vào được; người khác chỉ thấy số phòng.
- * Phòng lẻ ở phía bắc (z âm), phòng chẵn ở phía nam; mỗi cặp phòng cách nhau 2,5 m dọc hành lang.
+ * Cửa phòng trong gallery mỗi tầng (T072, FR-010). Chỉ chủ phòng vào được; người khác chỉ thấy số phòng.
+ * Bố cục theo bản vẽ 1815 (research.md §R18): sảnh cầu thang ở giữa, gallery chạy sang tây và đông, phòng xếp
+ * một bên (phía bắc, z âm), bên kia là cửa sổ. Phòng 1–20 ở gallery tây (1 ở đầu xa nhất), 21–40 ở gallery đông.
  */
 
-export const CORRIDOR_HALF_WIDTH = 2;
+export const GALLERY_HALF_WIDTH = 2;
 export const DOOR_SPACING = 2.5;
-export const FIRST_DOOR_X = 3;
+/** Nửa chiều dài sảnh cầu thang ở giữa. */
+export const HALL_HALF = 6;
 
 export interface DoorSpot {
   roomNumber: number;
   x: number;
-  z: number; // tường cửa
+  z: number; // mặt tường có cửa
   side: -1 | 1;
   mine: boolean;
 }
 
-export function doorPosition(roomNumber: number): { x: number; z: number; side: -1 | 1 } {
-  const k = Math.floor((roomNumber - 1) / 2);
-  const side: -1 | 1 = roomNumber % 2 === 1 ? -1 : 1;
-  return { x: FIRST_DOOR_X + k * DOOR_SPACING, z: side * CORRIDOR_HALF_WIDTH, side };
+export function doorPosition(roomNumber: number, roomsPerFloor = 40): { x: number; z: number; side: -1 | 1 } {
+  const half = Math.ceil(roomsPerFloor / 2);
+  const x =
+    roomNumber <= half
+      ? -(HALL_HALF + 1 + (half - roomNumber) * DOOR_SPACING)
+      : HALL_HALF + 1 + (roomNumber - half - 1) * DOOR_SPACING;
+  return { x, z: -GALLERY_HALF_WIDTH, side: -1 };
 }
 
-export function corridorLength(roomsPerFloor: number) {
-  return FIRST_DOOR_X + Math.ceil(roomsPerFloor / 2) * DOOR_SPACING + 1;
+/** Nửa chiều dài cả tầng (từ giữa sảnh cầu thang tới đầu gallery). */
+export function galleryHalfLength(roomsPerFloor: number) {
+  return HALL_HALF + 1 + Math.ceil(roomsPerFloor / 2) * DOOR_SPACING + 0.5;
 }
 
 export function buildDoors(roomsPerFloor: number, myRoomNumber: number | null): DoorSpot[] {
   return Array.from({ length: roomsPerFloor }, (_, i) => {
     const roomNumber = i + 1;
-    return { roomNumber, ...doorPosition(roomNumber), mine: roomNumber === myRoomNumber };
+    return { roomNumber, ...doorPosition(roomNumber, roomsPerFloor), mine: roomNumber === myRoomNumber };
   });
 }
 
-/** Vị trí đứng trước cửa (trong hành lang). */
+/** Vị trí đứng trước cửa (trong gallery). */
 export function standInFront(door: Pick<DoorSpot, "x" | "side">): [number, number] {
-  return [door.x, door.side * (CORRIDOR_HALF_WIDTH - 0.9)];
+  return [door.x, door.side * (GALLERY_HALF_WIDTH - 0.9)];
 }
 
 /** Cửa gần nhất trong tầm với (mặc định 1,4 m) tính từ vị trí người chơi. */

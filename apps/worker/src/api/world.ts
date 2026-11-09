@@ -10,13 +10,14 @@ import { requireOnboarded, requireUser } from "./guards";
 
 /** Thế giới chung (T066, contracts/http-api.md "Thế giới"). */
 
-/** Tên zone hợp lệ: lobby-N, garden-N, wing<A..>-floor<1..10>-N. */
-export const ZONE_RE = /^(lobby|garden|wing[A-Z]{1,3}-floor(?:[1-9]|10))-([1-9]\d{0,2})$/;
+/** Tên zone hợp lệ: lobby-N, garden-N, court-N, wing<A..>-floor<1..10>-N. */
+export const ZONE_RE = /^(lobby|garden|court|wing[A-Z]{1,3}-floor(?:[1-9]|10))-([1-9]\d{0,2})$/;
 const MAX_INSTANCES = 50;
 
 const JoinBody = z.discriminatedUnion("area", [
   z.object({ area: z.literal("lobby") }),
   z.object({ area: z.literal("garden") }),
+  z.object({ area: z.literal("court") }),
   z.object({ area: z.literal("floor"), wing: z.string().regex(/^[A-Z]{1,3}$/), floor: z.number().int().min(1).max(10) }),
 ]);
 

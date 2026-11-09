@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { Anim, Avatar } from "../avatar/avatar";
 import type { Engine } from "../engine/renderer";
-import { constrain, type Area } from "./hospital-builder";
+import { constrain, type Area, type CameraView } from "./hospital-builder";
 
 /**
  * Điều khiển nhân vật góc nhìn thứ ba (T070): W A S D / phím mũi tên trên máy tính, joystick cảm ứng
@@ -10,7 +10,7 @@ import { constrain, type Area } from "./hospital-builder";
 
 const SPEED = 3.2; // m/s
 // Góc nhìn cao (~55°) để tường và cổng phía gần camera (cao ≤ 3 m) không che nhân vật.
-const CAM_OFFSET = new THREE.Vector3(0, 9, 6.5);
+const DEFAULT_VIEW: CameraView = { offset: [0, 9, 6.5], lookY: 1, lookAhead: 0 };
 const KEYS: Record<string, [number, number]> = {
   KeyW: [0, -1], ArrowUp: [0, -1],
   KeyS: [0, 1], ArrowDown: [0, 1],
@@ -32,11 +32,29 @@ export class PlayerController {
   private waveUntil = 0;
   private stopFrame: () => void;
   private camTarget = new THREE.Vector3();
+  private camOffset = new THREE.Vector3();
+  private savedFar: [number, number, number] = [0, 0, 0];
+
+  private placeCamera() {
+    const v = this.area.view ?? DEFAULT_VIEW;
+    this.engine.camera.position.copy(this.camTarget).add(this.camOffset);
+    this.engine.camera.lookAt(this.camTarget.x, v.lookY, this.camTarget.z + v.lookAhead);
+  }
+
+  private setFar(far: number, fogNear: number, fogFar: number) {
+    this.engine.camera.far = far;
+    this.engine.camera.updateProjectionMatrix();
+    const fog = this.engine.scene.fog as THREE.Fog | null;
+    if (fog) {
+      fog.near = fogNear;
+      fog.far = fogFar;
+    }
+  }
 
   constructor(
     private engine: Engine,
     readonly avatar: Avatar,
-    private area: Pick<Area, "walk" | "blocks">,
+    private area: Pick<Area, "walk" | "blocks" | "view">,
     spawn: [number, number],
     private ui: HTMLElement,
   ) {
@@ -44,8 +62,12 @@ export class PlayerController {
     engine.scene.add(avatar.group);
     this.sync();
     this.camTarget.copy(this.position);
-    engine.camera.position.copy(this.position).add(CAM_OFFSET);
-    engine.camera.lookAt(this.position.x, 1, this.position.z);
+    const v = area.view ?? DEFAULT_VIEW;
+    this.camOffset.set(...v.offset);
+    // Khu ngoài trời rộng (sân trước) cần nhìn xa hơn mức đồ họa thấp để thấy mặt tiền; trả lại khi rời khu.
+    this.savedFar = [engine.camera.far, (engine.scene.fog as THREE.Fog | null)?.near ?? 0, (engine.scene.fog as THREE.Fog | null)?.far ?? 0];
+    if (v.far && v.far > engine.camera.far) this.setFar(v.far, v.far * 0.75, v.far);
+    this.placeCamera();
 
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
@@ -144,8 +166,7 @@ export class PlayerController {
 
     // Camera bám theo mượt.
     this.camTarget.lerp(this.position, 1 - Math.exp(-dt * 6));
-    this.engine.camera.position.copy(this.camTarget).add(CAM_OFFSET);
-    this.engine.camera.lookAt(this.camTarget.x, 1, this.camTarget.z);
+    this.placeCamera();
   }
 
   dispose() {
@@ -154,6 +175,7 @@ export class PlayerController {
     window.removeEventListener("keyup", this.onKeyUp);
     window.removeEventListener("blur", this.onBlur);
     this.joyEl?.remove();
+    if (this.engine.camera.far !== this.savedFar[0]) this.setFar(...this.savedFar);
     this.avatar.dispose();
   }
 }
