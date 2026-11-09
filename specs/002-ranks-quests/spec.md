@@ -14,6 +14,13 @@
 - Nhiệm vụ kiểu **hỗn hợp**: tự chăm sóc hằng ngày, mini-game công việc theo cấp, nhiệm vụ cộng đồng và khám phá. Điểm mỗi ngày có giới hạn, và không thưởng cho việc online lâu.
 - **Hội đồng bầu**: Thực tập sinh và Trưởng khoa lập thành Hội đồng. Ứng viên là Trưởng khoa. Không ai làm Viện trưởng hai tuần liền.
 
+## Clarifications
+
+### Session 2026-11-09
+
+- Q: Một Viện trưởng chung cho cả cộng đồng tiếng Việt và tiếng Anh, hay mỗi ngôn ngữ một người? → A: Một Viện trưởng chung (FR-029).
+- Q: Có giữ ngưỡng điểm, số ngày, giới hạn 100 điểm/ngày và lịch bầu cử mặc định không? → A: Đồng ý giữ các mặc định; quản trị viên chỉnh sau khi có số liệu thử nghiệm.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nhiệm vụ hằng ngày và sổ nhiệm vụ (Priority: P1)
