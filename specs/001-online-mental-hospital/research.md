@@ -328,7 +328,7 @@ trước dùng camera thấp nhìn về phía bắc với tầm nhìn tối thi�
   - Đèn đường và đèn cây tự bật; cửa sổ chuyển xanh đêm; trong nhà ban đêm có ánh đèn vàng ấm.
   - Người chơi chọn được "Theo giờ thật" (mặc định), "Luôn ban ngày" hoặc "Luôn ban đêm" trong Cài đặt.
 
-**Rationale**: Constitution VI đặt ngân sách tải lần đầu ≤ 15 MB ở mức thấp; bản dựng hiện khoảng 1,8 MB. Các thư viện
+**Rationale**: Constitution VI đặt ngân sách tải lần đầu ≤ 15 MB ở mức thấp; bản dựng hiện khoảng 1,3 MB. Các thư viện
 hậu kỳ có sẵn trong three r170, nên không thêm phụ thuộc. Người nhạy cảm với cảnh tối có thể giữ ban ngày.
 
 **Alternatives considered**: pmndrs/postprocessing (thêm phụ thuộc, lợi ích nhỏ với phong cách low-poly); Quaternius
