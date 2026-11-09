@@ -1,5 +1,22 @@
+/** Nhân vật 3D có cử động: Kenney Mini Characters (CC0) — xem apps/client/public/models/CREDITS.md. */
+export const CHARACTER_MODELS = [
+  "female-a", "female-b", "female-c", "female-d", "female-e", "female-f",
+  "male-a", "male-b", "male-c", "male-d", "male-e", "male-f",
+] as const;
+export type CharacterModel = (typeof CHARACTER_MODELS)[number];
+
+/** Nhân vật tạo trước khi có model: chọn tất định theo phần còn lại của spec để ai cũng thấy giống nhau. */
+export function modelOf(spec: { model?: string | null; parts: object; colors: object }): CharacterModel {
+  if (spec.model && (CHARACTER_MODELS as readonly string[]).includes(spec.model)) return spec.model as CharacterModel;
+  const s = JSON.stringify([spec.parts, spec.colors]);
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return CHARACTER_MODELS[(h >>> 0) % CHARACTER_MODELS.length];
+}
+
 /** Danh mục bộ phận nhân vật chibi (dùng chung client + worker để kiểm dữ liệu). */
 export const AVATAR_CATALOG = {
+  model: CHARACTER_MODELS,
   head: ["round", "oval"],
   hair: ["short", "bob", "long", "spiky", "bun", "curly"],
   outfit: ["hoodie", "cardigan", "pajamas", "tshirt", "coat"],
@@ -10,11 +27,13 @@ export const AVATAR_CATALOG = {
 } as const;
 
 export function isValidAvatar(a: {
+  model?: string | null;
   parts: { head: string; hair: string; outfit: string; accessory: string | null };
   colors: { skin: string; hair: string; outfit: string };
 }): boolean {
   const c = AVATAR_CATALOG;
   return (
+    (a.model == null || (CHARACTER_MODELS as readonly string[]).includes(a.model)) &&
     (c.head as readonly string[]).includes(a.parts.head) &&
     (c.hair as readonly string[]).includes(a.parts.hair) &&
     (c.outfit as readonly string[]).includes(a.parts.outfit) &&

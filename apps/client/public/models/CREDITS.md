@@ -9,3 +9,8 @@ All models here are CC0 (public domain). Credit is not required but given with t
 
 Built with `@gltf-transform/cli` 4.1.1: `merge --merge-scenes` → `dedup` → `prune` (KayKit atlas resized to 256×256).
 Each model is a root node named after its source file (e.g. `bed_single_A`, `tree_oak`).
+| `chars/*.glb`, `chars/_anims.glb` | Kenney Mini Characters, via [shorepine/kenney](https://github.com/shorepine/kenney) | Kenney (kenney.nl) | CC0 1.0 |
+
+Characters: each `character-*.glb` stripped of animations, welded and quantized (`KHR_mesh_quantization`); all
+animations (idle, walk, sit, pick-up, emote-yes, interact-right, wheelchair-*) kept once in `_anims.glb` — every
+character shares the same skeleton node names, so one set of clips drives them all.

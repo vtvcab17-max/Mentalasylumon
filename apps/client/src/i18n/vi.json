@@ -63,7 +63,9 @@
     "outfitColor": "Màu áo",
     "done": "Vào phòng của tôi",
     "taken": "Biệt danh này đã có người dùng.",
-    "invalid": "Biệt danh chưa hợp lệ."
+    "invalid": "Biệt danh chưa hợp lệ.",
+    "character": "Nhân vật",
+    "characterN": "Nhân vật {n}"
   },
   "room": {
     "label": "Phòng {wing}-{floor}-{room}",

@@ -19,6 +19,7 @@ const pick = <T,>(arr: readonly T[]) => arr[Math.floor(Math.random() * arr.lengt
 export function showCreateAvatar(root: HTMLElement, engine: Engine): Promise<Room> {
   const c = AVATAR_CATALOG;
   const spec: AvatarSpec = {
+    model: pick(c.model),
     parts: { head: "round", hair: pick(c.hair), outfit: pick(c.outfit), accessory: null },
     colors: { skin: pick(c.skin), hair: pick(c.hairColor), outfit: pick(c.outfitColor) },
   };
@@ -42,7 +43,14 @@ export function showCreateAvatar(root: HTMLElement, engine: Engine): Promise<Roo
     preview.group.rotation.y += dt * 0.5;
   });
 
-  const chips = (label: string, options: readonly (string | null)[], get: () => string | null, set: (v: string | null) => void, swatch = false) => {
+  const chips = (
+    label: string,
+    options: readonly (string | null)[],
+    get: () => string | null,
+    set: (v: string | null) => void,
+    swatch = false,
+    name?: (o: string | null) => string,
+  ) => {
     const wrap = h("div", { class: "bvo-chips" });
     const render = () =>
       wrap.replaceChildren(
@@ -53,7 +61,7 @@ export function showCreateAvatar(root: HTMLElement, engine: Engine): Promise<Roo
               type: "button",
               class: `bvo-chip ${swatch ? "bvo-swatch" : ""}`,
               "aria-pressed": String(get() === o),
-              "aria-label": o ?? t("avatar.none"),
+              "aria-label": name ? name(o) : (o ?? t("avatar.none")),
               style: swatch ? `background:${o}` : undefined,
               on: {
                 click: () => {
@@ -63,7 +71,7 @@ export function showCreateAvatar(root: HTMLElement, engine: Engine): Promise<Roo
                 },
               },
             },
-            swatch ? "" : o === null ? t("avatar.none") : o,
+            swatch ? "" : name ? name(o) : o === null ? t("avatar.none") : o,
           ),
         ),
       );
@@ -99,13 +107,15 @@ export function showCreateAvatar(root: HTMLElement, engine: Engine): Promise<Roo
           { class: "bvo-card", style: "max-height:62vh" },
           h("h2", {}, t("avatar.title")),
           h("label", { class: "bvo-field" }, h("span", {}, t("avatar.nickname")), nick, h("small", { class: "bvo-muted" }, t("avatar.nicknameHint"))),
-          chips(t("avatar.hair"), c.hair, () => spec.parts.hair, (v) => (spec.parts.hair = v!)),
-          chips(t("avatar.outfit"), c.outfit, () => spec.parts.outfit, (v) => (spec.parts.outfit = v!)),
-          chips(t("avatar.accessory"), [null, ...c.accessory], () => spec.parts.accessory, (v) => (spec.parts.accessory = v)),
-          chips(t("avatar.head"), c.head, () => spec.parts.head, (v) => (spec.parts.head = v!)),
-          chips(t("avatar.skin"), c.skin, () => spec.colors.skin, (v) => (spec.colors.skin = v!), true),
-          chips(t("avatar.hairColor"), c.hairColor, () => spec.colors.hair, (v) => (spec.colors.hair = v!), true),
-          chips(t("avatar.outfitColor"), c.outfitColor, () => spec.colors.outfit, (v) => (spec.colors.outfit = v!), true),
+          // Nhân vật 3D có cử động (Kenney Mini Characters, CC0). Các tùy chọn khối cũ chỉ còn dùng làm dự phòng.
+          chips(
+            t("avatar.character"),
+            c.model,
+            () => spec.model ?? null,
+            (v) => (spec.model = v ?? undefined),
+            false,
+            (o) => t("avatar.characterN", { n: String(c.model.indexOf(o as (typeof c.model)[number]) + 1) }),
+          ),
           err,
           done,
         ),

@@ -10,6 +10,8 @@ export const Nickname = z
   .regex(/^[\p{L}\p{N} _]+$/u, "letters, numbers, spaces and _ only");
 
 export const AvatarSpec = z.object({
+  /** Nhân vật 3D có cử động (Kenney Mini Characters); thiếu thì suy ra từ phần còn lại (modelOf). */
+  model: z.string().max(20).optional(),
   parts: z.object({ head: z.string(), hair: z.string(), outfit: z.string(), accessory: z.string().nullable() }),
   colors: z.object({
     skin: z.string().regex(/^#[0-9a-f]{6}$/i),

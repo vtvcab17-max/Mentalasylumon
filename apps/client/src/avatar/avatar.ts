@@ -1,5 +1,7 @@
-import type { AvatarSpec } from "@bvo/shared";
+import { modelOf, type AvatarSpec, type CharacterModel } from "@bvo/shared";
 import * as THREE from "three";
+import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { clone as cloneSkinned } from "three/examples/jsm/utils/SkeletonUtils.js";
 
 /**
  * Nhân vật chibi dựng từ khối hình (T056): đầu to, thân nhỏ, tóc/áo/phụ kiện đổi được.
@@ -119,7 +121,8 @@ function accessory(kind: string | null, outfit: string): THREE.Object3D | null {
   return null;
 }
 
-export function buildAvatar(spec: AvatarSpec): Avatar {
+/** Nhân vật dựng bằng khối (dự phòng khi chưa tải được model, và khi model lỗi). */
+export function buildBlockAvatar(spec: AvatarSpec): Avatar {
   const group = new THREE.Group();
   const body = new THREE.Group();
   group.add(body);
@@ -209,6 +212,105 @@ export function buildAvatar(spec: AvatarSpec): Avatar {
     // Hình khối/vật liệu dùng chung: chỉ cần gỡ khỏi cảnh.
     dispose() {
       group.removeFromParent();
+    },
+  };
+}
+
+// ── Nhân vật có cử động (Kenney Mini Characters, CC0 — research.md §R19) ─────────────
+// Mỗi nhân vật là một GLB nhỏ (~125 KB, chỉ lưới + xương); hoạt ảnh dùng chung một file (~83 KB) vì cùng bộ xương.
+// Trong lúc tải, hiện nhân vật khối; tải xong thì thay. Lỗi mạng thì giữ nhân vật khối.
+
+const loader = new GLTFLoader();
+const modelCache = new Map<string, Promise<GLTF>>();
+let clipsPromise: Promise<Map<string, THREE.AnimationClip>> | null = null;
+const HEIGHT = 1.35; // đầu to hơn nhân vật khối cũ nên thấp hơn một chút để vừa ghế, cửa, camera
+
+function loadModel(name: CharacterModel) {
+  let p = modelCache.get(name);
+  if (!p) {
+    p = loader.loadAsync(`/models/chars/${name}.glb`);
+    modelCache.set(name, p);
+    p.catch(() => modelCache.delete(name));
+  }
+  return p;
+}
+
+function loadClips() {
+  if (!clipsPromise) {
+    clipsPromise = loader.loadAsync("/models/chars/_anims.glb").then((g) => new Map(g.animations.map((a) => [a.name, a])));
+    clipsPromise.catch(() => (clipsPromise = null));
+  }
+  return clipsPromise;
+}
+
+const CLIP: Record<Anim, string> = { idle: "idle", walk: "walk", sit: "sit", wave: "interact-right" };
+
+export function buildAvatar(spec: AvatarSpec): Avatar {
+  const group = new THREE.Group();
+  const block = buildBlockAvatar(spec);
+  group.add(block.group);
+  let anim: Anim = "idle";
+  let disposed = false;
+  let mixer: THREE.AnimationMixer | null = null;
+  let actions: Partial<Record<Anim, THREE.AnimationAction>> = {};
+  let current: THREE.AnimationAction | null = null;
+  let model: THREE.Object3D | null = null;
+
+  const play = (a: Anim, fade = 0.2) => {
+    const next = actions[a] ?? actions.idle;
+    if (!next || next === current) return;
+    next.reset().setEffectiveWeight(1).fadeIn(fade).play();
+    current?.fadeOut(fade);
+    current = next;
+  };
+
+  Promise.all([loadModel(modelOf(spec)), loadClips()])
+    .then(([gltf, clips]) => {
+      if (disposed) return;
+      model = cloneSkinned(gltf.scene);
+      const size = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
+      model.scale.setScalar(HEIGHT / Math.max(size.y, 0.01));
+      model.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.isMesh) {
+          m.castShadow = true;
+          m.frustumCulled = false; // lưới có xương: hộp bao gốc không theo cử động
+        }
+      });
+      mixer = new THREE.AnimationMixer(model);
+      actions = {};
+      for (const a of Object.keys(CLIP) as Anim[]) {
+        const clip = clips.get(CLIP[a]);
+        if (clip) actions[a] = mixer.clipAction(clip);
+      }
+      group.remove(block.group);
+      block.dispose();
+      group.add(model);
+      play(anim, 0);
+    })
+    .catch(() => {
+      /* giữ nhân vật khối */
+    });
+
+  return {
+    group,
+    get anim() {
+      return anim;
+    },
+    setAnim(a) {
+      anim = a;
+      block.setAnim(a);
+      play(a);
+    },
+    update(dt) {
+      if (mixer) mixer.update(dt);
+      else block.update(dt);
+    },
+    dispose() {
+      disposed = true;
+      mixer?.stopAllAction();
+      if (model) mixer?.uncacheRoot(model);
+      block.dispose();
     },
   };
 }

@@ -63,7 +63,9 @@
     "outfitColor": "Outfit colour",
     "done": "Go to my room",
     "taken": "That nickname is taken.",
-    "invalid": "That nickname isn't valid."
+    "invalid": "That nickname isn't valid.",
+    "character": "Character",
+    "characterN": "Character {n}"
   },
   "room": {
     "label": "Room {wing}-{floor}-{room}",

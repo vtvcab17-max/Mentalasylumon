@@ -57,6 +57,9 @@ Khi làm một task: đọc task trong `tasks.md` → viết test trước (bắ
 - **Đồ họa & ngày/đêm** (research.md §R19): model CC0 KayKit + Kenney gộp trong `apps/client/public/models/*.glb`
   (~440 KB, ghi công `CREDITS.md`), `engine/atmosphere.ts` theo giờ VN, Sky shader/bloom theo mức đồ họa,
   Cài đặt → "Ngày & đêm". Đồ vật dùng chung hình học → khi dispose bỏ qua mesh có `userData.shared`.
+  Nhân vật: Kenney Mini Characters (CC0) trong `public/models/chars/` — 12 model (~125 KB, chỉ lưới + xương) +
+  `_anims.glb` dùng chung; `AvatarSpec.model` (tài khoản cũ suy ra bằng `modelOf`); tải xong mới thay nhân vật khối.
+- **D1 bản thật:** migration 0001–0006 đã áp (2026-11-09, qua Cloudflare MCP).
 - **Model giả cho test/máy:** model `@test/…` hoặc `FAKE_AI=1` (chỉ khi APP_ENV ≠ production) — `ai/gateway.ts`.
   `pnpm dev:local` bật sẵn. Lớp từ khóa an toàn vẫn chạy thật.
 - **Còn mở:**
@@ -83,7 +86,7 @@ Khi làm một task: đọc task trong `tasks.md` → viết test trước (bắ
   (`apps/client/dist`), API (Hono), WebSocket → Durable Objects.
 - **Durable Objects:** `PatientRecord` (lịch sử chat từng người, giới hạn lượt/ngày), `KeyVault` (khóa mã hóa tự tạo —
   **không bao giờ xóa**, mất khóa = mất lịch sử), `WorldZone`, `CircleRoom` (tin nhắn trong SQLite của DO, tự xóa sau 30 ngày), `LectureHall` (chưa làm).
-- **D1** `benh-vien-dev` (id `1c8ae363-563b-4881-9f5d-8ba99adec4ce`, APAC): migration 0001–0003 đã áp lên bản thật; `pnpm --filter worker deploy` tự áp migration mới (0004+) trước khi deploy.
+- **D1** `benh-vien-dev` (id `1c8ae363-563b-4881-9f5d-8ba99adec4ce`, APAC): migration 0001–0006 đã áp lên bản thật; `pnpm --filter worker deploy` tự áp migration mới (0007+) trước khi deploy.
 - **R2: đang tắt** vì tài khoản chưa bật R2 — bật lại binding trong `wrangler.jsonc` khi cần tài sản 3D/audio.
 - **Đăng nhập:** Google Identity Services (nút "Sign in with Google") → ID token → `POST /auth/google/token`, server
   kiểm RS256 bằng JWKS của Google. Chỉ cần `GOOGLE_CLIENT_ID` (công khai, nằm trong `vars`). **Không có client secret.**
