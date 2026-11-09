@@ -3,6 +3,7 @@ import type { Env } from "../env";
 import { nowIso } from "../types";
 import { award, ensureProgress } from "./ledger";
 import { vnDay, vnWeek } from "./time";
+import { weeklyProgress } from "../elections/director";
 
 /**
  * Nhiệm vụ (T006, FR-001–FR-003, research.md R1).
@@ -137,6 +138,8 @@ export async function recordEvent(env: Pick<Env, "DB">, userId: string, ev: Game
     }
     updates.push({ questId: q.quest_id, progress, target: q.target, status: done ? "done" : "active", awarded });
   }
+  // Nhiệm vụ tuần của cả viện (do Viện trưởng chọn) — lỗi ở đây không được làm hỏng nhiệm vụ cá nhân.
+  await weeklyProgress(env, userId, ev.type, now).catch((e) => console.error("weekly quest failed", e));
   return updates;
 }
 

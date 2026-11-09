@@ -22,7 +22,7 @@ export interface Rect {
   maxZ: number;
 }
 
-export type PortalTarget = "lobby" | "garden" | "court" | "stairs" | "circle";
+export type PortalTarget = "lobby" | "garden" | "court" | "stairs" | "circle" | "council";
 
 export interface Portal {
   target: PortalTarget;
@@ -380,6 +380,16 @@ function buildLobby(root: THREE.Group, engine: Engine): Built {
   portal(root, 0, -5.4, 0, t("world.elevator"), true, labels);
   portal(root, 11.8, 0, -Math.PI / 2, t("world.garden"), true, labels);
   portal(root, -11.8, 0, Math.PI / 2, t("world.circle"), true, labels);
+  // Bảng tin Hội đồng (002 US4): ứng viên, kết quả, bảng vàng.
+  const board = box(3, 1.7, 0.12, "#7a5a3a");
+  board.position.set(7.6, 1.7, -8.78);
+  const paper = box(2.7, 1.4, 0.04, "#f6efe2", false);
+  paper.position.set(7.6, 1.7, -8.7);
+  root.add(board, paper);
+  const boardSign = makeLabel(`🏛 ${t("council.board")}`, { height: 0.36 });
+  boardSign.position.set(7.6, 2.9, -8.6);
+  root.add(boardSign);
+  labels.push(boardSign);
   const title = makeLabel(t("app.title"), { height: 0.55, bg: "rgba(46,125,107,0.9)", color: "#ffffff" });
   title.position.set(0, 3.4, -8.7);
   root.add(title);
@@ -397,6 +407,7 @@ function buildLobby(root: THREE.Group, engine: Engine): Built {
       { target: "stairs", x: 0, z: -5.4, radius: 1.4, enabled: true },
       { target: "garden", x: 11, z: 0, radius: 1.6, enabled: true },
       { target: "circle", x: -11, z: 0, radius: 1.6, enabled: true },
+      { target: "council", x: 7.6, z: -7.6, radius: 1.4, enabled: true },
     ],
     doors: [],
     labels,

@@ -68,23 +68,23 @@
 
 ## Phase 6: User Story 4 - Hội đồng bầu Viện trưởng (P2)
 
-- [ ] T027 [P] [US4] Test `apps/worker/test/elections.test.ts` (đồng hồ giả): tạo kỳ, ứng cử chỉ bậc 6, lời hứa xúc phạm bị chặn, bỏ phiếu chỉ Hội đồng ≥ 14 ngày, đổi phiếu, không lộ ai bầu ai, hòa → điểm 28 ngày → bốc thăm, < 3 phiếu → vacant, không 2 nhiệm kỳ liền
-- [ ] T028 [US4] Migration `apps/worker/migrations/0006_elections.sql`: `elections`, `candidates`, `ballots` (voter_hash), `election_voters`, `terms`, `term_actions`, `announcements` (UNIQUE author_id+day), `catalog_items` + seed danh mục vi/en
-- [ ] T029 [US4] Viết `apps/worker/src/elections/election.ts` (`tickElections(now)`, kiểm phiếu, phân định R6) và cron `*/10 * * * *` trong `wrangler.jsonc` + `scheduled()` ở `apps/worker/src/index.ts`
-- [ ] T030 [US4] Viết `apps/worker/src/api/elections.ts`: /api/elections/current, candidacy, vote, hall-of-fame
-- [ ] T031 [US4] Client `apps/client/src/features/elections/council.ts`: bảng tin ở sảnh, ứng viên, bỏ phiếu, kết quả, bảng vàng
+- [X] T027 [P] [US4] Test `apps/worker/test/elections.test.ts` (đồng hồ giả): tạo kỳ, ứng cử chỉ bậc 6, lời hứa xúc phạm bị chặn, bỏ phiếu chỉ Hội đồng ≥ 14 ngày, đổi phiếu, không lộ ai bầu ai, hòa → điểm 28 ngày → bốc thăm, < 3 phiếu → vacant, không 2 nhiệm kỳ liền
+- [X] T028 [US4] Migration `apps/worker/migrations/0006_elections.sql`: `elections`, `candidates`, `ballots` (voter_hash), `election_voters`, `terms`, `term_actions`, `announcements` (UNIQUE author_id+day), `catalog_items` + seed danh mục vi/en
+- [X] T029 [US4] Viết `apps/worker/src/elections/election.ts` (`tickElections(now)`, kiểm phiếu, phân định R6) và cron `*/10 * * * *` trong `wrangler.jsonc` + `scheduled()` ở `apps/worker/src/index.ts`
+- [X] T030 [US4] Viết `apps/worker/src/api/elections.ts`: /api/elections/current, candidacy, vote, hall-of-fame
+- [X] T031 [US4] Client `apps/client/src/features/elections/council.ts`: bảng tin ở sảnh, ứng viên, bỏ phiếu, kết quả, bảng vàng
 
 ## Phase 7: User Story 5 - Một tuần làm Viện trưởng (P3)
 
-- [ ] T032 [P] [US5] Test bảo mật `apps/worker/test/director-security.test.ts`: phiên Viện trưởng gọi mọi route admin → 404, không đọc được dữ liệu người khác; người không giữ nhiệm kỳ gọi /api/director/* → 403 (SC-006)
-- [ ] T033 [US5] Viết `apps/worker/src/elections/director.ts` + /api/director/* + /api/world/state + /api/catalog; thông báo qua `moderatePublic`, 1 lần/ngày; nhật ký `term_actions`
-- [ ] T034 [US5] Client `apps/client/src/features/elections/director-desk.ts` + `apps/client/src/world/decor.ts` (trang trí theo nhiệm kỳ, tên vàng, áo choàng)
-- [ ] T035 [US5] Admin: phế truất, nhật ký Viện trưởng, danh sách người đã bầu, CRUD danh mục trong `apps/worker/src/admin/progress.ts`
+- [X] T032 [P] [US5] Test bảo mật `apps/worker/test/director-security.test.ts`: phiên Viện trưởng gọi mọi route admin → 404, không đọc được dữ liệu người khác; người không giữ nhiệm kỳ gọi /api/director/* → 403 (SC-006)
+- [X] T033 [US5] Viết `apps/worker/src/elections/director.ts` + /api/director/* + /api/world/state + /api/catalog; thông báo qua `moderatePublic`, 1 lần/ngày; nhật ký `term_actions`
+- [X] T034 [US5] Client `apps/client/src/features/elections/director-desk.ts` + `apps/client/src/world/decor.ts` (trang trí theo nhiệm kỳ, tên vàng, áo choàng)
+- [X] T035 [US5] Admin: phế truất, nhật ký Viện trưởng, danh sách người đã bầu, CRUD danh mục trong `apps/worker/src/admin/progress.ts`
 
 ## Phase 8: Polish & Cross-Cutting
 
 - [ ] T036 [P] E2E `e2e/progress.spec.ts`: làm nhiệm vụ, lên Nhân viên lau dọn, nhặt rác (desktop + mobile)
-- [ ] T037 [P] Script `scripts/sim-progress.mjs` cấp điểm/bậc và tua đồng hồ bầu cử ở máy
+- [X] T037 [P] (thay bằng `localSql` + `timeTravel` trong e2e/helpers.ts) Script `scripts/sim-progress.mjs` cấp điểm/bậc và tua đồng hồ bầu cử ở máy
 - [ ] T038 Xóa tài khoản dọn dữ liệu 002 (ledger, quests, candidates, phiếu qua voter list) trong `apps/worker/src/api/account.ts`
 - [ ] T039 Cập nhật AGENTS.md, i18n check, chạy quickstart.md
 

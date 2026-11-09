@@ -5,6 +5,7 @@ import { decrypt, encrypt } from "../crypto/aes";
 import { chatKey } from "../do/key-vault";
 import type { WorldZone } from "../do/world-zone";
 import { listQuests, recordEvent } from "../progress/quests";
+import { weeklyViews } from "../elections/director";
 import { progressView, promote } from "../progress/ranks";
 import { vnDay } from "../progress/time";
 import { buildCrisisResponse } from "../safety/crisis-template";
@@ -34,7 +35,8 @@ export function registerProgress(app: Hono<AppEnv>) {
 
   app.get("/api/quests", ...guard, async (c) => {
     const user = c.get("user")!;
-    return c.json(await listQuests(c.env.DB, user.id, user.locale));
+    const q = await listQuests(c.env.DB, user.id, user.locale);
+    return c.json({ ...q, weekly: await weeklyViews(c.env.DB, user.locale) });
   });
 
   app.post("/api/quests/breath/start", ...guard, async (c) => {

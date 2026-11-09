@@ -71,3 +71,11 @@ export async function createUsers(n, { prefix = "sim", locale = "vi" } = {}) {
   });
   return users;
 }
+
+/** Chạy SQL trên D1 local (chỉ dùng cho test/mô phỏng ở máy). */
+export function localSql(sql) {
+  assertLocal();
+  const file = join(mkdtempSync(join(tmpdir(), "bvo-sql-")), "q.sql");
+  writeFileSync(file, sql);
+  execFileSync("npx", ["wrangler", "d1", "execute", "benh-vien-dev", "--local", "--file", file], { stdio: "pipe" });
+}

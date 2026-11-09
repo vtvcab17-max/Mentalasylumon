@@ -35,8 +35,9 @@ test("hành lang → sảnh → vườn cùng người khác; cửa người kh�
   const [ax, az] = doorStand(ua.room.roomNumber);
   const [nx, nz] = doorStand(neighbour);
   await walk(a, nz > az ? "KeyS" : "KeyW", Math.abs(nz - az));
-  await walk(a, nx > ax ? "KeyD" : "KeyA", Math.abs(nx - ax));
+  // Đi tới khi nút cửa hàng xóm hiện ra (máy không GPU chạy ít khung hình nên đi theo thời gian dễ hụt).
   const locked = a.getByRole("button", { name: new RegExp(`🔒 ${String(neighbour).padStart(2, "0")}`) });
+  await walkUntil(a, nx > ax ? "KeyD" : "KeyA", locked);
   await expect(locked).toBeVisible();
   await locked.click();
   await expect(a.getByText(/cửa khóa, chỉ chủ phòng vào được/)).toBeVisible();
@@ -47,7 +48,8 @@ test("hành lang → sảnh → vườn cùng người khác; cửa người kh�
     await p.getByRole("button", { name: /Sảnh chính/ }).click();
     await expect(p.getByText(/Sảnh chính ·/)).toBeVisible({ timeout: 15_000 });
   }
-  await expect(a.getByText(/2 người ở đây/)).toBeVisible({ timeout: 15_000 });
+  // Có thể còn người của lượt test khác ở sảnh.
+  await expect(a.getByText(/([2-9]|\d\d) người ở đây/)).toBeVisible({ timeout: 15_000 });
   await b.getByRole("button", { name: "Vẫy tay" }).click();
   await a.waitForTimeout(800);
   await a.screenshot({ path: `test-results/us2-${test.info().project.name}-lobby.png` });

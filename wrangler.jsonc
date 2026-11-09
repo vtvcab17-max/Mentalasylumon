@@ -47,7 +47,7 @@
   // Secrets (wrangler secret put): ANTHROPIC_API_KEY, ELEVENLABS_API_KEY. Không cần Google secret
   // (đăng nhập bằng ID token). CHAT_ENCRYPTION_KEY tùy chọn: không đặt thì KeyVault tự tạo. Không bao giờ ghi vào file này (Constitution).
 
-  "triggers": { "crons": ["17 19 * * *"] },
+  "triggers": { "crons": ["17 19 * * *", "*/10 * * * *"] },
 
   "env": {
     "staging": {

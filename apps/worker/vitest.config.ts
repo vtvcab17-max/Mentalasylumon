@@ -15,6 +15,7 @@ export default defineWorkersConfig(async () => {
           miniflare: {
             bindings: {
               APP_ENV: "dev",
+              ALLOW_TIME_TRAVEL: "1",
               TEST_MIGRATIONS: migrations,
               CHAT_ENCRYPTION_KEY: "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
               GOOGLE_CLIENT_ID: "test-client",

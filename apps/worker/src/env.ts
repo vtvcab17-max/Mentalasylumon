@@ -19,5 +19,6 @@ export interface Env {
   ANTHROPIC_API_KEY?: string; // chỉ khi dùng model Claude
   ELEVENLABS_API_KEY: string;
   CHAT_ENCRYPTION_KEY?: string; // tùy chọn; không đặt thì KeyVault tự tạo
-  FAKE_AI?: string; // "1" chỉ khi chạy ở máy (pnpm dev:local); bị bỏ qua ở production
+  FAKE_AI?: string;
+  ALLOW_TIME_TRAVEL?: string; // "1" chỉ trong test/máy cục bộ: cho tua đồng hồ bầu cử qua header X-Test-Now // "1" chỉ khi chạy ở máy (pnpm dev:local); bị bỏ qua ở production
 }

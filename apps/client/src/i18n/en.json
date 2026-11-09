@@ -27,7 +27,9 @@
   },
   "errors": {
     "network": "Couldn't connect. Please try again.",
-    "NOT_ELIGIBLE": "You don't meet the requirements for this yet."
+    "NOT_ELIGIBLE": "You don't meet the requirements for this yet.",
+    "NOT_DIRECTOR": "Only the current Director can do this.",
+    "MODERATION_BLOCKED": "Not posted: it may be harmful or insulting to others."
   },
   "login": {
     "welcome": "Welcome to the Online Mental Hospital",
@@ -256,5 +258,81 @@
     "unlock6": "Unlocked: stand for Director.",
     "unlock7": "A one-week term as Director.",
     "inGameNote": "This is an in-game title, not a real medical role."
+  },
+  "council": {
+    "title": "Council & elections",
+    "board": "Council",
+    "open": "Open the council board",
+    "mapHint": "Candidates, voting, this week's Director",
+    "directorNow": "This week's Director: {name}",
+    "vacant": "The Director's seat is empty this week",
+    "theme": "Weekly theme: {title}",
+    "honorary": "Honorary heads: {names}",
+    "week": "Election {week}",
+    "status": {
+      "nominating": "Nominations open",
+      "voting": "Voting",
+      "announced": "Announced",
+      "vacant": "Seat left empty"
+    },
+    "stepNominate": "Nominations (Heads of ward)",
+    "stepVote": "Council secret ballot",
+    "stepAnnounce": "Results",
+    "termNote": "The winner serves as Director from Monday to the end of Sunday next week, then a new election.",
+    "vacantResult": "The Director's seat will be empty next week",
+    "vacantReason": {
+      "no_candidates": "There were no candidates.",
+      "few_votes": "Fewer than 3 valid votes.",
+      "winner_unavailable": "The winner can no longer take office."
+    },
+    "winner": "Next week's Director: {name}",
+    "votes": "{n} votes",
+    "tie": {
+      "points_28d": "Tie — decided by contribution points over the last 28 days.",
+      "lot": "Tie in votes and points — decided by a public draw."
+    },
+    "candidates": "Candidates",
+    "noCandidates": "No candidates yet.",
+    "vote": "Vote for this person",
+    "yourVote": "Your vote",
+    "voted": "Your secret ballot is recorded.",
+    "nominateTitle": "Stand for Director",
+    "pledgePh": "Your pledge (up to 200 characters)…",
+    "plansHint": "Pick up to 3 things you plan to do:",
+    "nominate": "Stand",
+    "updatePledge": "Update pledge",
+    "withdraw": "Withdraw",
+    "nominated": "You are now a candidate.",
+    "max3": "Pick at most 3.",
+    "reason": {
+      "rank": "Reach Intern to join the council and vote.",
+      "account_age": "Accounts need to be 14 days old to vote.",
+      "suspended": "Your account is suspended.",
+      "council_banned": "You are temporarily not on the council.",
+      "consecutive": "You are serving as Director, so you sit out one term."
+    },
+    "youCanVote": "You are on the council and can vote.",
+    "fame": "Directors' hall of fame",
+    "fameEmpty": "No Directors yet.",
+    "secretNote": "Ballots are secret: no one — not the Director, not admins — can see who you voted for.",
+    "announcementFrom": "Director {name}"
+  },
+  "director": {
+    "desk": "Director's desk",
+    "intro": "This week you can do the 5 things below. Every choice comes from an approved list.",
+    "power": {
+      "theme": "Weekly theme",
+      "quests": "Hospital-wide weekly quests (up to 3)",
+      "decor": "Decorations",
+      "announce": "Hospital announcement",
+      "honorary": "Honorary heads"
+    },
+    "saved": "Saved.",
+    "announcePh": "A message to the whole hospital (up to 200 characters)…",
+    "announceSend": "Send announcement",
+    "announced": "Announcement sent.",
+    "announceRule": "One announcement a day, checked like any public message.",
+    "honoraryPh": "Nickname of the person to appoint",
+    "limits": "The Director can't see anyone's chats, journals or reports, and can't suspend players."
   }
 }

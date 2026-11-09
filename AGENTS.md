@@ -62,9 +62,10 @@ Khi làm một task: đọc task trong `tasks.md` → viết test trước (bắ
   - T062 + `pnpm eval:moderation` — chạy eval với Workers AI thật (cần CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN).
   - SC-004 (500 người cùng lúc) chưa kiểm trên staging — xem `docs/perf.md`.
 - **Tiếp theo:**
-  1. **Tính năng 002 — cấp bậc & nhiệm vụ** (`specs/002-ranks-quests/`, đang làm; MVP US1+US2 xong: sổ cái điểm,
-     nhiệm vụ ngày + chuỗi, Sổ nhiệm vụ, Dẫn đường, bài thở, lễ thăng cấp. Tiếp: T019 đồng phục, US3 mini-game,
-     US4 bầu cử, US5 Viện trưởng). Quyết định đã chốt:
+  1. **Tính năng 002 — cấp bậc & nhiệm vụ** (`specs/002-ranks-quests/`, đang làm). Xong: US1 nhiệm vụ ngày + Sổ nhiệm vụ,
+     US2 thăng cấp, US4 bầu cử (cron `*/10`, phiếu kín HMAC, bảng Hội đồng ở sảnh), US5 Viện trưởng (bàn làm việc, trang
+     trí, thông báo, nhiệm vụ tuần). Còn: T019 đồng phục, US3 mini-game (T022–T026), T036/T038/T039.
+     Test/máy cục bộ tua đồng hồ bầu cử bằng header `X-Test-Now` (chỉ khi `ALLOW_TIME_TRAVEL=1`). Quyết định đã chốt:
      Bệnh nhân → Nhân viên lau dọn → Hộ lý → Điều dưỡng → Thực tập sinh → Trưởng khoa → Viện trưởng.
      Nhiệm vụ hỗn hợp (tự chăm sóc hằng ngày, mini-game lau dọn, cộng đồng, khám phá), giới hạn điểm mỗi ngày,
      không thưởng thời gian online. Hội đồng (Thực tập sinh + Trưởng khoa) bầu Viện trưởng mỗi tuần, ứng viên là
@@ -100,7 +101,7 @@ specs/          Spec Kit
 
 ```bash
 pnpm install
-pnpm test                 # Vitest trong môi trường Workers (141 test) — phải xanh
+pnpm test                 # Vitest trong môi trường Workers (148 test) — phải xanh
 pnpm lint && pnpm --filter worker typecheck
 pnpm build                # build client
 pnpm i18n:check

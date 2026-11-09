@@ -59,6 +59,10 @@ export const STYLES = `
 .bvo-pop .bvo-btn{margin:4px 0;padding:10px 12px;text-align:left}
 .bvo-thank{border:0;background:none;cursor:pointer;font-size:15px;padding:2px 4px;margin-top:2px}.bvo-thank:disabled{opacity:.4}
 .bvo-thanks{display:inline-block;font-size:12px;color:var(--muted);margin-left:6px}
+.bvo-announce{position:absolute;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top));max-width:min(560px,calc(100% - 32px));background:#fff8e1;border:2px solid #f6d186;border-radius:14px;padding:10px 40px 10px 14px;box-shadow:0 4px 14px rgba(0,0,0,.12);font-weight:600}
+.bvo-announce .bvo-x{position:absolute;right:4px;top:4px;background:none;border:0;font-size:20px;cursor:pointer}
+.bvo-quest.voted{border:2px solid var(--accent)}
+.bvo-chip input{vertical-align:-2px}
 .bvo-qh{font-size:15px;margin:16px 0 6px}
 .bvo-qhead{padding:4px 0 8px}.bvo-rank{font-size:18px;font-weight:700}
 .bvo-rest{margin-top:6px;background:#e6f2ef;border-radius:10px;padding:8px 10px;font-size:14px}

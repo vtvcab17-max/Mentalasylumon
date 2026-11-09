@@ -19,7 +19,7 @@
 | `quest_progress` | `questId, progress, target, status, awarded` | Chỉ người liên quan nhận |
 | `celebrate` | `id, rank` | Lễ thăng cấp: mọi người trong zone thấy hiệu ứng |
 | `guide_invite` | `inviteId, from:{id,nickname,rank}` | Chỉ người mới nhận |
-| `announcement` | `text, author` | Thông báo của Viện trưởng, phát cho mọi zone đang mở lúc gửi |
+| `announcement` | `text, author` | *(bản đầu: chưa phát realtime — client lấy qua `GET /api/world/state` mỗi lần vào khu và hiện một lần mỗi ngày)* |
 
 ## CircleRoom
 

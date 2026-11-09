@@ -1,8 +1,12 @@
 import type { Browser, Locator, Page } from "@playwright/test";
 // @ts-expect-error — script .mjs dùng chung với các công cụ local
-import { createUsers } from "../scripts/lib/fake-users.mjs";
+import { createUsers, localSql } from "../scripts/lib/fake-users.mjs";
+
+export { localSql };
 
 export interface TestUser {
+  id: string;
+  nickname: string;
   token: string;
   room: { wing: string; floor: number; roomNumber: number };
 }
@@ -13,7 +17,7 @@ export interface TestUser {
  */
 export async function testUsers(n: number): Promise<TestUser[]> {
   const fromEnv = [process.env.E2E_SESSION, process.env.E2E_SESSION_2].filter(Boolean) as string[];
-  if (fromEnv.length >= n) return fromEnv.slice(0, n).map((token) => ({ token, room: null as never }));
+  if (fromEnv.length >= n) return fromEnv.slice(0, n).map((token) => ({ id: "", nickname: "", token, room: null as never }));
   return createUsers(n, { prefix: "e2e" });
 }
 
@@ -53,4 +57,10 @@ export async function walk(page: Page, key: string, meters: number) {
   await page.keyboard.down(key);
   await page.waitForTimeout((meters / 3.2) * 1000);
   await page.keyboard.up(key);
+}
+
+/** Tua đồng hồ máy chủ cho trang này (chỉ server local có ALLOW_TIME_TRAVEL=1). */
+export async function timeTravel(page: Page, iso: string) {
+  await page.unroute("**/api/**").catch(() => undefined);
+  await page.route("**/api/**", (route) => route.continue({ headers: { ...route.request().headers(), "x-test-now": iso } }));
 }

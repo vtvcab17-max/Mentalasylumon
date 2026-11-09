@@ -17,6 +17,8 @@
     "NOT_IMPLEMENTED": "This feature isn't available yet.",
     "NICKNAME_TAKEN": "That nickname is taken — please choose another.",
     "CONFLICT": "This has already been done.",
-    "NOT_ELIGIBLE": "You don't meet the requirements for this yet."
+    "NOT_ELIGIBLE": "You don't meet the requirements for this yet.",
+    "NOT_DIRECTOR": "Only the current Director can do this.",
+    "MODERATION_BLOCKED": "Not posted: it may be harmful or insulting to others."
   }
 }

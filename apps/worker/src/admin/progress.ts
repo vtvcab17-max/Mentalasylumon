@@ -4,6 +4,8 @@ import { apiError } from "../api/errors";
 import { requireAdmin } from "../api/guards";
 import { ensureProgress } from "../progress/ledger";
 import { nowIso, type AppEnv } from "../types";
+import { clockOf } from "../elections/director";
+import { vnWeek } from "../progress/time";
 
 /** Quản trị cấp bậc (002 T021, FR-009, FR-013). Đổi ngưỡng không hạ cấp người đã ở bậc đó. */
 
@@ -45,6 +47,51 @@ export function registerAdminProgress(app: Hono<AppEnv>) {
     if (!body.success) return apiError(c, "VALIDATION", 400);
     await ensureProgress(c.env.DB, c.req.param("id"));
     await c.env.DB.prepare("UPDATE user_progress SET council_banned = ?, updated_at = ? WHERE user_id = ?").bind(body.data.banned ? 1 : 0, nowIso(), c.req.param("id")).run();
+    return c.json({ ok: true });
+  });
+}
+
+/** Bầu cử & nhiệm kỳ cho quản trị viên (002 T035, FR-019, FR-025, FR-026). */
+export function registerAdminElections(app: Hono<AppEnv>) {
+  app.post("/admin/api/terms/current/remove", requireAdmin, async (c) => {
+    const body = z.object({ note: z.string().trim().min(3).max(500) }).safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return apiError(c, "VALIDATION", 400);
+    const week = vnWeek(clockOf(c));
+    const t = await c.env.DB.prepare("SELECT holder_id FROM terms WHERE week = ? AND ended_reason IS NULL AND holder_id IS NOT NULL").bind(week).first<{ holder_id: string }>();
+    if (!t) return apiError(c, "NOT_FOUND", 404);
+    await c.env.DB.prepare("UPDATE terms SET ended_reason = 'removed_by_admin' WHERE week = ?").bind(week).run();
+    return c.json({ ok: true });
+  });
+
+  app.get("/admin/api/terms/:week/actions", requireAdmin, async (c) => {
+    const { results } = await c.env.DB.prepare("SELECT holder_id, action, payload, at FROM term_actions WHERE week = ? ORDER BY at").bind(c.req.param("week")).all();
+    return c.json(results);
+  });
+
+  // Chỉ ai đã bầu — không kèm phiếu (phiếu kín, R4).
+  app.get("/admin/api/elections/:id/voters", requireAdmin, async (c) => {
+    const { results } = await c.env.DB.prepare(
+      "SELECT v.voter_id, u.nickname, v.voted_at FROM election_voters v JOIN users u ON u.id = v.voter_id WHERE v.election_id = ? ORDER BY v.voted_at",
+    )
+      .bind(c.req.param("id"))
+      .all();
+    return c.json(results);
+  });
+
+  app.get("/admin/api/catalog", requireAdmin, async (c) => c.json((await c.env.DB.prepare("SELECT * FROM catalog_items ORDER BY kind, id").all()).results));
+
+  app.put("/admin/api/catalog/:id", requireAdmin, async (c) => {
+    const Text = z.object({ title: z.string().trim().min(1).max(80), desc: z.string().trim().max(200) });
+    const body = z
+      .object({ kind: z.enum(["theme", "decor", "weekly_quest"]), text: z.object({ vi: Text, en: Text }), data: z.record(z.unknown()).default({}), active: z.boolean().default(true) })
+      .safeParse(await c.req.json().catch(() => null));
+    if (!body.success || !/^[a-z0-9-]{2,40}$/.test(c.req.param("id"))) return apiError(c, "VALIDATION", 400);
+    const b = body.data;
+    await c.env.DB.prepare(
+      "INSERT INTO catalog_items (id, kind, text, data, active) VALUES (?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET kind = excluded.kind, text = excluded.text, data = excluded.data, active = excluded.active",
+    )
+      .bind(c.req.param("id"), b.kind, JSON.stringify(b.text), JSON.stringify(b.data), b.active ? 1 : 0)
+      .run();
     return c.json({ ok: true });
   });
 }

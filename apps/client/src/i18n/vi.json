@@ -27,7 +27,9 @@
   },
   "errors": {
     "network": "Không kết nối được. Vui lòng thử lại.",
-    "NOT_ELIGIBLE": "Bạn chưa đủ điều kiện cho bước này."
+    "NOT_ELIGIBLE": "Bạn chưa đủ điều kiện cho bước này.",
+    "NOT_DIRECTOR": "Chỉ Viện trưởng đương nhiệm làm được việc này.",
+    "MODERATION_BLOCKED": "Nội dung chưa được đăng vì có thể gây hại hoặc xúc phạm người khác."
   },
   "login": {
     "welcome": "Chào mừng tới Bệnh viện tâm thần online",
@@ -256,5 +258,81 @@
     "unlock6": "Mở khóa: được ứng cử Viện trưởng.",
     "unlock7": "Nhiệm kỳ Viện trưởng một tuần.",
     "inGameNote": "Đây là chức danh trong game, không phải nhân viên y tế thật."
+  },
+  "council": {
+    "title": "Hội đồng & bầu cử",
+    "board": "Hội đồng",
+    "open": "Xem bảng Hội đồng",
+    "mapHint": "Ứng viên, bỏ phiếu, Viện trưởng tuần này",
+    "directorNow": "Viện trưởng tuần này: {name}",
+    "vacant": "Ghế Viện trưởng tuần này để trống",
+    "theme": "Chủ đề tuần: {title}",
+    "honorary": "Trưởng khoa danh dự: {names}",
+    "week": "Kỳ bầu cử {week}",
+    "status": {
+      "nominating": "Đang ứng cử",
+      "voting": "Đang bỏ phiếu",
+      "announced": "Đã công bố",
+      "vacant": "Ghế để trống"
+    },
+    "stepNominate": "Ứng cử (Trưởng khoa)",
+    "stepVote": "Hội đồng bỏ phiếu kín",
+    "stepAnnounce": "Công bố kết quả",
+    "termNote": "Người thắng làm Viện trưởng từ thứ Hai tới hết Chủ Nhật tuần sau, rồi bầu lại.",
+    "vacantResult": "Tuần tới ghế Viện trưởng để trống",
+    "vacantReason": {
+      "no_candidates": "Không có ứng viên.",
+      "few_votes": "Chưa đủ 3 phiếu hợp lệ.",
+      "winner_unavailable": "Người thắng không còn nhận chức được."
+    },
+    "winner": "Viện trưởng tuần tới: {name}",
+    "votes": "{n} phiếu",
+    "tie": {
+      "points_28d": "Hòa phiếu — phân định bằng điểm cống hiến 28 ngày gần nhất.",
+      "lot": "Hòa phiếu và hòa điểm — phân định bằng bốc thăm công khai."
+    },
+    "candidates": "Ứng viên",
+    "noCandidates": "Chưa có ứng viên nào.",
+    "vote": "Bầu cho người này",
+    "yourVote": "Phiếu của bạn",
+    "voted": "Đã ghi phiếu kín của bạn.",
+    "nominateTitle": "Ứng cử Viện trưởng",
+    "pledgePh": "Lời hứa của bạn (tối đa 200 ký tự)…",
+    "plansHint": "Chọn tối đa 3 việc bạn định làm:",
+    "nominate": "Ứng cử",
+    "updatePledge": "Cập nhật lời hứa",
+    "withdraw": "Rút ứng cử",
+    "nominated": "Đã ghi danh ứng cử.",
+    "max3": "Chọn tối đa 3 mục.",
+    "reason": {
+      "rank": "Bạn cần lên Thực tập sinh để vào Hội đồng và bỏ phiếu.",
+      "account_age": "Tài khoản cần đủ 14 ngày mới được bỏ phiếu.",
+      "suspended": "Tài khoản đang bị khóa.",
+      "council_banned": "Bạn tạm thời không thuộc Hội đồng.",
+      "consecutive": "Bạn đang làm Viện trưởng nên nghỉ một nhiệm kỳ."
+    },
+    "youCanVote": "Bạn là thành viên Hội đồng và có thể bỏ phiếu.",
+    "fame": "Bảng vàng Viện trưởng",
+    "fameEmpty": "Chưa có Viện trưởng nào.",
+    "secretNote": "Phiếu bầu là phiếu kín: không ai — kể cả Viện trưởng hay quản trị viên — xem được bạn bầu cho ai.",
+    "announcementFrom": "Viện trưởng {name}"
+  },
+  "director": {
+    "desk": "Bàn làm việc Viện trưởng",
+    "intro": "Trong tuần này bạn có thể làm 5 việc dưới đây. Mọi lựa chọn đều lấy từ danh sách đã duyệt.",
+    "power": {
+      "theme": "Chủ đề tuần",
+      "quests": "Nhiệm vụ tuần cho cả viện (tối đa 3)",
+      "decor": "Trang trí viện",
+      "announce": "Thông báo toàn viện",
+      "honorary": "Trưởng khoa danh dự"
+    },
+    "saved": "Đã lưu.",
+    "announcePh": "Lời nhắn tới cả viện (tối đa 200 ký tự)…",
+    "announceSend": "Gửi thông báo",
+    "announced": "Đã gửi thông báo.",
+    "announceRule": "Mỗi ngày 1 thông báo, được kiểm duyệt như tin công khai.",
+    "honoraryPh": "Biệt danh người được bổ nhiệm",
+    "limits": "Viện trưởng không xem được trò chuyện, nhật ký hay báo cáo của ai và không khóa được người chơi."
   }
 }

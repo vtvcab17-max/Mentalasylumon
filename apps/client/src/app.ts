@@ -8,6 +8,8 @@ import { burst, showCeremony } from "./features/progress/ceremony";
 import { openQuestBook } from "./features/progress/quest-book";
 import { questNudgesQuiet } from "./features/progress/rank";
 import { showGuide } from "./world/hotspots";
+import { openCouncil, type WorldState } from "./features/elections/council";
+import { applyDecor } from "./world/decor";
 import { openDoctorChat } from "./features/doctor-chat/doctor-chat";
 import { showCreateAvatar } from "./features/onboarding/create-avatar";
 import { showLanguagePicker } from "./features/onboarding/language-picker";
@@ -113,7 +115,13 @@ class Navigator {
   }
 
   private mapOpts(place: Place) {
-    return { layout: this.layout!, current: place, go: (p: Place) => void this.go(p), openCircles: () => void this.openCircles() };
+    return {
+      layout: this.layout!,
+      current: place,
+      go: (p: Place) => void this.go(p),
+      openCircles: () => void this.openCircles(),
+      openCouncil: () => openCouncil(this.ui, this.me),
+    };
   }
 
   openCircles() {
@@ -224,6 +232,17 @@ class Navigator {
     zone.connect();
     this.zoneId = join.zoneId;
 
+    // Trang trí + thông báo của Viện trưởng (002 US5).
+    let stopDecor: (() => void) | null = null;
+    let alive = true;
+    api<WorldState>("/api/world/state")
+      .then((w) => {
+        if (!alive) return;
+        stopDecor = applyDecor(area.root, place.kind, w.decor?.data ?? null);
+        if (w.announcement && place.kind !== "floor") showAnnouncement(this.ui, w.announcement);
+      })
+      .catch(() => undefined);
+
     // Dẫn đường tới điểm khám phá (002 FR-002).
     let stopGuide: (() => void) | null = null;
     this.showGuideHere = (spot) => {
@@ -276,14 +295,17 @@ class Navigator {
       else if (portal.target === "lobby") setAction(`🏥 ${t("world.goLobby")}`, () => this.go({ kind: "lobby" }));
       else if (portal.target === "stairs")
         setAction(`🪜 ${t("world.useElevator")}`, () => openMap(this.ui, this.mapOpts(place)));
+      else if (portal.target === "council") setAction(`🏛 ${t("council.open")}`, () => openCouncil(this.ui, this.me));
       else setAction(`⭕ ${t("world.goCircle")}`, () => void this.openCircles());
     });
 
     return {
       place,
       dispose: () => {
+        alive = false;
         stop();
         stopGuide?.();
+        stopDecor?.();
         window.removeEventListener("keydown", onKey);
         zone.close();
         crowd.dispose();
@@ -310,4 +332,21 @@ function entrySpawn(area: Area, from: Place | null): [number, number] {
   if (p.kind === "floor" && from?.kind !== "room") return [j() * 0.8, -1.4];
   if (p.kind === "floor") return area.spawn;
   return [area.spawn[0] + j(), area.spawn[1] + j()];
+}
+
+/** Thông báo của Viện trưởng: hiện một lần mỗi ngày mỗi thông báo (002 FR-023). */
+function showAnnouncement(ui: HTMLElement, a: { text: string; day: string; author: string }) {
+  const key = `bvo.ann.${a.day}.${a.text.length}`;
+  try {
+    if (localStorage.getItem(key)) return;
+    localStorage.setItem(key, "1");
+  } catch {
+    /* không lưu được thì vẫn hiện */
+  }
+  const el = h("div", { class: "bvo-announce", role: "status" }, `📢 ${t("council.announcementFrom", { name: a.author })}: `, h("span", {}, a.text));
+  const x = h("button", { class: "bvo-x", type: "button", "aria-label": t("world.close") }, "×");
+  x.addEventListener("click", () => el.remove());
+  el.append(x);
+  ui.append(el);
+  setTimeout(() => el.remove(), 12_000);
 }
