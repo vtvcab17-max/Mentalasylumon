@@ -7,6 +7,9 @@
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat"],
 
+  // Wrangler tự build client trước khi deploy, nên Workers Builds chạy được dù ô "Build command" để trống.
+  "build": { "command": "pnpm build", "watch_dir": "apps/client/src" },
+
   "assets": {
     "directory": "apps/client/dist",
     "binding": "ASSETS",

@@ -42,7 +42,11 @@ async function listCircles(env: Env, lang: "vi" | "en", excludeUserId: string) {
       name: r.name,
       language: r.language,
       maxSeats: r.max_seats,
-      seatsTaken: await circleStub(env, r.id).members(excludeUserId),
+      // Một vòng lỗi (DO đang khởi động lại…) không được làm hỏng cả danh sách: thử lại một lần rồi coi là 0.
+      seatsTaken: await circleStub(env, r.id)
+        .members(excludeUserId)
+        .catch(() => circleStub(env, r.id).members(excludeUserId))
+        .catch(() => 0),
       session: r.topic ? { topic: r.topic, startsAt: r.starts_at!, status: r.status! } : null,
     })),
   );
