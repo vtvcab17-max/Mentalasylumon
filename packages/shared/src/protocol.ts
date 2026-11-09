@@ -5,6 +5,16 @@ import { z } from "zod";
 const Vec3 = z.tuple([z.number(), z.number(), z.number()]);
 const Anim = z.enum(["idle", "walk", "sit", "wave"]);
 
+/** Tiến độ nhiệm vụ (002 contracts/ws-protocol.md) — chỉ người liên quan nhận. */
+export const QuestProgressMsg = z.object({
+  t: z.literal("quest_progress"),
+  questId: z.string(),
+  progress: z.number(),
+  target: z.number(),
+  status: z.enum(["active", "done"]),
+  awarded: z.number(),
+});
+
 // ── WorldZone ─────────────────────────────────────────────
 export const ZoneClientMsg = z.discriminatedUnion("t", [
   z.object({ t: z.literal("move"), p: Vec3, r: z.number(), a: Anim }),
@@ -19,6 +29,8 @@ export const PlayerPublic = z.object({
   p: Vec3,
   r: z.number(),
   a: Anim,
+  /** Bậc 1–7 (002): chức danh hiện dưới biệt danh. */
+  rank: z.number().int().min(1).max(7).default(1),
 });
 
 export const ZoneServerMsg = z.discriminatedUnion("t", [
@@ -35,6 +47,8 @@ export const ZoneServerMsg = z.discriminatedUnion("t", [
   }),
   z.object({ t: z.literal("emote"), id: z.string(), e: z.string() }),
   z.object({ t: z.literal("zone_full"), redirectZoneId: z.string() }),
+  QuestProgressMsg,
+  z.object({ t: z.literal("celebrate"), id: z.string(), rank: z.number() }),
   z.object({ t: z.literal("warn"), code: z.literal("RATE_LIMITED") }),
   z.object({ t: z.literal("kicked"), reason: z.string() }),
 ]);
@@ -45,6 +59,7 @@ export const CircleClientMsg = z.discriminatedUnion("t", [
   z.object({ t: z.literal("sit"), seat: z.number().int().min(0).max(19) }),
   z.object({ t: z.literal("stand") }),
   z.object({ t: z.literal("chat"), text: z.string().trim().min(1).max(300), clientMsgId: z.string().max(64) }),
+  z.object({ t: z.literal("thank"), messageId: z.string().min(1).max(64) }),
 ]);
 export type CircleClientMsg = z.infer<typeof CircleClientMsg>;
 
@@ -103,6 +118,8 @@ export const CircleServerMsg = z.discriminatedUnion("t", [
     label: z.literal("AI"),
   }),
   z.object({ t: z.literal("session"), status: z.enum(["scheduled", "live", "ended"]), topic: z.string() }),
+  z.object({ t: z.literal("thanked"), messageId: z.string(), count: z.number() }),
+  QuestProgressMsg,
 ]);
 export type CircleServerMsg = z.infer<typeof CircleServerMsg>;
 

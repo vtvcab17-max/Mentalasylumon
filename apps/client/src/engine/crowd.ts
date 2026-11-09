@@ -2,6 +2,7 @@ import type { AvatarSpec } from "@bvo/shared";
 import * as THREE from "three";
 import { buildAvatar, type Anim, type Avatar } from "../avatar/avatar";
 import { disposeLabel, makeLabel } from "./label";
+import { rankLabel } from "../features/progress/rank";
 import type { Engine } from "./renderer";
 
 /**
@@ -20,11 +21,13 @@ export interface RemoteInfo {
   p: [number, number, number];
   r: number;
   a: Anim;
+  rank?: number;
 }
 
 interface Remote {
   id: string;
   nickname: string;
+  rank: number;
   spec: AvatarSpec | null;
   pos: THREE.Vector3;
   target: THREE.Vector3;
@@ -64,11 +67,13 @@ export class Crowd {
     const existing = this.remotes.get(info.id);
     if (existing) {
       existing.nickname = info.nickname;
+      if (info.rank && info.rank !== existing.rank) this.setRank(info.id, info.rank);
       return;
     }
     this.remotes.set(info.id, {
       id: info.id,
       nickname: info.nickname,
+      rank: info.rank ?? 1,
       spec: (info.avatar as AvatarSpec) ?? null,
       pos: new THREE.Vector3(...info.p),
       target: new THREE.Vector3(...info.p),
@@ -108,6 +113,24 @@ export class Crowd {
     this.lodTimer = LOD_EVERY;
   }
 
+  /** Lễ thăng cấp: đổi chức danh trên tên ngay. */
+  setRank(id: string, rank: number) {
+    const r = this.remotes.get(id);
+    if (!r) return;
+    r.rank = rank;
+    if (r.full && r.label) {
+      disposeLabel(r.label);
+      r.label = this.makeNameLabel(r);
+      r.full.group.add(r.label);
+    }
+  }
+
+  private makeNameLabel(r: Remote) {
+    const l = makeLabel(rankLabel(r.nickname, r.rank), r.rank === 7 ? { height: 0.3, bg: "rgba(201,162,39,0.95)", color: "#ffffff" } : { height: 0.28 });
+    l.position.y = 2.0;
+    return l;
+  }
+
   emote(id: string) {
     const r = this.remotes.get(id);
     if (r) r.emoteUntil = performance.now() + 2000;
@@ -116,8 +139,7 @@ export class Crowd {
   private promote(r: Remote) {
     if (r.full || !r.spec) return;
     r.full = buildAvatar(r.spec);
-    r.label = makeLabel(r.nickname, { height: 0.28 });
-    r.label.position.y = 2.0;
+    r.label = this.makeNameLabel(r);
     r.full.group.add(r.label);
     this.engine.scene.add(r.full.group);
   }

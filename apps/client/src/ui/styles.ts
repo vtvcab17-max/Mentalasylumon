@@ -57,6 +57,24 @@ export const STYLES = `
 .bvo-msg.doctor{padding-right:30px}
 .bvo-pop{position:absolute;right:0;top:28px;z-index:5;background:var(--card);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.18);padding:6px;min-width:180px}
 .bvo-pop .bvo-btn{margin:4px 0;padding:10px 12px;text-align:left}
+.bvo-thank{border:0;background:none;cursor:pointer;font-size:15px;padding:2px 4px;margin-top:2px}.bvo-thank:disabled{opacity:.4}
+.bvo-thanks{display:inline-block;font-size:12px;color:var(--muted);margin-left:6px}
+.bvo-qh{font-size:15px;margin:16px 0 6px}
+.bvo-qhead{padding:4px 0 8px}.bvo-rank{font-size:18px;font-weight:700}
+.bvo-rest{margin-top:6px;background:#e6f2ef;border-radius:10px;padding:8px 10px;font-size:14px}
+.bvo-next{border:2px solid #cfe3dd;border-radius:14px;padding:12px;margin:8px 0;background:#f7fbfa}
+.bvo-req{margin:8px 0;font-size:14px}
+.bvo-bar{height:8px;border-radius:999px;background:#ebe5da;overflow:hidden;margin-top:4px}.bvo-bar span{display:block;height:100%;background:var(--accent)}
+.bvo-quest{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:8px 0;background:#fff}
+.bvo-quest.done{opacity:.6}.bvo-quest .bvo-row{margin-top:8px;align-items:center}.bvo-quest .bvo-btn{margin:0}
+.bvo-quest .bvo-input{flex:1;min-width:140px}
+.bvo-qtitle{font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.bvo-breath-circle{width:160px;height:160px;margin:20px auto;border-radius:50%;background:radial-gradient(circle,#cfe3dd,#8fc1b5);transition:transform .1s linear}
+.bvo-breath-phase{font-size:20px;font-weight:700}
+.bvo-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.bvo-confetti i{position:absolute;top:-12px;width:8px;height:14px;border-radius:2px;animation:bvo-fall 2.6s linear forwards}
+@keyframes bvo-fall{to{transform:translateY(110vh) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){.bvo-confetti{display:none}.bvo-breath-circle{transition:none}}
 @media (max-width:600px){.bvo-panel{width:100%}
 .bvo-circle-chat{top:auto;height:48%;width:100%;border-radius:16px 16px 0 0}
 .bvo-circle-dock{bottom:calc(48% + 8px);left:8px;right:8px}

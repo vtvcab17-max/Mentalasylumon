@@ -6,6 +6,8 @@ import type { Env } from "../env";
 import { createFlag, notifyAdmins } from "../safety/flags";
 import { moderatePublic, type SafetyDeps } from "../safety/pipeline";
 import { loadResourceRows, toPublic } from "../safety/resources";
+import { recordEvent, type GameEvent } from "../progress/quests";
+import { vnDay } from "../progress/time";
 
 /**
  * CircleRoom — một vòng sinh hoạt (T079, ws-protocol.md "CircleRoom", research.md §R11, FR-022–FR-027).
@@ -24,6 +26,8 @@ interface Member {
   locale: "vi" | "en";
   seat: number | null;
   lastChat: number;
+  /** Thời điểm bắt đầu ngồi (002: nhiệm vụ "ngồi cùng vòng"). */
+  satSince?: number | null;
 }
 
 interface CircleRow {
@@ -61,6 +65,7 @@ export class CircleRoom extends DurableObject<Env> {
         created_at INTEGER NOT NULL, hidden INTEGER NOT NULL DEFAULT 0)`);
       this.sql.exec("CREATE INDEX IF NOT EXISTS messages_time ON messages (created_at)");
       this.sql.exec("CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT NOT NULL)");
+      this.sql.exec("CREATE TABLE IF NOT EXISTS msg_thanks (message_id TEXT NOT NULL, user_id TEXT NOT NULL, PRIMARY KEY (message_id, user_id))");
     });
   }
 
@@ -143,7 +148,10 @@ export class CircleRoom extends DurableObject<Env> {
   kick(userId: string, reason = "SUSPENDED") {
     for (const ws of this.ctx.getWebSockets(userId)) {
       const m = this.member(ws);
-      if (m) ws.serializeAttachment({ ...m, seat: null });
+      if (m) {
+        this.flushSit(m);
+        ws.serializeAttachment({ ...m, seat: null, satSince: null });
+      }
       this.send(ws, { t: "kicked", reason });
       try {
         ws.close(4003, reason.toLowerCase());
@@ -233,6 +241,7 @@ export class CircleRoom extends DurableObject<Env> {
     });
     // Mỗi lần có người vào: chắc chắn đã hẹn giờ cho buổi sinh hoạt kế tiếp và lần dọn tin.
     this.ctx.waitUntil(this.planAlarm());
+    this.questEvent(userId, { type: "circle_visit" });
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -263,6 +272,7 @@ export class CircleRoom extends DurableObject<Env> {
       if (taken) return this.send(ws, { t: "warn", code: "SEAT_TAKEN" });
       const old = me.seat;
       me.seat = msg.seat;
+      if (old === null) me.satSince = Date.now();
       ws.serializeAttachment(me);
       if (old !== null) this.broadcast({ t: "seat_update", seat: old, userId: null });
       this.broadcast({ t: "seat_update", seat: msg.seat, userId: me.id, nickname: me.nickname, avatar: me.avatar });
@@ -273,10 +283,13 @@ export class CircleRoom extends DurableObject<Env> {
       if (me.seat === null) return;
       const old = me.seat;
       me.seat = null;
+      this.flushSit(me);
       ws.serializeAttachment(me);
       this.broadcast({ t: "seat_update", seat: old, userId: null });
       return;
     }
+
+    if (msg.t === "thank") return this.thank(ws, me, msg.messageId);
 
     // chat
     if (me.seat === null) return this.send(ws, { t: "warn", code: "NOT_SEATED" });
@@ -336,8 +349,55 @@ export class CircleRoom extends DurableObject<Env> {
   private leave(ws: WebSocket) {
     const m = this.member(ws);
     if (!m || m.seat === null) return;
-    ws.serializeAttachment({ ...m, seat: null });
+    this.flushSit(m);
+    ws.serializeAttachment({ ...m, seat: null, satSince: null });
     this.broadcast({ t: "seat_update", seat: m.seat, userId: null }, (o) => o.id === m.id);
+  }
+
+  // ── Tiến trình (002) ────────────────────────────────────────────────
+  protected questEvent(userId: string, ev: GameEvent) {
+    this.ctx.waitUntil(
+      recordEvent(this.env, userId, ev)
+        .then((updates) => {
+          for (const u of updates) for (const ws of this.ctx.getWebSockets(userId)) this.send(ws, { t: "quest_progress", ...u });
+        })
+        .catch((e) => console.error("quest event failed", e)),
+    );
+  }
+
+  /** Cộng số phút đã ngồi (tối thiểu 1 phút mới tính). */
+  private flushSit(m: Member) {
+    if (!m.satSince) return;
+    const minutes = Math.floor((Date.now() - m.satSince) / 60_000);
+    m.satSince = null;
+    if (minutes >= 1) this.questEvent(m.id, { type: "sit", amount: Math.min(minutes, 120) });
+  }
+
+  /** Chỉ dùng trong test (không có đường HTTP tới đây): lùi giờ bắt đầu ngồi. */
+  testShiftSit(userId: string, ms: number) {
+    if (this.env.APP_ENV === "production") return;
+    for (const ws of this.ctx.getWebSockets(userId)) {
+      const m = this.member(ws);
+      if (m?.satSince) ws.serializeAttachment({ ...m, satSince: m.satSince - ms });
+    }
+  }
+
+  /** Cảm ơn tin của người khác (002 FR-008): mỗi cặp người tính điểm 1 lần/ngày, không tính khi có chặn. */
+  private async thank(ws: WebSocket, me: Member, messageId: string) {
+    const msg = this.getMessage(messageId);
+    if (!msg || msg.hidden || msg.userId === me.id) return;
+    const fresh = this.sql.exec("INSERT OR IGNORE INTO msg_thanks (message_id, user_id) VALUES (?, ?)", messageId, me.id).rowsWritten > 0;
+    if (!fresh) return;
+    const count = this.sql.exec<{ n: number }>("SELECT COUNT(*) AS n FROM msg_thanks WHERE message_id = ?", messageId).one().n;
+    this.broadcast({ t: "thanked", messageId, count });
+    const blocked = await this.env.DB.prepare("SELECT 1 FROM blocks WHERE (blocker_id = ? AND blocked_id = ?) OR (blocker_id = ? AND blocked_id = ?) LIMIT 1")
+      .bind(me.id, msg.userId, msg.userId, me.id)
+      .first();
+    if (blocked) return;
+    const pair = await this.env.DB.prepare("INSERT OR IGNORE INTO thanks (from_user_id, to_user_id, day, message_id) VALUES (?, ?, ?, ?)")
+      .bind(me.id, msg.userId, vnDay(), messageId)
+      .run();
+    if (pair.meta.changes) this.questEvent(me.id, { type: "thank" });
   }
 
   // ── lịch sinh hoạt + dọn tin (alarm) ────────────────────────────────
@@ -386,6 +446,8 @@ export class CircleRoom extends DurableObject<Env> {
       await this.env.DB.prepare("UPDATE circle_sessions SET status = 'ended' WHERE id = ?").bind(s.id).run();
       if (s.status === "live") {
         await this.say(circle, s, ["closing"]);
+        // Ai đang ngồi lúc kết thúc buổi được tính là đã dự buổi sinh hoạt (002 chuỗi "Người giữ lửa").
+        for (const seat of this.seats()) this.questEvent(seat.userId, { type: "circle_session" });
         this.broadcast({ t: "session", status: "ended", topic: s.topic });
       }
     }

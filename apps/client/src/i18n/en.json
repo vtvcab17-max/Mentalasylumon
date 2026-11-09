@@ -26,7 +26,8 @@
     "high": "High"
   },
   "errors": {
-    "network": "Couldn't connect. Please try again."
+    "network": "Couldn't connect. Please try again.",
+    "NOT_ELIGIBLE": "You don't meet the requirements for this yet."
   },
   "login": {
     "welcome": "Welcome to the Online Mental Hospital",
@@ -188,6 +189,72 @@
       "harmful": "Not sent: it may be harmful to others.",
       "harassment": "Not sent: it contains insulting language.",
       "spam": "Too fast — wait 3 seconds and try again."
-    }
+    },
+    "thank": "Thank {name}'s message"
+  },
+  "rank": {
+    "patient": "Patient",
+    "cleaner": "Cleaner",
+    "orderly": "Orderly",
+    "nurse": "Nurse",
+    "intern": "Intern",
+    "head": "Head of ward",
+    "director": "Director"
+  },
+  "chain": {
+    "firstday": "First day at the hospital",
+    "helper": "A helping hand",
+    "gardener": "The gardener",
+    "guide": "The guide",
+    "keeper": "Keeper of the flame"
+  },
+  "progress": {
+    "book": "Quest book",
+    "rankLabel": "Title",
+    "points": "{total} points total · Today {today}/{cap}",
+    "capped": "You've reached today's points. Resting is a quest too 🌙",
+    "next": "Next step: {title}",
+    "reqPoints": "Contribution points: {have}/{need}",
+    "reqDays": "Active days: {have}/{need}",
+    "reqChain": "“{name}” quests: {have}/{need} steps",
+    "promote": "Receive your promotion",
+    "goLobbyForCeremony": "Go to the main lobby for your promotion",
+    "keepGoing": "Take your time — every small quest gets you closer.",
+    "topRank": "You are a Head of ward",
+    "topRankHint": "Next, stand for Director when the council opens an election.",
+    "today": "Today's quests",
+    "chain": "Quests to become {name}",
+    "weekly": "Hospital-wide weekly quests",
+    "guide": "Show the way",
+    "save": "Save",
+    "gratitudePh": "Today I'm grateful for…",
+    "breathStart": "Start breathing",
+    "awarded": "Saved · +{n} points",
+    "saved": "Saved",
+    "questDone": "✅ Quest complete · +{n} points",
+    "questDoneNoPoints": "✅ Quest complete",
+    "mood": {
+      "great": "Great",
+      "ok": "Okay",
+      "meh": "So-so",
+      "low": "A bit down",
+      "bad": "Sad"
+    },
+    "breathTitle": "Three slow minutes",
+    "breathIn": "Breathe in…",
+    "breathOut": "Breathe out…",
+    "breathStop": "Stop",
+    "breathDone": "Done. Thank you for taking time for yourself.",
+    "breathDoneAward": "Done · +{n} points. Thank you for taking time for yourself.",
+    "ceremonyTitle": "Promotion",
+    "ceremonyOk": "Thank you!",
+    "ceremonyLine": "Congratulations! From today you hold the title of {title} in the hospital. Thank you for helping everyone.",
+    "unlock2": "Unlocked: the Cleaning mini-game, green uniform.",
+    "unlock3": "Unlocked: Chairs & tea in circles, Orderly badge.",
+    "unlock4": "Unlocked: Gardening, short white coat.",
+    "unlock5": "Unlocked: council seat, vote for Director, guide newcomers.",
+    "unlock6": "Unlocked: stand for Director.",
+    "unlock7": "A one-week term as Director.",
+    "inGameNote": "This is an in-game title, not a real medical role."
   }
 }

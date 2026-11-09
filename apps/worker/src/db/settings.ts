@@ -2,6 +2,7 @@
 
 export interface Settings {
   daily_message_limit: number;
+  daily_point_cap: number;
   zone_capacity: number;
   lecture_capacity: number;
   model_chat: string;
@@ -13,6 +14,8 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   daily_message_limit: 20,
+  // Điểm cống hiến tối đa mỗi ngày (002 FR-004).
+  daily_point_cap: 100,
   zone_capacity: 150,
   lecture_capacity: 200,
   // Workers AI (không cần khóa). SEA-LION được huấn luyện cho tiếng Đông Nam Á, gồm tiếng Việt.
@@ -23,7 +26,7 @@ export const DEFAULT_SETTINGS: Settings = {
   admin_webhook_url: "",
 };
 
-const NUMERIC: (keyof Settings)[] = ["daily_message_limit", "zone_capacity", "lecture_capacity"];
+const NUMERIC: (keyof Settings)[] = ["daily_message_limit", "daily_point_cap", "zone_capacity", "lecture_capacity"];
 
 export async function getSettings(db: D1Database): Promise<Settings> {
   const { results } = await db.prepare("SELECT key, value FROM settings").all<{ key: string; value: string }>();

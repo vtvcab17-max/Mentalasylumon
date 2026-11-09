@@ -37,7 +37,9 @@ CREATE TABLE IF NOT EXISTS messages (
   seq INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS messages_conv ON messages (conversation_id, seq);
-CREATE TABLE IF NOT EXISTS usage_daily (date TEXT PRIMARY KEY, count INTEGER NOT NULL);`;
+CREATE TABLE IF NOT EXISTS usage_daily (date TEXT PRIMARY KEY, count INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS selfcare (id TEXT PRIMARY KEY, kind TEXT NOT NULL, value TEXT NOT NULL, day TEXT NOT NULL, created_at TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS selfcare_day ON selfcare (day);`;
 
 export class PatientRecord extends DurableObject<Env> {
   private sql: SqlStorage;
@@ -132,6 +134,23 @@ export class PatientRecord extends DurableObject<Env> {
   async deleteAll(): Promise<void> {
     await this.ctx.storage.deleteAll();
     this.ensureSchema();
+  }
+
+  // ── Nhật ký tự chăm sóc (002 FR-006): `value` đã mã hóa ở Worker; chỉ chủ tài khoản đọc. ──
+  addSelfCare(kind: "mood" | "gratitude", value: string, day: string): string {
+    const id = crypto.randomUUID();
+    this.sql.exec("INSERT INTO selfcare (id, kind, value, day, created_at) VALUES (?, ?, ?, ?, ?)", id, kind, value, day, new Date().toISOString());
+    return id;
+  }
+
+  listSelfCare(sinceDay: string): { id: string; kind: string; value: string; day: string }[] {
+    return this.sql.exec<{ id: string; kind: string; value: string; day: string }>(
+      "SELECT id, kind, value, day FROM selfcare WHERE day >= ? ORDER BY created_at DESC LIMIT 200", sinceDay,
+    ).toArray() as { id: string; kind: string; value: string; day: string }[];
+  }
+
+  clearSelfCare(): void {
+    this.sql.exec("DELETE FROM selfcare");
   }
 
   /** true nếu lần đầu hỏi "được lắng nghe" cho cuộc này. */

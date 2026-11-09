@@ -11,3 +11,4 @@ export type ErrorBody = z.infer<typeof ErrorBody>;
 export * from "./protocol";
 export * from "./api";
 export * from "./avatar";
+export * from "./progress";

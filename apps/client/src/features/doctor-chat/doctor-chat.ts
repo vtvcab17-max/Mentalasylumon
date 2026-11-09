@@ -2,6 +2,7 @@ import type { AvatarSpec, SupportResource } from "@bvo/shared";
 import { t } from "../../i18n";
 import { api, ApiError, postSse } from "../../net/api";
 import { h, toast } from "../../ui/dom";
+import { quietQuestNudges } from "../progress/rank";
 
 /**
  * Trò chuyện với bác sĩ AI trong phòng riêng (T059, FR-012–FR-021, SC-007).
@@ -126,6 +127,7 @@ export function openDoctorChat(root: HTMLElement, opts: { onDoctor(spec: AvatarS
             acc += String(data.text ?? "");
             out.textContent = acc;
           } else if (ev.event === "crisis") {
+            quietQuestNudges();
             thinking.className = "bvo-msg safety";
             out.textContent = plain(String(data.message));
             thinking.append(resourcesBlock(data.resources as SupportResource[]));

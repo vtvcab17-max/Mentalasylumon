@@ -26,7 +26,8 @@
     "high": "Cao"
   },
   "errors": {
-    "network": "Không kết nối được. Vui lòng thử lại."
+    "network": "Không kết nối được. Vui lòng thử lại.",
+    "NOT_ELIGIBLE": "Bạn chưa đủ điều kiện cho bước này."
   },
   "login": {
     "welcome": "Chào mừng tới Bệnh viện tâm thần online",
@@ -188,6 +189,72 @@
       "harmful": "Tin chưa được gửi: có nội dung có thể gây hại cho người khác.",
       "harassment": "Tin chưa được gửi: có lời lẽ xúc phạm.",
       "spam": "Bạn gửi hơi nhanh — chờ 3 giây rồi gửi lại."
-    }
+    },
+    "thank": "Cảm ơn tin của {name}"
+  },
+  "rank": {
+    "patient": "Bệnh nhân",
+    "cleaner": "Nhân viên lau dọn",
+    "orderly": "Hộ lý",
+    "nurse": "Điều dưỡng",
+    "intern": "Thực tập sinh",
+    "head": "Trưởng khoa",
+    "director": "Viện trưởng"
+  },
+  "chain": {
+    "firstday": "Ngày đầu ở viện",
+    "helper": "Bàn tay giúp đỡ",
+    "gardener": "Người chăm vườn",
+    "guide": "Người dẫn đường",
+    "keeper": "Người giữ lửa"
+  },
+  "progress": {
+    "book": "Sổ nhiệm vụ",
+    "rankLabel": "Chức danh",
+    "points": "Tổng {total} điểm · Hôm nay {today}/{cap}",
+    "capped": "Hôm nay bạn đã đủ điểm. Nghỉ ngơi cũng là một nhiệm vụ 🌙",
+    "next": "Bước tiếp theo: {title}",
+    "reqPoints": "Điểm cống hiến: {have}/{need}",
+    "reqDays": "Ngày có hoạt động: {have}/{need}",
+    "reqChain": "Chuỗi “{name}”: {have}/{need} bước",
+    "promote": "Nhận lễ thăng cấp",
+    "goLobbyForCeremony": "Tới sảnh chính nhận lễ thăng cấp",
+    "keepGoing": "Cứ thong thả — mỗi nhiệm vụ nhỏ đều đưa bạn tới gần hơn.",
+    "topRank": "Bạn đã là Trưởng khoa",
+    "topRankHint": "Bước tiếp theo là ứng cử Viện trưởng khi Hội đồng mở bầu cử.",
+    "today": "Nhiệm vụ hôm nay",
+    "chain": "Chuỗi thăng cấp lên {name}",
+    "weekly": "Nhiệm vụ tuần của cả viện",
+    "guide": "Dẫn đường",
+    "save": "Lưu",
+    "gratitudePh": "Hôm nay mình biết ơn…",
+    "breathStart": "Bắt đầu bài thở",
+    "awarded": "Đã lưu · +{n} điểm",
+    "saved": "Đã lưu",
+    "questDone": "✅ Hoàn thành nhiệm vụ · +{n} điểm",
+    "questDoneNoPoints": "✅ Hoàn thành nhiệm vụ",
+    "mood": {
+      "great": "Rất vui",
+      "ok": "Ổn",
+      "meh": "Bình thường",
+      "low": "Hơi buồn",
+      "bad": "Buồn"
+    },
+    "breathTitle": "Thở chậm 3 phút",
+    "breathIn": "Hít vào…",
+    "breathOut": "Thở ra…",
+    "breathStop": "Dừng",
+    "breathDone": "Xong rồi. Cảm ơn bạn đã dành thời gian cho mình.",
+    "breathDoneAward": "Xong rồi · +{n} điểm. Cảm ơn bạn đã dành thời gian cho mình.",
+    "ceremonyTitle": "Lễ thăng cấp",
+    "ceremonyOk": "Cảm ơn!",
+    "ceremonyLine": "Chúc mừng bạn! Từ hôm nay bạn mang chức danh {title} trong viện. Cảm ơn bạn đã góp sức cho mọi người.",
+    "unlock2": "Mở khóa: mini-game Lau dọn, đồng phục xanh.",
+    "unlock3": "Mở khóa: Sắp ghế & rót trà ở vòng sinh hoạt, huy hiệu Hộ lý.",
+    "unlock4": "Mở khóa: Chăm vườn, áo blouse ngắn.",
+    "unlock5": "Mở khóa: vào Hội đồng, được bỏ phiếu bầu Viện trưởng, dẫn người mới tham quan.",
+    "unlock6": "Mở khóa: được ứng cử Viện trưởng.",
+    "unlock7": "Nhiệm kỳ Viện trưởng một tuần.",
+    "inGameNote": "Đây là chức danh trong game, không phải nhân viên y tế thật."
   }
 }

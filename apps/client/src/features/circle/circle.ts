@@ -6,6 +6,7 @@ import { CircleClient, type CircleMsg } from "../../net/circle-client";
 import { h, toast } from "../../ui/dom";
 import { buildCircleRoom } from "../../world/circle-room";
 import { resourcesBlock } from "../doctor-chat/doctor-chat";
+import { questNudgesQuiet, quietQuestNudges } from "../progress/rank";
 
 /**
  * Vòng sinh hoạt (T083, FR-022–FR-026, FR-038): danh sách vòng, chọn ghế, khung chat đã kiểm duyệt,
@@ -257,6 +258,12 @@ export async function enterCircle(
         menuFor(m, bubble);
       });
       bubble.prepend(more);
+      const thanks = h("button", { class: "bvo-thank", type: "button", "aria-label": t("circle.thank", { name: m.from.nickname }) }, "🙏");
+      thanks.addEventListener("click", () => {
+        client.thank(m.id);
+        thanks.setAttribute("disabled", "");
+      });
+      bubble.append(thanks);
     }
     if (muted.has(m.from.id)) bubble.style.display = "none";
     msgs.append(bubble);
@@ -330,6 +337,7 @@ export async function enterCircle(
           break;
         }
         case "support": {
+          quietQuestNudges();
           const b = h("div", { class: "bvo-msg safety" }, h("span", {}, m.message), resourcesBlock(m.resources as SupportResource[]));
           msgs.append(b);
           scroll();
@@ -341,6 +349,19 @@ export async function enterCircle(
           scroll();
           break;
         }
+        case "thanked": {
+          const b = msgs.querySelector(`[data-id="${CSS.escape(m.messageId)}"]`);
+          let badge = b?.querySelector<HTMLElement>(".bvo-thanks");
+          if (b && !badge) {
+            badge = h("span", { class: "bvo-thanks" });
+            b.append(badge);
+          }
+          if (badge) badge.textContent = `🙏 ${m.count}`;
+          break;
+        }
+        case "quest_progress":
+          if (m.status === "done" && !questNudgesQuiet()) toast(m.awarded ? t("progress.questDone", { n: String(m.awarded) }) : t("progress.questDoneNoPoints"));
+          break;
         case "session":
           sessionPill.style.display = "";
           sessionPill.textContent = m.status === "live" ? t("circle.liveNow", { topic: m.topic }) : t("circle.ended");

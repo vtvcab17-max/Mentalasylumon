@@ -9,8 +9,10 @@ import { registerAccount } from "./api/account";
 import { registerAdminFlags } from "./admin/flags";
 import { registerWorld, ZONE_RE } from "./api/world";
 import { CIRCLE_ID_RE, registerCircles } from "./api/circles";
+import { registerProgress } from "./api/progress";
 import { registerAdminReports } from "./admin/reports";
 import { registerAdminCircles } from "./admin/circles";
+import { registerAdminProgress } from "./admin/progress";
 import { getSettings } from "./db/settings";
 import { registerGoogleAuth } from "./auth/google";
 import { loadUser, requireCsrfHeader } from "./auth/session";
@@ -41,8 +43,10 @@ registerAccount(app);
 registerAdminFlags(app);
 registerWorld(app);
 registerCircles(app);
+registerProgress(app);
 registerAdminReports(app);
 registerAdminCircles(app);
+registerAdminProgress(app);
 
 // WebSocket → Durable Object. Người chơi phải đăng nhập và đã qua onboarding.
 const WS_ROUTES: Record<string, keyof Pick<Env, "WORLD_ZONE" | "CIRCLE_ROOM" | "LECTURE_HALL">> = {
@@ -69,6 +73,8 @@ app.get("/ws/:kind/:id{.+}", requireUser, requireOnboarded, async (c) => {
   req.headers.set("X-User-Nickname", encodeURIComponent(user.nickname ?? ""));
   req.headers.set("X-User-Avatar", user.avatar ?? "null");
   req.headers.set("X-Zone-Id", id);
+  const progress = await c.env.DB.prepare("SELECT rank FROM user_progress WHERE user_id = ?").bind(user.id).first<{ rank: number }>();
+  req.headers.set("X-User-Rank", String(progress?.rank ?? 1));
   req.headers.set("X-Zone-Capacity", String((await getSettings(c.env.DB)).zone_capacity));
   return stub.fetch(req);
 });

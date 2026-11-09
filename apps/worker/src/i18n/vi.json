@@ -16,6 +16,7 @@
     "AI_UNAVAILABLE": "Bác sĩ AI đang tạm thời không trả lời được. Nút \"Cần giúp đỡ ngay\" vẫn luôn dùng được.",
     "NOT_IMPLEMENTED": "Tính năng này chưa có.",
     "NICKNAME_TAKEN": "Biệt danh này đã có người dùng, bạn chọn tên khác nhé.",
-    "CONFLICT": "Thao tác này đã được thực hiện rồi."
+    "CONFLICT": "Thao tác này đã được thực hiện rồi.",
+    "NOT_ELIGIBLE": "Bạn chưa đủ điều kiện cho bước này."
   }
 }

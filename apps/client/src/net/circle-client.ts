@@ -60,6 +60,9 @@ export class CircleClient {
   chat(text: string, clientMsgId: string) {
     this.raw({ t: "chat", text, clientMsgId });
   }
+  thank(messageId: string) {
+    this.raw({ t: "thank", messageId });
+  }
   close() {
     this.closedByUs = true;
     this.ws?.close(1000, "leave");

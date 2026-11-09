@@ -1,6 +1,7 @@
-import { ZoneClientMsg, type ZoneServerMsg } from "@bvo/shared";
+import { HOTSPOTS, zoneBase, ZoneClientMsg, type ZoneServerMsg } from "@bvo/shared";
 import { DurableObject } from "cloudflare:workers";
 import type { Env } from "../env";
+import { recordEvent, type GameEvent } from "../progress/quests";
 
 /**
  * WorldZone — một không gian chung (sảnh, vườn, hành lang một tầng) (T065, research.md §R2, ws-protocol.md).
@@ -27,6 +28,7 @@ interface PlayerState {
   r: number;
   a: Anim;
   lastEmote: number;
+  rank: number;
 }
 
 /** Trạng thái chỉ giữ trong bộ nhớ (không lưu khi ngủ). */
@@ -36,6 +38,8 @@ interface Volatile {
   drops: number;
   lastWarn: number;
   persistedAt: number;
+  /** Hotspot người chơi đang đứng trong (chỉ ghi sự kiện lúc bước vào). */
+  inside: Set<string>;
 }
 
 export const MOVE_PER_SECOND = 6; // client gửi ≤ 5; +1 cho độ lệch đồng hồ
@@ -47,6 +51,7 @@ export const CROWDED = 80;
 export const VIEW_RADIUS = 30;
 export const MAX_VIEW = 60;
 const BOUND = 200;
+export const WAVE_RADIUS = 8;
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const r2 = (v: number) => Math.round(v * 100) / 100;
@@ -95,7 +100,7 @@ export class WorldZone extends DurableObject<Env> {
   private volatile(ws: WebSocket): Volatile {
     let v = this.vol.get(ws);
     if (!v) {
-      v = { tokens: MOVE_BURST, refillAt: Date.now(), drops: 0, lastWarn: 0, persistedAt: 0 };
+      v = { tokens: MOVE_BURST, refillAt: Date.now(), drops: 0, lastWarn: 0, persistedAt: 0, inside: new Set() };
       this.vol.set(ws, v);
     }
     return v;
@@ -174,16 +179,19 @@ export class WorldZone extends DurableObject<Env> {
     }
 
     this.ctx.acceptWebSocket(server, [userId]);
-    const me: PlayerState = { id: userId, nickname, avatar, p, r: 0, a: "idle", lastEmote: 0 };
+    const rank = Math.min(7, Math.max(1, Number(req.headers.get("X-User-Rank")) || 1));
+    if (!this.ctx.storage.kv.get("zoneId")) this.ctx.storage.kv.put("zoneId", zoneId);
+    const me: PlayerState = { id: userId, nickname, avatar, p, r: 0, a: "idle", lastEmote: 0, rank };
     this.save(server, me);
 
     const others = this.sockets()
       .filter((ws) => ws !== server)
       .map((ws) => this.state(ws))
       .filter((s): s is PlayerState => !!s && s.id !== userId)
-      .map((s) => ({ id: s.id, nickname: s.nickname, avatar: s.avatar, p: s.p, r: s.r, a: s.a }));
+      .map((s) => ({ id: s.id, nickname: s.nickname, avatar: s.avatar, p: s.p, r: s.r, a: s.a, rank: s.rank ?? 1 }));
     this.send(server, { t: "welcome", selfId: userId, zoneId, players: others });
-    this.broadcast({ t: "join", player: { id: me.id, nickname: me.nickname, avatar: me.avatar, p: me.p, r: me.r, a: me.a } }, server);
+    this.broadcast({ t: "join", player: { id: me.id, nickname: me.nickname, avatar: me.avatar, p: me.p, r: me.r, a: me.a, rank } }, server);
+    this.checkHotspots(server, me);
     // Snapshot đầu tiên cho người mới (ai đang ở gần) và cho người khác (người mới xuất hiện).
     this.dirty.add(userId);
     this.schedule();
@@ -224,6 +232,7 @@ export class WorldZone extends DurableObject<Env> {
       if (now - v.persistedAt > PERSIST_MS) this.save(ws, s);
       this.dirty.add(s.id);
       this.schedule();
+      this.checkHotspots(ws, s);
       return;
     }
 
@@ -232,10 +241,14 @@ export class WorldZone extends DurableObject<Env> {
       s.lastEmote = now;
       this.save(ws, s);
       const out: ZoneServerMsg = { t: "emote", id: s.id, e: msg.e };
+      let someoneNear = false;
       for (const other of this.sockets()) {
         const o = this.state(other);
         if (other !== ws && o && dist2(o.p, s.p) <= VIEW_RADIUS * VIEW_RADIUS) this.send(other, out);
+        if (o && o.id !== s.id && dist2(o.p, s.p) <= WAVE_RADIUS * WAVE_RADIUS) someoneNear = true;
       }
+      // Nhiệm vụ "chào một người" chỉ tính khi thật sự có người ở gần (002 research.md R1).
+      if (msg.e === "wave" && someoneNear) this.questEvent(s.id, { type: "wave" });
     }
   }
 
@@ -279,6 +292,44 @@ export class WorldZone extends DurableObject<Env> {
       }
     }
     this.dirty.clear();
+  }
+
+  // ── Tiến trình (002): sự kiện nhiệm vụ do máy chủ xác nhận ─────────────
+  private base(): string {
+    return zoneBase(this.ctx.storage.kv.get<string>("zoneId") ?? "");
+  }
+
+  private checkHotspots(ws: WebSocket, s: PlayerState) {
+    const spots = HOTSPOTS[this.base()];
+    if (!spots) return;
+    const v = this.volatile(ws);
+    for (const h of spots) {
+      const inside = (s.p[0] - h.x) ** 2 + (s.p[2] - h.z) ** 2 <= h.r * h.r;
+      if (inside && !v.inside.has(h.id)) {
+        v.inside.add(h.id);
+        this.questEvent(s.id, { type: "reach", zone: this.base(), spot: h.id });
+      } else if (!inside) v.inside.delete(h.id);
+    }
+  }
+
+  /** Ghi sự kiện ngoài vòng xử lý tin; báo tiến độ cho chính người đó. */
+  protected questEvent(userId: string, ev: GameEvent) {
+    this.ctx.waitUntil(
+      recordEvent(this.env, userId, ev)
+        .then((updates) => {
+          for (const u of updates) for (const ws of this.ctx.getWebSockets(userId)) this.send(ws, { t: "quest_progress", ...u });
+        })
+        .catch((e) => console.error("quest event failed", e)),
+    );
+  }
+
+  /** Lễ thăng cấp (002 US2): cập nhật bậc trên tên và bắn pháo giấy cho cả zone. */
+  celebrate(userId: string, rank: number) {
+    for (const ws of this.ctx.getWebSockets(userId)) {
+      const s = this.state(ws);
+      if (s) this.save(ws, { ...s, rank });
+    }
+    this.broadcast({ t: "celebrate", id: userId, rank });
   }
 
   async webSocketClose(ws: WebSocket, code: number, reason: string) {

@@ -4,6 +4,10 @@ import { buildAvatar } from "./avatar/avatar";
 import { Crowd } from "./engine/crowd";
 import type { Engine } from "./engine/renderer";
 import { enterCircle, openCircleList } from "./features/circle/circle";
+import { burst, showCeremony } from "./features/progress/ceremony";
+import { openQuestBook } from "./features/progress/quest-book";
+import { questNudgesQuiet } from "./features/progress/rank";
+import { showGuide } from "./world/hotspots";
 import { openDoctorChat } from "./features/doctor-chat/doctor-chat";
 import { showCreateAvatar } from "./features/onboarding/create-avatar";
 import { showLanguagePicker } from "./features/onboarding/language-picker";
@@ -65,6 +69,11 @@ class Navigator {
   private stage: Stage | null = null;
   private layout: Layout | null = null;
   private busy = false;
+  /** Zone đang ở (để lễ thăng cấp bắn pháo giấy đúng sảnh). */
+  private zoneId: string | null = null;
+  /** Điểm cần dẫn đường tới sau khi đổi khu. */
+  private pendingGuide: { zone: string; spot: string } | null = null;
+  private showGuideHere: ((spot: { zone: string; spot: string }) => void) | null = null;
 
   constructor(
     private ui: HTMLElement,
@@ -79,6 +88,8 @@ class Navigator {
     try {
       this.stage?.dispose();
       this.stage = null;
+      this.zoneId = null;
+      this.showGuideHere = null;
       this.ui.replaceChildren();
       this.layout = await api<Layout>("/api/world/layout");
       if (place.kind === "circle") {
@@ -109,12 +120,36 @@ class Navigator {
     return openCircleList(this.ui, { pick: (id) => void this.go({ kind: "circle", id }) });
   }
 
+  /** Sổ nhiệm vụ (002). */
+  openBook(place: Place) {
+    openQuestBook(this.ui, {
+      inLobby: place.kind === "lobby",
+      guide: (spot) => {
+        if (place.kind === spot.zone && this.showGuideHere) return this.showGuideHere(spot);
+        this.pendingGuide = spot;
+        void this.go({ kind: spot.zone as "lobby" | "garden" | "court" });
+      },
+      openCircles: () => void this.openCircles(),
+      goLobby: () => void this.go({ kind: "lobby" }),
+      promote: async () => {
+        try {
+          const r = await api<{ level: number }>("/api/ranks/promote", { body: { zoneId: this.zoneId ?? undefined } });
+          showCeremony(this.ui, r.level);
+        } catch {
+          toast(t("errors.NOT_ELIGIBLE"));
+        }
+      },
+    });
+  }
+
   private topBar(title: HTMLElement, place: Place) {
+    const bookBtn = h("button", { class: "bvo-btn secondary", type: "button", "aria-label": t("progress.book") }, "📒");
+    bookBtn.addEventListener("click", () => this.openBook(place));
     const mapBtn = h("button", { class: "bvo-btn secondary", type: "button" }, `🗺 ${t("world.map")}`);
     const settingsBtn = h("button", { class: "bvo-btn secondary", type: "button" }, `⚙ ${t("room.settings")}`);
     mapBtn.addEventListener("click", () => this.layout && openMap(this.ui, this.mapOpts(place)));
     settingsBtn.addEventListener("click", () => openSettings(this.ui, this.engine, { onLocale: () => this.go(place) }));
-    return h("div", { class: "bvo-hud" }, title, h("div", { class: "bvo-row", style: "flex-wrap:nowrap" }, mapBtn, settingsBtn));
+    return h("div", { class: "bvo-hud" }, title, h("div", { class: "bvo-row", style: "flex-wrap:nowrap" }, bookBtn, mapBtn, settingsBtn));
   }
 
   // ── Phòng riêng (US1) ───────────────────────────────────────────────
@@ -171,6 +206,12 @@ class Navigator {
         else if (m.t === "leave") crowd.remove(m.id);
         else if (m.t === "snapshot") crowd.applySnapshot(m.players, m.gone);
         else if (m.t === "emote") crowd.emote(m.id);
+        else if (m.t === "quest_progress") {
+          if (m.status === "done" && !questNudgesQuiet()) toast(m.awarded ? t("progress.questDone", { n: String(m.awarded) }) : t("progress.questDoneNoPoints"));
+        } else if (m.t === "celebrate") {
+          crowd.setRank(m.id, m.rank);
+          if (m.id !== this.me.id) burst(this.ui);
+        }
         renderTitle();
       },
       onStatus: (s) => (status.style.display = s === "reconnecting" ? "" : "none"),
@@ -181,6 +222,16 @@ class Navigator {
       },
     });
     zone.connect();
+    this.zoneId = join.zoneId;
+
+    // Dẫn đường tới điểm khám phá (002 FR-002).
+    let stopGuide: (() => void) | null = null;
+    this.showGuideHere = (spot) => {
+      stopGuide?.();
+      stopGuide = showGuide(this.engine, spot.zone, spot.spot, () => controller.position);
+    };
+    if (this.pendingGuide && this.pendingGuide.zone === place.kind) this.showGuideHere(this.pendingGuide);
+    this.pendingGuide = null;
 
     // Nút ngữ cảnh: cửa phòng, lối ra vườn/sảnh, thang máy.
     let onAction: (() => void) | null = null;
@@ -232,6 +283,7 @@ class Navigator {
       place,
       dispose: () => {
         stop();
+        stopGuide?.();
         window.removeEventListener("keydown", onKey);
         zone.close();
         crowd.dispose();
