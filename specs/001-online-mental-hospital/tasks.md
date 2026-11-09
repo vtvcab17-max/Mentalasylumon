@@ -168,19 +168,19 @@ chặn merge. Test cho phần an toàn được viết **trước** và phải *
 
 ### Tests for User Story 3
 
-- [ ] T076 [P] [US3] Viết test `CircleRoom` (ngồi/đứng, tin bị lọc không tới người khác, chỉ người gửi nhận `support` khi khủng hoảng, lọc theo danh sách chặn, giới hạn 1 tin/3 giây) trong `apps/worker/test/circle-room.test.ts`
-- [ ] T077 [P] [US3] Viết script `evals/run-moderation.ts` (`pnpm eval:moderation`, chặn ≥ 95%, SC-006)
+- [X] T076 [P] [US3] Viết test `CircleRoom` (ngồi/đứng, tin bị lọc không tới người khác, chỉ người gửi nhận `support` khi khủng hoảng, lọc theo danh sách chặn, giới hạn 1 tin/3 giây) trong `apps/worker/test/circle-room.test.ts`
+- [X] T077 [P] [US3] Viết script `evals/run-moderation.ts` (`pnpm eval:moderation`, chặn ≥ 95%, SC-006)
 
 ### Implementation for User Story 3
 
-- [ ] T078 [US3] Viết migration `apps/worker/migrations/0004_circles_reports.sql`: `circles` (language `vi`|`en`, max_seats mặc định 12, khoảng 4–20), `circle_sessions`, `reports` (reason, status `open`|`actioned`|`dismissed`, action)
-- [ ] T079 [US3] Viết Durable Object `apps/worker/src/do/circle-room.ts`: ghế, tin nhắn qua `safety/pipeline.ts` trước khi phát, `chat_hidden`, xóa tin sau 30 ngày bằng alarm (research.md §R11)
-- [ ] T080 [US3] Viết bác sĩ dẫn dắt theo `circle_sessions` (mở đầu, mời chia sẻ, nhắc quy tắc, nói ngôn ngữ của vòng) trong `apps/worker/src/ai/facilitator.ts` (FR-024, FR-038)
-- [ ] T081 [US3] Viết `GET /api/circles?lang=`, `POST /api/circles/:id/join`, `POST /api/reports`, `POST/DELETE /api/blocks` trong `apps/worker/src/api/circles.ts`
+- [X] T078 [US3] Viết migration `apps/worker/migrations/0004_circles_reports.sql`: `circles` (language `vi`|`en`, max_seats mặc định 12, khoảng 4–20), `circle_sessions`, `reports` (reason, status `open`|`actioned`|`dismissed`, action)
+- [X] T079 [US3] Viết Durable Object `apps/worker/src/do/circle-room.ts`: ghế, tin nhắn qua `safety/pipeline.ts` trước khi phát, `chat_hidden`, xóa tin sau 30 ngày bằng alarm (research.md §R11)
+- [X] T080 [US3] Viết bác sĩ dẫn dắt theo `circle_sessions` (mở đầu, mời chia sẻ, nhắc quy tắc, nói ngôn ngữ của vòng) trong `apps/worker/src/ai/facilitator.ts` (FR-024, FR-038)
+- [X] T081 [US3] Viết `GET /api/circles?lang=`, `POST /api/circles/:id/join`, `POST /api/reports`, `POST/DELETE /api/blocks` trong `apps/worker/src/api/circles.ts`
 - [ ] T082 [P] [US3] Làm model phòng tròn với ghế xếp vòng trong `assets-src/circle-room/` → `apps/client/public/models/circle-room.glb`
-- [ ] T083 [US3] Viết cảnh và UI vòng sinh hoạt (chọn ghế, khung chat, quy tắc cộng đồng lần đầu, báo cáo/chặn/tắt tiếng) trong `apps/client/src/features/circle/circle.ts` (FR-022–FR-026)
-- [ ] T084 [US3] Viết trang admin báo cáo (ẩn tin, khóa tạm/vĩnh viễn, tô đỏ báo cáo chờ quá 12 giờ, webhook báo cáo mới) và CRUD vòng/lịch sinh hoạt trong `apps/worker/src/admin/reports.ts` và `apps/worker/src/admin/circles.ts` (FR-028)
-- [ ] T085 [US3] Viết test e2e US3 trong `e2e/us3-circle.spec.ts`
+- [X] T083 [US3] Viết cảnh và UI vòng sinh hoạt (chọn ghế, khung chat, quy tắc cộng đồng lần đầu, báo cáo/chặn/tắt tiếng) trong `apps/client/src/features/circle/circle.ts` (FR-022–FR-026)
+- [X] T084 [US3] Viết trang admin báo cáo (ẩn tin, khóa tạm/vĩnh viễn, tô đỏ báo cáo chờ quá 12 giờ, webhook báo cáo mới) và CRUD vòng/lịch sinh hoạt trong `apps/worker/src/admin/reports.ts` và `apps/worker/src/admin/circles.ts` (FR-028)
+- [X] T085 [US3] Viết test e2e US3 trong `e2e/us3-circle.spec.ts`
 
 **Checkpoint**: US1–US3 chạy độc lập; đạt SC-006
 

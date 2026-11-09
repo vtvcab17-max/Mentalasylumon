@@ -48,24 +48,36 @@ Khi làm một task: đọc task trong `tasks.md` → viết test trước (bắ
 
 ## Trạng thái (2026-11-09)
 
-- **69/105 task xong.** Phase 1–2, US1 (phòng riêng + bác sĩ AI) và US2 (đi dạo 3D nhiều người, `WorldZone` DO)
-  đã chạy; e2e desktop 4/4 xanh, 113 unit test xanh.
-- **Bố cục viện theo bản vẽ 1815** (research.md §R18): sân trước có mặt tiền + portico + mái vòm → sảnh chính →
-  cầu thang chính lên gallery các tầng (phòng một bên) → vườn sau có ao. Không dùng tên/thương hiệu bệnh viện thật.
+- **78/105 task xong.** Phase 1–2, US1 (phòng riêng + bác sĩ AI), US2 (đi dạo 3D nhiều người, `WorldZone`) và
+  US3 (vòng sinh hoạt, `CircleRoom`) đã chạy; 126 unit test, e2e desktop + mobile xanh.
+- **Bố cục viện theo bản vẽ 1815** (research.md §R18): sân trước → sảnh chính → cầu thang chính lên gallery các tầng
+  → vườn sau. Phòng sinh hoạt vào từ cổng tây của sảnh hoặc bản đồ.
+- **Vòng sinh hoạt:** mọi tin qua `moderatePublic` trước khi phát; chặn/báo cáo/tắt tiếng; admin ẩn tin, khóa tạm/vĩnh
+  viễn (`/admin/api/reports`); bác sĩ AI dẫn dắt theo `circle_sessions` (alarm của DO), nói ngôn ngữ của vòng.
+- **Model giả cho test/máy:** model `@test/…` hoặc `FAKE_AI=1` (chỉ khi APP_ENV ≠ production) — `ai/gateway.ts`.
+  `pnpm dev:local` bật sẵn. Lớp từ khóa an toàn vẫn chạy thật.
 - **Còn mở:**
-  - T022, T023 — bộ mẫu eval an toàn/kiểm duyệt cần người có chuyên môn duyệt và bổ sung.
-  - T057, T067 — model 3D GLB (hiện dựng bằng khối hình trong code).
-  - T062 — chạy eval an toàn với Workers AI thật, ghi `evals/RESULTS.md`.
+  - T022, T023 — bộ mẫu eval an toàn/kiểm duyệt cần người có chuyên môn duyệt và bổ sung (kiểm duyệt mới 24/400 mẫu).
+  - T057, T067, T082 — model 3D GLB (hiện dựng bằng khối hình trong code).
+  - T062 + `pnpm eval:moderation` — chạy eval với Workers AI thật (cần CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN).
   - SC-004 (500 người cùng lúc) chưa kiểm trên staging — xem `docs/perf.md`.
-- **Tiếp theo:** US3 vòng sinh hoạt (T076–T085), US4 thuyết trình (T086–T097), Phase 7 hoàn thiện.
+- **Tiếp theo:**
+  1. **Tính năng 002 — cấp bậc & nhiệm vụ** (người dùng đã chốt 2026-11-09, cần viết spec bằng Spec Kit trước khi code):
+     Bệnh nhân → Nhân viên lau dọn → Hộ lý → Điều dưỡng → Thực tập sinh → Trưởng khoa → Viện trưởng.
+     Nhiệm vụ hỗn hợp (tự chăm sóc hằng ngày, mini-game lau dọn, cộng đồng, khám phá), giới hạn điểm mỗi ngày,
+     không thưởng thời gian online. Hội đồng (Thực tập sinh + Trưởng khoa) bầu Viện trưởng mỗi tuần, ứng viên là
+     Trưởng khoa, không làm 2 tuần liền. Viện trưởng chỉ có **quyền trong game** (chủ đề tuần, nhiệm vụ tuần, trang
+     trí, thông báo qua kiểm duyệt, bổ nhiệm danh dự) — KHÔNG xem dữ liệu riêng/cờ, KHÔNG khóa người chơi, KHÔNG đổi
+     quy tắc an toàn. Cấp "bác sĩ" của người chơi không được khuyên y khoa (Constitution II).
+  2. US4 thuyết trình (T086–T097), Phase 7 hoàn thiện.
 
 ## Kiến trúc nhanh
 
 - **Một Cloudflare Worker** `mentalasylumon` (cấu hình `wrangler.jsonc` ở **thư mục gốc**): phục vụ client
   (`apps/client/dist`), API (Hono), WebSocket → Durable Objects.
 - **Durable Objects:** `PatientRecord` (lịch sử chat từng người, giới hạn lượt/ngày), `KeyVault` (khóa mã hóa tự tạo —
-  **không bao giờ xóa**, mất khóa = mất lịch sử), `WorldZone` / `CircleRoom` / `LectureHall` (chưa làm, đang là khung).
-- **D1** `benh-vien-dev` (id `1c8ae363-563b-4881-9f5d-8ba99adec4ce`, APAC): migration 0001–0003 đã áp lên bản thật.
+  **không bao giờ xóa**, mất khóa = mất lịch sử), `WorldZone`, `CircleRoom` (tin nhắn trong SQLite của DO, tự xóa sau 30 ngày), `LectureHall` (chưa làm).
+- **D1** `benh-vien-dev` (id `1c8ae363-563b-4881-9f5d-8ba99adec4ce`, APAC): migration 0001–0003 đã áp lên bản thật; `pnpm --filter worker deploy` tự áp migration mới (0004+) trước khi deploy.
 - **R2: đang tắt** vì tài khoản chưa bật R2 — bật lại binding trong `wrangler.jsonc` khi cần tài sản 3D/audio.
 - **Đăng nhập:** Google Identity Services (nút "Sign in with Google") → ID token → `POST /auth/google/token`, server
   kiểm RS256 bằng JWKS của Google. Chỉ cần `GOOGLE_CLIENT_ID` (công khai, nằm trong `vars`). **Không có client secret.**
@@ -86,11 +98,12 @@ specs/          Spec Kit
 
 ```bash
 pnpm install
-pnpm test                 # Vitest trong môi trường Workers (113 test) — phải xanh
+pnpm test                 # Vitest trong môi trường Workers (126 test) — phải xanh
 pnpm lint && pnpm --filter worker typecheck
 pnpm build                # build client
 pnpm i18n:check
 pnpm eval:safety --lang vi,en   # cần CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN (Workers AI Read)
+pnpm eval:moderation            # kiểm duyệt vòng sinh hoạt, ngưỡng chặn ≥ 95% (SC-006)
 # chạy ở máy:
 npx wrangler d1 migrations apply benh-vien-dev --local
 npx wrangler d1 execute benh-vien-dev --local --file apps/worker/seed/dev.sql

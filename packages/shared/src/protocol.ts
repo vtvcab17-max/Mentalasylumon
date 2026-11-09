@@ -61,18 +61,41 @@ export const SupportResource = z.object({
 });
 export type SupportResource = z.infer<typeof SupportResource>;
 
+export const CircleChat = z.object({
+  t: z.literal("chat"),
+  id: z.string(),
+  from: z.object({ id: z.string(), nickname: z.string() }),
+  text: z.string(),
+  ts: z.string(),
+});
+export type CircleChat = z.infer<typeof CircleChat>;
+
+export const CircleSeat = z.object({ seat: z.number(), userId: z.string(), nickname: z.string(), avatar: z.unknown() });
+export type CircleSeat = z.infer<typeof CircleSeat>;
+
 export const CircleServerMsg = z.discriminatedUnion("t", [
   z.object({
-    t: z.literal("chat"),
-    id: z.string(),
-    from: z.object({ id: z.string(), nickname: z.string() }),
-    text: z.string(),
-    ts: z.string(),
+    t: z.literal("welcome"),
+    selfId: z.string(),
+    circle: z.object({ id: z.string(), name: z.string(), language: z.enum(["vi", "en"]), maxSeats: z.number() }),
+    seats: z.array(CircleSeat),
+    /** Đã lọc theo danh sách chặn của người nhận. */
+    recent: z.array(CircleChat),
+    session: z.object({ status: z.enum(["scheduled", "live", "ended"]), topic: z.string(), startsAt: z.string() }).nullable(),
   }),
+  CircleChat,
   z.object({ t: z.literal("chat_rejected"), clientMsgId: z.string(), reason: z.enum(["harmful", "harassment", "spam"]) }),
   z.object({ t: z.literal("support"), message: z.string(), resources: z.array(SupportResource) }),
   z.object({ t: z.literal("chat_hidden"), id: z.string() }),
-  z.object({ t: z.literal("seat_update"), seat: z.number(), userId: z.string().nullable() }),
+  z.object({
+    t: z.literal("seat_update"),
+    seat: z.number(),
+    userId: z.string().nullable(),
+    nickname: z.string().optional(),
+    avatar: z.unknown().optional(),
+  }),
+  z.object({ t: z.literal("warn"), code: z.enum(["RATE_LIMITED", "SEAT_TAKEN", "NOT_SEATED"]) }),
+  z.object({ t: z.literal("kicked"), reason: z.string() }),
   z.object({
     t: z.literal("facilitator"),
     doctor: z.object({ id: z.string(), name: z.string() }),

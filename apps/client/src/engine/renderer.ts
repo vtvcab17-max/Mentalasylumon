@@ -47,7 +47,7 @@ export class Engine {
   private frameCallbacks = new Set<(dt: number) => void>();
   private clock = new THREE.Clock();
 
-  constructor(private canvas: HTMLCanvasElement, quality: Quality = storedQuality()) {
+  constructor(readonly canvas: HTMLCanvasElement, quality: Quality = storedQuality()) {
     this.quality = quality;
     this.renderer = this.createRenderer();
     this.scene.background = new THREE.Color("#f4efe6");

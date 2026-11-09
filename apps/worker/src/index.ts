@@ -8,6 +8,9 @@ import { registerConversations } from "./api/conversations";
 import { registerAccount } from "./api/account";
 import { registerAdminFlags } from "./admin/flags";
 import { registerWorld, ZONE_RE } from "./api/world";
+import { CIRCLE_ID_RE, registerCircles } from "./api/circles";
+import { registerAdminReports } from "./admin/reports";
+import { registerAdminCircles } from "./admin/circles";
 import { getSettings } from "./db/settings";
 import { registerGoogleAuth } from "./auth/google";
 import { loadUser, requireCsrfHeader } from "./auth/session";
@@ -37,6 +40,9 @@ registerConversations(app);
 registerAccount(app);
 registerAdminFlags(app);
 registerWorld(app);
+registerCircles(app);
+registerAdminReports(app);
+registerAdminCircles(app);
 
 // WebSocket → Durable Object. Người chơi phải đăng nhập và đã qua onboarding.
 const WS_ROUTES: Record<string, keyof Pick<Env, "WORLD_ZONE" | "CIRCLE_ROOM" | "LECTURE_HALL">> = {
@@ -52,6 +58,7 @@ app.get("/ws/:kind/:id{.+}", requireUser, requireOnboarded, async (c) => {
   const binding = WS_ROUTES[kind];
   if (!binding) return apiError(c, "NOT_FOUND", 404);
   if (kind === "zone" && !ZONE_RE.test(id)) return apiError(c, "NOT_FOUND", 404);
+  if (kind === "circle" && !CIRCLE_ID_RE.test(id)) return apiError(c, "NOT_FOUND", 404);
   const ns = c.env[binding];
   const stub = ns.get(ns.idFromName(id));
   const user = c.get("user")!;

@@ -44,7 +44,23 @@ export const STYLES = `
 .bvo-doctors{padding:12px 16px calc(80px + env(safe-area-inset-bottom));overflow:auto}
 .bvo-doctor{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px;margin:8px 0;cursor:pointer;font:inherit}
 .bvo-toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#2b2b2b;color:#fff;padding:10px 16px;border-radius:10px;z-index:2147482000}
-@media (max-width:600px){.bvo-panel{width:100%}}
+.bvo-tag{display:inline-block;font-size:12px;font-weight:600;background:#e6f2ef;color:var(--accent);border-radius:6px;padding:1px 6px;vertical-align:1px}
+.bvo-circle-chat{width:min(380px,100%)}
+.bvo-circle-chat .bvo-compose{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+.bvo-circle-dock{left:16px;transform:none}
+.bvo-msg{position:relative}.bvo-msg.pending{opacity:.55}.bvo-msg.rejected{background:#fbe4e0}.bvo-msg.rejected > span{text-decoration:line-through}
+.bvo-msg.rejected .bvo-muted{text-decoration:none}
+.bvo-nick{display:block;font-size:13px;margin-bottom:2px}
+.bvo-msg.facilitator{border:2px solid #cfe3dd}
+.bvo-system{align-self:center;font-size:13px;color:var(--muted);text-align:center}
+.bvo-more{position:absolute;top:4px;right:4px;border:0;background:none;font-size:18px;line-height:1;cursor:pointer;padding:2px 6px;color:var(--muted)}
+.bvo-msg.doctor{padding-right:30px}
+.bvo-pop{position:absolute;right:0;top:28px;z-index:5;background:var(--card);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.18);padding:6px;min-width:180px}
+.bvo-pop .bvo-btn{margin:4px 0;padding:10px 12px;text-align:left}
+@media (max-width:600px){.bvo-panel{width:100%}
+.bvo-circle-chat{top:auto;height:48%;width:100%;border-radius:16px 16px 0 0}
+.bvo-circle-dock{bottom:calc(48% + 8px);left:8px;right:8px}
+.bvo-circle-dock .bvo-btn{padding:10px 12px;font-size:14px;white-space:nowrap;min-width:0}}
 `;
 
 export function injectStyles() {

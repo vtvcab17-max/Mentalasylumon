@@ -37,7 +37,10 @@ export async function createFlag(env: Pick<Env, "DB" | "CHAT_ENCRYPTION_KEY" | "
 export async function notifyAdmins(db: D1Database, flag: { id: string; level: string; source: string }): Promise<void> {
   const { admin_webhook_url } = await getSettings(db);
   if (!admin_webhook_url) return;
-  const text = `🚩 Cờ ${flag.level === "acute" ? "KHẨN" : "cần chú ý"} mới (${flag.source}) — mở trang quản trị để xem. ID: ${flag.id}`;
+  const text =
+    flag.level === "report"
+      ? `📝 Báo cáo vi phạm mới (${flag.source}) — mở trang quản trị để xử lý trong 24 giờ. ID: ${flag.id}`
+      : `🚩 Cờ ${flag.level === "acute" ? "KHẨN" : "cần chú ý"} mới (${flag.source}) — mở trang quản trị để xem. ID: ${flag.id}`;
   await fetch(admin_webhook_url, {
     method: "POST",
     headers: { "content-type": "application/json" },

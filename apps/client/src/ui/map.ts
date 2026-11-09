@@ -18,13 +18,16 @@ export function placeName(p: Place): string {
   if (p.kind === "lobby") return t("world.lobby");
   if (p.kind === "garden") return t("world.garden");
   if (p.kind === "court") return t("world.court");
+  if (p.kind === "circle") return t("world.circle");
   return t("world.floor", { wing: p.wing, floor: String(p.floor) });
 }
 
 const same = (a: Place, b: Place) =>
-  a.kind === b.kind && (a.kind !== "floor" || (b.kind === "floor" && a.wing === b.wing && a.floor === b.floor));
+  a.kind === b.kind &&
+  (a.kind !== "floor" || (b.kind === "floor" && a.wing === b.wing && a.floor === b.floor)) &&
+  (a.kind !== "circle" || (b.kind === "circle" && a.id === b.id));
 
-export function openMap(root: HTMLElement, opts: { layout: Layout; current: Place; go(p: Place): void }) {
+export function openMap(root: HTMLElement, opts: { layout: Layout; current: Place; go(p: Place): void; openCircles(): void }) {
   const close = () => panel.remove();
   const item = (p: Place | null, label: string, extra?: string) => {
     const here = p && same(p, opts.current);
@@ -67,7 +70,12 @@ export function openMap(root: HTMLElement, opts: { layout: Layout; current: Plac
       item({ kind: "lobby" }, `🏥 ${t("world.lobby")}`),
       item({ kind: "court" }, `🏛 ${t("world.court")}`),
       item({ kind: "garden" }, `🌳 ${t("world.garden")}`),
-      item(null, `⭕ ${t("world.circle")}`, t("world.comingSoon")),
+      h(
+        "button",
+        { class: "bvo-doctor", type: "button", "aria-current": opts.current.kind === "circle" ? "location" : undefined, on: { click: () => (close(), opts.openCircles()) } },
+        h("strong", {}, `⭕ ${t("world.circle")}`),
+        h("div", { class: "bvo-muted" }, t("circle.listHint")),
+      ),
       others.length ? h("h3", { style: "margin:16px 0 4px" }, t("world.otherFloors")) : null,
       ...others.map((f) => item({ kind: "floor", ...f }, placeName({ kind: "floor", ...f }))),
     ),

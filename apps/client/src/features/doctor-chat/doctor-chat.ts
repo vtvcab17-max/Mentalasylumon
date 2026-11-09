@@ -14,7 +14,7 @@ interface Usage { used: number; limit: number; resetsAt: string }
 
 const plain = (s: string) => s.replace(/\*\*(.+?)\*\*/g, "$1");
 
-function resourcesBlock(resources: SupportResource[]) {
+export function resourcesBlock(resources: SupportResource[]) {
   const shown = resources.filter((r) => r.scope === "emergency" || r.onDutyNow || r.scope === "international");
   return h(
     "div",

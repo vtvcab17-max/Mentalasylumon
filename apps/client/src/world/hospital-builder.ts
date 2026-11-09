@@ -37,7 +37,11 @@ export type Place =
   | { kind: "lobby" }
   | { kind: "court" }
   | { kind: "garden" }
-  | { kind: "floor"; wing: string; floor: number };
+  | { kind: "floor"; wing: string; floor: number }
+  | { kind: "circle"; id: string };
+
+/** Khu đi bộ chung (có WorldZone). */
+export type WalkPlace = Exclude<Place, { kind: "room" } | { kind: "circle" }>;
 
 /** Góc camera riêng của khu (mặc định nhìn cao từ phía nam xuống). */
 export interface CameraView {
@@ -375,7 +379,7 @@ function buildLobby(root: THREE.Group, engine: Engine): Built {
   portal(root, 0, 8.8, Math.PI, t("world.court"), true, labels);
   portal(root, 0, -5.4, 0, t("world.elevator"), true, labels);
   portal(root, 11.8, 0, -Math.PI / 2, t("world.garden"), true, labels);
-  portal(root, -11.8, 0, Math.PI / 2, `${t("world.circle")} · ${t("world.comingSoon")}`, false, labels);
+  portal(root, -11.8, 0, Math.PI / 2, t("world.circle"), true, labels);
   const title = makeLabel(t("app.title"), { height: 0.55, bg: "rgba(46,125,107,0.9)", color: "#ffffff" });
   title.position.set(0, 3.4, -8.7);
   root.add(title);
@@ -392,7 +396,7 @@ function buildLobby(root: THREE.Group, engine: Engine): Built {
       { target: "court", x: 0, z: 8.2, radius: 1.6, enabled: true },
       { target: "stairs", x: 0, z: -5.4, radius: 1.4, enabled: true },
       { target: "garden", x: 11, z: 0, radius: 1.6, enabled: true },
-      { target: "circle", x: -11, z: 0, radius: 1.6, enabled: false },
+      { target: "circle", x: -11, z: 0, radius: 1.6, enabled: true },
     ],
     doors: [],
     labels,
@@ -529,7 +533,7 @@ function buildFloor(
 
 export function buildArea(
   engine: Engine,
-  place: Exclude<Place, { kind: "room" }>,
+  place: WalkPlace,
   layout: { roomsPerFloor: number; myRoom: { wing: string; floor: number; roomNumber: number } | null },
 ): Area {
   const root = new THREE.Group();

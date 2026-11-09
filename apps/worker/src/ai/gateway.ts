@@ -14,6 +14,8 @@ export interface GatewayEnv {
   /** Chỉ cho script eval chạy ngoài Worker (không có binding AI): gọi Workers AI qua REST. */
   CLOUDFLARE_ACCOUNT_ID?: string;
   CLOUDFLARE_API_TOKEN?: string;
+  /** "1" = dùng model giả cho mọi lời gọi (chỉ `pnpm dev:local`, không bao giờ ở production). */
+  FAKE_AI?: string;
 }
 
 export interface ChatMessage {
@@ -122,6 +124,7 @@ async function post(env: GatewayEnv, opts: CompleteOptions, stream: boolean): Pr
 }
 
 export async function complete(env: GatewayEnv, opts: CompleteOptions): Promise<string> {
+  if (env.APP_ENV !== "production" && (env.FAKE_AI === "1" || opts.model.startsWith("@test/"))) return fakeComplete(opts);
   if (opts.model.startsWith("@cf/")) return runWorkersAi(env, opts);
   const res = await post(env, opts, false);
   const data = (await res.json()) as { content?: { type: string; text?: string }[] };
@@ -152,4 +155,28 @@ export async function* stream(env: GatewayEnv, opts: CompleteOptions): AsyncGene
       }
     }
   }
+}
+
+// ── Model giả cho test và chạy ở máy (không mạng, kết quả tất định) ──────────
+// Chỉ dùng khi APP_ENV ≠ production và model "@test/…" hoặc FAKE_AI=1. Lớp từ khóa an toàn vẫn chạy như thật.
+const VI_CHARS = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i;
+const FAKE_HARASS = /(đồ ngu|câm mồm|vô dụng|thằng điên|con điên|\bidiot\b|\bstupid\b|shut up|\bloser\b|nobody cares)/i;
+const FAKE_HARMFUL = /(cách (tự tử|tự sát|cắt tay)|how to (kill|hurt|cut) (myself|yourself)|best way to die)/i;
+
+function fakeComplete(opts: CompleteOptions): string {
+  const last = opts.messages.at(-1)?.content ?? "";
+  if (opts.system.includes("safety classifier")) {
+    const text = last.match(/<<<\n([\s\S]*)\n>>>/)?.[1] ?? last;
+    return JSON.stringify({
+      level: "none",
+      category: "none",
+      asks_diagnosis: false,
+      asks_medication: false,
+      lang: VI_CHARS.test(text) ? "vi" : "en",
+      harassment: FAKE_HARASS.test(text),
+      harmful_content: FAKE_HARMFUL.test(text),
+    });
+  }
+  const vi = /Vietnamese/.test(opts.system) || VI_CHARS.test(last);
+  return vi ? "(AI thử nghiệm) Cảm ơn bạn đã chia sẻ. Bạn muốn kể thêm không?" : "(Test AI) Thanks for sharing. Would you like to tell me more?";
 }

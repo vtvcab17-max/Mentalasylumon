@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev --config ../../wrangler.jsonc",
-    "deploy": "wrangler deploy --config ../../wrangler.jsonc",
+    "deploy": "wrangler d1 migrations apply DB --remote --config ../../wrangler.jsonc && wrangler deploy --config ../../wrangler.jsonc",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

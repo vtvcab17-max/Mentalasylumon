@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { buildAvatar } from "./avatar/avatar";
 import { Crowd } from "./engine/crowd";
 import type { Engine } from "./engine/renderer";
+import { enterCircle, openCircleList } from "./features/circle/circle";
 import { openDoctorChat } from "./features/doctor-chat/doctor-chat";
 import { showCreateAvatar } from "./features/onboarding/create-avatar";
 import { showLanguagePicker } from "./features/onboarding/language-picker";
@@ -14,7 +15,7 @@ import { h, toast } from "./ui/dom";
 import { openMap, placeName, type Layout } from "./ui/map";
 import { openSettings } from "./ui/settings";
 import { doorAction, nearestDoor } from "./world/doors";
-import { buildArea, type Area, type Place } from "./world/hospital-builder";
+import { buildArea, type Area, type Place, type WalkPlace } from "./world/hospital-builder";
 import { PlayerController } from "./world/player-controller";
 import { buildPrivateRoom } from "./world/private-room";
 
@@ -80,7 +81,15 @@ class Navigator {
       this.stage = null;
       this.ui.replaceChildren();
       this.layout = await api<Layout>("/api/world/layout");
-      this.stage = place.kind === "room" ? this.enterRoom() : await this.enterArea(place, from);
+      if (place.kind === "circle") {
+        const circle = await enterCircle(this.ui, this.engine, this.me, place.id, {
+          leave: () => void this.go({ kind: "lobby" }),
+          pick: (id) => void this.go({ kind: "circle", id }),
+          topBar: (title) => this.topBar(title, place),
+        });
+        // Vòng đầy: ở lại sảnh, danh sách vòng khác đang mở.
+        this.stage = circle ? { place, dispose: () => circle.dispose() } : await this.enterArea({ kind: "lobby" }, from);
+      } else this.stage = place.kind === "room" ? this.enterRoom() : await this.enterArea(place, from);
     } catch {
       toast(t("errors.network"));
       if (place.kind !== "room") {
@@ -92,10 +101,18 @@ class Navigator {
     }
   }
 
+  private mapOpts(place: Place) {
+    return { layout: this.layout!, current: place, go: (p: Place) => void this.go(p), openCircles: () => void this.openCircles() };
+  }
+
+  openCircles() {
+    return openCircleList(this.ui, { pick: (id) => void this.go({ kind: "circle", id }) });
+  }
+
   private topBar(title: HTMLElement, place: Place) {
     const mapBtn = h("button", { class: "bvo-btn secondary", type: "button" }, `🗺 ${t("world.map")}`);
     const settingsBtn = h("button", { class: "bvo-btn secondary", type: "button" }, `⚙ ${t("room.settings")}`);
-    mapBtn.addEventListener("click", () => this.layout && openMap(this.ui, { layout: this.layout, current: place, go: (p) => this.go(p) }));
+    mapBtn.addEventListener("click", () => this.layout && openMap(this.ui, this.mapOpts(place)));
     settingsBtn.addEventListener("click", () => openSettings(this.ui, this.engine, { onLocale: () => this.go(place) }));
     return h("div", { class: "bvo-hud" }, title, h("div", { class: "bvo-row", style: "flex-wrap:nowrap" }, mapBtn, settingsBtn));
   }
@@ -121,7 +138,7 @@ class Navigator {
   }
 
   // ── Khu chung, nhiều người (US2) ───────────────────────────────────
-  private async enterArea(place: Exclude<Place, { kind: "room" }>, from: Place | null): Promise<Stage> {
+  private async enterArea(place: WalkPlace, from: Place | null): Promise<Stage> {
     const join = await api<{ zoneId: string }>("/api/world/join", {
       body: place.kind === "floor" ? { area: "floor", wing: place.wing, floor: place.floor } : { area: place.kind },
     });
@@ -207,8 +224,8 @@ class Navigator {
       else if (portal.target === "court") setAction(`🏛 ${t("world.goCourt")}`, () => this.go({ kind: "court" }));
       else if (portal.target === "lobby") setAction(`🏥 ${t("world.goLobby")}`, () => this.go({ kind: "lobby" }));
       else if (portal.target === "stairs")
-        setAction(`🪜 ${t("world.useElevator")}`, () => openMap(this.ui, { layout, current: place, go: (p) => this.go(p) }));
-      else setAction(`⭕ ${t("world.circle")} · ${t("world.comingSoon")}`, () => toast(t("world.comingSoon")), true);
+        setAction(`🪜 ${t("world.useElevator")}`, () => openMap(this.ui, this.mapOpts(place)));
+      else setAction(`⭕ ${t("world.goCircle")}`, () => void this.openCircles());
     });
 
     return {
@@ -235,6 +252,7 @@ function entrySpawn(area: Area, from: Place | null): [number, number] {
   const j = () => (Math.random() - 0.5) * 1.2;
   if (p.kind === "lobby" && from?.kind === "court") return [j(), 6.4];
   if (p.kind === "lobby" && from?.kind === "garden") return [9.2, j()];
+  if (p.kind === "lobby" && from?.kind === "circle") return [-9.2, j()];
   if (p.kind === "lobby" && (from?.kind === "floor" || from?.kind === "room")) return [j(), -3.6];
   if (p.kind === "court" && from?.kind === "lobby") return [j(), 2.4];
   if (p.kind === "floor" && from?.kind !== "room") return [j() * 0.8, -1.4];
