@@ -54,6 +54,9 @@ Khi làm một task: đọc task trong `tasks.md` → viết test trước (bắ
   → vườn sau. Phòng sinh hoạt vào từ cổng tây của sảnh hoặc bản đồ.
 - **Vòng sinh hoạt:** mọi tin qua `moderatePublic` trước khi phát; chặn/báo cáo/tắt tiếng; admin ẩn tin, khóa tạm/vĩnh
   viễn (`/admin/api/reports`); bác sĩ AI dẫn dắt theo `circle_sessions` (alarm của DO), nói ngôn ngữ của vòng.
+- **Đồ họa & ngày/đêm** (research.md §R19): model CC0 KayKit + Kenney gộp trong `apps/client/public/models/*.glb`
+  (~440 KB, ghi công `CREDITS.md`), `engine/atmosphere.ts` theo giờ VN, Sky shader/bloom theo mức đồ họa,
+  Cài đặt → "Ngày & đêm". Đồ vật dùng chung hình học → khi dispose bỏ qua mesh có `userData.shared`.
 - **Model giả cho test/máy:** model `@test/…` hoặc `FAKE_AI=1` (chỉ khi APP_ENV ≠ production) — `ai/gateway.ts`.
   `pnpm dev:local` bật sẵn. Lớp từ khóa an toàn vẫn chạy thật.
 - **Còn mở:**

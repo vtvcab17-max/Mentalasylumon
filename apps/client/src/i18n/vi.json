@@ -334,5 +334,12 @@
     "announceRule": "Mỗi ngày 1 thông báo, được kiểm duyệt như tin công khai.",
     "honoraryPh": "Biệt danh người được bổ nhiệm",
     "limits": "Viện trưởng không xem được trò chuyện, nhật ký hay báo cáo của ai và không khóa được người chơi."
+  },
+  "daynight": {
+    "label": "Ngày & đêm",
+    "auto": "Theo giờ thật",
+    "day": "Luôn ban ngày",
+    "night": "Luôn ban đêm",
+    "hint": "Theo giờ Việt Nam: trời sáng khoảng 6 giờ, tối khoảng 18 giờ. Đèn trong viện tự bật khi trời tối."
   }
 }

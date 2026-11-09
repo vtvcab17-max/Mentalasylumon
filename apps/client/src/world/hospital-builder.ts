@@ -1,4 +1,7 @@
 import * as THREE from "three";
+import { Atmosphere } from "../engine/atmosphere";
+import { furnish } from "./furnish";
+import { isShared, placeProp } from "./props";
 import { mat } from "../avatar/avatar";
 import type { Engine } from "../engine/renderer";
 import { disposeLabel, makeLabel } from "../engine/label";
@@ -83,16 +86,13 @@ const box = (w: number, h: number, d: number, color: string, shadow = true) => {
   return m;
 };
 
-function lights(root: THREE.Group, engine: Engine, span: number) {
-  root.add(new THREE.HemisphereLight("#fff8ee", "#b9a68a", 0.95));
-  const sun = new THREE.DirectionalLight("#ffeccc", 1.0);
-  sun.position.set(-span * 0.4, 22, span * 0.3);
-  sun.castShadow = engine.preset.shadows;
-  const cam = sun.shadow.camera;
-  cam.left = cam.bottom = -span;
-  cam.right = cam.top = span;
-  cam.far = 80;
-  root.add(sun);
+/** Khu đang dựng (để cây, ghế đá… đặt model GLB không cần truyền engine qua mọi hàm). */
+let building: { engine: Engine; atm: Atmosphere | null } | null = null;
+
+/** Ánh sáng theo ngày/đêm (research.md §R19). */
+function lights(root: THREE.Group, engine: Engine, span: number, outdoor = false) {
+  const atm = new Atmosphere(engine, root, { outdoor, span, indoorLight: outdoor ? 0 : 1 });
+  if (building) building.atm = atm;
 }
 
 function floorPlane(root: THREE.Group, w: number, d: number, color: string | THREE.Material, cx = 0, cz = 0) {
@@ -132,7 +132,19 @@ function portal(root: THREE.Group, x: number, z: number, rotY: number, label: st
   labels.push(sign);
 }
 
+const TREES = ["tree_oak", "tree_detailed", "tree_default", "tree_fat"];
+
 function tree(root: THREE.Group, x: number, z: number, s: number) {
+  const engine = building?.engine;
+  if (engine) {
+    const name = TREES[Math.abs(Math.round(x * 7 + z * 13)) % TREES.length];
+    void placeProp(engine, root, name, x, z, { height: 3.8 * s, rotY: x + z }).then((o) => o ?? primitiveTree(root, x, z, s));
+    return;
+  }
+  primitiveTree(root, x, z, s);
+}
+
+function primitiveTree(root: THREE.Group, x: number, z: number, s: number) {
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.15 * s, 0.2 * s, 1.4 * s, 8), mat("#8a5a3b"));
   trunk.position.set(x, 0.7 * s, z);
   const crown = new THREE.Mesh(new THREE.SphereGeometry(1.1 * s, 12, 10), mat(s > 1.1 ? "#5f9e6e" : "#7bb37a"));
@@ -142,6 +154,15 @@ function tree(root: THREE.Group, x: number, z: number, s: number) {
 }
 
 function bench(root: THREE.Group, x: number, z: number, rotY: number) {
+  const engine = building?.engine;
+  if (engine) {
+    void placeProp(engine, root, "bench", x, z, { width: 1.7, rotY: rotY + Math.PI }).then((o) => o ?? primitiveBench(root, x, z, rotY));
+    return;
+  }
+  primitiveBench(root, x, z, rotY);
+}
+
+function primitiveBench(root: THREE.Group, x: number, z: number, rotY: number) {
   const g = new THREE.Group();
   const seat = box(1.6, 0.1, 0.5, "#b07d50");
   seat.position.y = 0.45;
@@ -225,7 +246,7 @@ function facadeBlock(root: THREE.Group, tex: THREE.Texture, x: number, z: number
 function buildCourt(root: THREE.Group, engine: Engine): Built {
   const labels: THREE.Sprite[] = [];
   const textures: THREE.Texture[] = [];
-  lights(root, engine, 34);
+  lights(root, engine, 34, true);
   floorPlane(root, 90, 50, "#9fcf8a", 0, 10);
 
   // Mặt chính: cánh tây/đông dài, khối giữa nhô ra và cao hơn, hai đầu hồi nhô nhẹ.
@@ -418,7 +439,7 @@ function buildLobby(root: THREE.Group, engine: Engine): Built {
 // ── Vườn sau (sân dạo): tường gạch bao, cây, lối đi chữ thập, ao phía đông ──
 function buildGarden(root: THREE.Group, engine: Engine): Built {
   const labels: THREE.Sprite[] = [];
-  lights(root, engine, 20);
+  lights(root, engine, 20, true);
   floorPlane(root, 32, 32, "#9fcf8a");
   const pathNS = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 30), mat("#e2cfa8"));
   pathNS.rotation.x = -Math.PI / 2;
@@ -549,9 +570,7 @@ export function buildArea(
 ): Area {
   const root = new THREE.Group();
   engine.scene.add(root);
-  const sky = place.kind === "garden" || place.kind === "court" ? "#cfe8f3" : "#f4efe6";
-  engine.scene.background = new THREE.Color(sky);
-  (engine.scene.fog as THREE.Fog | null)?.color.set(sky);
+  building = { engine, atm: null };
   const built =
     place.kind === "lobby"
       ? buildLobby(root, engine)
@@ -567,6 +586,9 @@ export function buildArea(
               layout.myRoom && layout.myRoom.wing === place.wing && layout.myRoom.floor === place.floor ? layout.myRoom.roomNumber : null,
             );
   const { labels, textures, ...rest } = built;
+  const atm = building.atm;
+  building = null;
+  if (atm) furnish(engine, root, place.kind, atm);
   return {
     place,
     root,
@@ -574,9 +596,10 @@ export function buildArea(
     dispose() {
       labels.forEach(disposeLabel);
       textures.forEach((x) => x.dispose());
+      atm?.dispose();
       root.traverse((o) => {
         const m = o as THREE.Mesh;
-        if (!m.isMesh) return;
+        if (!m.isMesh || isShared(m)) return;
         m.geometry.dispose();
         // Vật liệu dùng chung (cache) giữ lại; chỉ giải phóng vật liệu riêng có texture.
         for (const mm of Array.isArray(m.material) ? m.material : [m.material]) {

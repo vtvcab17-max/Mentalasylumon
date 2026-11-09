@@ -334,5 +334,12 @@
     "announceRule": "One announcement a day, checked like any public message.",
     "honoraryPh": "Nickname of the person to appoint",
     "limits": "The Director can't see anyone's chats, journals or reports, and can't suspend players."
+  },
+  "daynight": {
+    "label": "Day & night",
+    "auto": "Real time",
+    "day": "Always day",
+    "night": "Always night",
+    "hint": "Follows Vietnam time: sunrise around 6:00, sunset around 18:00. Lamps turn on by themselves after dark."
   }
 }

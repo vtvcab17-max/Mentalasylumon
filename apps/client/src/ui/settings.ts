@@ -1,4 +1,5 @@
 import type { Engine, Quality } from "../engine/renderer";
+import { dayMode, setDayMode, type DayMode } from "../engine/atmosphere";
 import { getLocale, setLocale, t, type Locale } from "../i18n";
 import { api } from "../net/api";
 import { h, toast } from "./dom";
@@ -51,6 +52,21 @@ export function openSettings(root: HTMLElement, engine: Engine, opts: { onLocale
           return b;
         }),
       ),
+      h("h3", {}, t("daynight.label")),
+      h(
+        "div",
+        { class: "bvo-row" },
+        ...(["auto", "day", "night"] as DayMode[]).map((m) => {
+          const b = h("button", { class: `bvo-btn ${dayMode() === m ? "" : "secondary"}`, type: "button" }, t(`daynight.${m}`));
+          b.dataset.dm = m;
+          b.addEventListener("click", () => {
+            setDayMode(m);
+            panel.querySelectorAll<HTMLButtonElement>("[data-dm]").forEach((x) => x.classList.toggle("secondary", x.dataset.dm !== m));
+          });
+          return b;
+        }),
+      ),
+      h("p", { class: "bvo-muted" }, t("daynight.hint")),
       h(
         "button",
         {

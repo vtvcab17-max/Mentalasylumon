@@ -307,6 +307,33 @@ giới tính như bản gốc — trái với nguyên tắc An toàn trên hết
 **Kỹ thuật**: zone mới `court-N` (`ZONE_RE`, `JoinBody`); mỗi khu có thể đặt góc camera riêng (`Area.view`) — sân
 trước dùng camera thấp nhìn về phía bắc với tầm nhìn tối thiểu 90 m để thấy cả mặt tiền ở mức đồ họa thấp.
 
+## R19. Đồ họa: model CC0 từ GitHub, ánh sáng và ngày/đêm
+
+**Quyết định**:
+
+- **Model**: chỉ dùng tài sản CC0 tìm trên GitHub, gộp thành 2 file GLB nhỏ trong `apps/client/public/models/`
+  (ghi công trong `CREDITS.md` cùng thư mục):
+  - KayKit Furniture/City Builder/Restaurant Bits (Kay Lousberg): giường, ghế bành, sofa, đèn cây, tủ, khung tranh, thảm,
+    ghế đá, cột đèn đường.
+  - Kenney Nature Kit (Kenney): cây, bụi, hoa, súng, đá.
+
+  Tổng khoảng 440 KB, tải sẵn khi ở phòng riêng. Nếu tải lỗi, game vẫn dùng khối hình dựng bằng code. Hình học và vật liệu
+  dùng chung được đánh dấu `userData.shared` để không bị giải phóng nhầm khi rời khu.
+- **Renderer**: tone mapping `Neutral` (giữ màu pastel); thêm vào ba mức đồ họa:
+  - thấp: màu nền đổi theo giờ, không có đèn điểm, không bloom;
+  - vừa: Sky shader (three/examples), 4 đèn điểm ban đêm;
+  - cao: thêm bloom (UnrealBloomPass, ngưỡng 1.0, nên chỉ bóng đèn mới lóa), 8 đèn điểm.
+- **Ngày/đêm** (`engine/atmosphere.ts`): theo giờ Việt Nam, mặt trời mọc khoảng 6 giờ và lặn khoảng 18 giờ.
+  - Mặt trời đổi màu lúc hoàng hôn; ban đêm có trăng (ánh xanh nhạt) và sao.
+  - Đèn đường và đèn cây tự bật; cửa sổ chuyển xanh đêm; trong nhà ban đêm có ánh đèn vàng ấm.
+  - Người chơi chọn được "Theo giờ thật" (mặc định), "Luôn ban ngày" hoặc "Luôn ban đêm" trong Cài đặt.
+
+**Rationale**: Constitution VI đặt ngân sách tải lần đầu ≤ 15 MB ở mức thấp; bản dựng hiện khoảng 1,8 MB. Các thư viện
+hậu kỳ có sẵn trong three r170, nên không thêm phụ thuộc. Người nhạy cảm với cảnh tối có thể giữ ban ngày.
+
+**Alternatives considered**: pmndrs/postprocessing (thêm phụ thuộc, lợi ích nhỏ với phong cách low-poly); Quaternius
+packs trên GitHub (bản gốc chủ yếu phát hành ngoài GitHub, khó xác minh bản phân phối lại).
+
 ## Sources
 
 - [Durable Objects – WebSockets (Hibernation)](https://developers.cloudflare.com/durable-objects/api/websockets)

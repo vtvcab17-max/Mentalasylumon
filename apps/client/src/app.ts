@@ -10,6 +10,7 @@ import { questNudgesQuiet } from "./features/progress/rank";
 import { showGuide } from "./world/hotspots";
 import { openCouncil, type WorldState } from "./features/elections/council";
 import { applyDecor } from "./world/decor";
+import { preloadProps } from "./world/props";
 import { openDoctorChat } from "./features/doctor-chat/doctor-chat";
 import { showCreateAvatar } from "./features/onboarding/create-avatar";
 import { showLanguagePicker } from "./features/onboarding/language-picker";
@@ -81,7 +82,10 @@ class Navigator {
     private ui: HTMLElement,
     private engine: Engine,
     private me: Me,
-  ) {}
+  ) {
+    // Tải sẵn gói đồ vật 3D (~440 KB) trong lúc người chơi ở phòng riêng.
+    preloadProps(engine);
+  }
 
   async go(place: Place): Promise<void> {
     if (this.busy) return;

@@ -54,7 +54,7 @@ export async function createUsers(n, { prefix = "sim", locale = "vi" } = {}) {
       `INSERT INTO sessions (id, user_id, created_at, expires_at) VALUES ('${hash}','${id}','${now}','${exp}');`,
       `INSERT INTO consents (id, user_id, terms_version, items, granted_at) VALUES ('${randomUUID()}','${id}','${terms.version}','${items}','${now}');`,
     );
-    users.push({ id, token, cookie: `sid=${token}`, nickname: `${prefix}_${i}_${id.slice(0, 4)}`.slice(0, 20) });
+    users.push({ id, token, cookie: `sid=${token}`, nickname: `${prefix}${i}_${id.replace(/-/g, "").slice(0, 8)}`.slice(0, 20) });
   }
   const file = join(mkdtempSync(join(tmpdir(), "bvo-sim-")), "users.sql");
   writeFileSync(file, sql.join("\n"));

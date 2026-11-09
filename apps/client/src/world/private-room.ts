@@ -1,5 +1,7 @@
 import type { AvatarSpec } from "@bvo/shared";
 import * as THREE from "three";
+import { Atmosphere } from "../engine/atmosphere";
+import { placeProp } from "./props";
 import { buildAvatar, type Avatar } from "../avatar/avatar";
 import type { Engine } from "../engine/renderer";
 
@@ -20,12 +22,8 @@ export function buildPrivateRoom(engine: Engine, avatar: AvatarSpec): PrivateRoo
   const root = new THREE.Group();
   engine.scene.add(root);
 
-  // Ánh sáng ấm
-  root.add(new THREE.HemisphereLight("#fff6e8", "#b9a68a", 0.9));
-  const sun = new THREE.DirectionalLight("#ffe9c7", 1.1);
-  sun.position.set(-3, 5, 2);
-  sun.castShadow = engine.preset.shadows;
-  root.add(sun);
+  // Ánh sáng theo ngày/đêm; trong phòng ban đêm có đèn cây (research.md §R19).
+  const atm = new Atmosphere(engine, root, { outdoor: false, span: 6, indoorLight: 1 });
 
   // Sàn + tường (phòng 6 × 5 m)
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(6, 5), mat("#d9b98f"));
@@ -46,7 +44,9 @@ export function buildPrivateRoom(engine: Engine, avatar: AvatarSpec): PrivateRoo
   root.add(right);
 
   // Cửa sổ có ánh trời
-  const win = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.1), new THREE.MeshBasicMaterial({ color: "#bfe3f5" }));
+  const winMat = new THREE.MeshBasicMaterial({ color: "#bfe3f5" });
+  atm.addWindow(winMat);
+  const win = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.1), winMat);
   win.position.set(-1.2, 1.7, -2.49);
   root.add(win);
   const frame = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.06, 0.05), mat("#ffffff"));
@@ -61,7 +61,15 @@ export function buildPrivateRoom(engine: Engine, avatar: AvatarSpec): PrivateRoo
   pillow.position.set(0, 0.48, -0.75);
   bed.add(base, pillow);
   bed.position.set(2.1, 0, -1.3);
-  root.add(bed);
+  // Giường, kệ sách, cây, khung tranh: model CC0 (KayKit); lỗi tải thì giữ khối đơn giản.
+  void placeProp(engine, root, "bed_single_A", 2.1, -1.2, { width: 2.1, rotY: 0 }).then((o) => {
+    if (!o) root.add(bed);
+  });
+  // Tủ nhỏ có đồ trang trí sát tường trái, cây góc phải sau — không che camera.
+  void placeProp(engine, root, "cabinet_small_decorated", -2.6, -0.9, { width: 1.1, rotY: Math.PI / 2 });
+  void placeProp(engine, root, "pictureframe_large_A", 0.9, -2.45, { height: 0.9, y: 1.1 });
+  void placeProp(engine, root, "pot_large", 2.6, -2.15, { height: 0.5 });
+  void placeProp(engine, root, "plant_bush", 2.6, -2.15, { height: 0.8, y: 0.4, noShadow: true });
 
   // Thảm tròn + 2 ghế (một cho bác sĩ)
   const rug = new THREE.Mesh(new THREE.CircleGeometry(1.1, 32), mat("#cdb4db"));
@@ -82,15 +90,15 @@ export function buildPrivateRoom(engine: Engine, avatar: AvatarSpec): PrivateRoo
   chair(-1.2, 0.4, Math.PI / 2);
   chair(0.5, 0.4, -Math.PI / 2);
 
-  // Đèn cây
-  const lamp = new THREE.Mesh(new THREE.ConeGeometry(0.25, 0.3, 20, 1, true), mat("#f6d186"));
-  lamp.position.set(-2.4, 1.6, -2.0);
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.5), mat("#555"));
-  pole.position.set(-2.4, 0.75, -2.0);
-  root.add(lamp, pole);
-  const glow = new THREE.PointLight("#ffd9a0", 0.6, 4);
-  glow.position.set(-2.4, 1.5, -2.0);
-  root.add(glow);
+  // Đèn cây: sáng ấm khi trời tối.
+  void placeProp(engine, root, "lamp_standing", -2.4, -2.0, { height: 1.75 });
+  const bulbMat = new THREE.MeshStandardMaterial({ color: "#fff4d6", emissive: "#ffcf8a", emissiveIntensity: 0.3 });
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), bulbMat);
+  bulb.position.set(-2.4, 1.5, -2.0);
+  root.add(bulb);
+  atm.addLamp({ position: new THREE.Vector3(-2.4, 1.3, -2.0), bulb: bulbMat, color: "#ffd9a0", range: 6 });
+  // Đèn trần dịu cho cả phòng lúc tối.
+  atm.addLamp({ position: new THREE.Vector3(0, 2.7, 0), color: "#ffe6c0", range: 8 });
 
   // Người chơi ngồi ghế trái
   const player = buildAvatar(avatar);
@@ -125,6 +133,7 @@ export function buildPrivateRoom(engine: Engine, avatar: AvatarSpec): PrivateRoo
     },
     dispose() {
       stop();
+      atm.dispose();
       engine.scene.remove(root);
       player.dispose();
       doctor?.dispose();

@@ -1,5 +1,9 @@
 import * as THREE from "three";
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 /**
  * Renderer Three.js với 3 mức đồ họa (T038, FR-006a, research.md §R5, Constitution VI).
@@ -15,12 +19,18 @@ export interface QualityPreset {
   farPlane: number;
   maxFullAvatars: number;
   antialias: boolean;
+  /** Bầu trời vật lý (Sky shader) ngoài trời; mức thấp dùng màu nền chuyển dần. */
+  sky: boolean;
+  /** Số đèn điểm thật bật ban đêm (đèn đường, đèn cây); còn lại chỉ phát sáng bằng vật liệu. */
+  maxLampLights: number;
+  /** Hậu kỳ phát sáng (bloom) cho đèn ban đêm. */
+  bloom: boolean;
 }
 
 export const PRESETS: Record<Quality, QualityPreset> = {
-  low: { pixelRatio: 1, shadows: false, shadowMapSize: 0, farPlane: 40, maxFullAvatars: 30, antialias: false },
-  medium: { pixelRatio: 1.5, shadows: true, shadowMapSize: 1024, farPlane: 80, maxFullAvatars: 60, antialias: true },
-  high: { pixelRatio: 2, shadows: true, shadowMapSize: 2048, farPlane: 150, maxFullAvatars: 120, antialias: true },
+  low: { pixelRatio: 1, shadows: false, shadowMapSize: 0, farPlane: 40, maxFullAvatars: 30, antialias: false, sky: false, maxLampLights: 0, bloom: false },
+  medium: { pixelRatio: 1.5, shadows: true, shadowMapSize: 1024, farPlane: 80, maxFullAvatars: 60, antialias: true, sky: true, maxLampLights: 4, bloom: false },
+  high: { pixelRatio: 2, shadows: true, shadowMapSize: 2048, farPlane: 150, maxFullAvatars: 120, antialias: true, sky: true, maxLampLights: 8, bloom: true },
 };
 
 const STORAGE_KEY = "bvo.quality";
@@ -46,6 +56,10 @@ export class Engine {
   private cache = new Map<string, Promise<GLTF>>();
   private frameCallbacks = new Set<(dt: number) => void>();
   private clock = new THREE.Clock();
+  private composer: EffectComposer | null = null;
+  private bloomPass: UnrealBloomPass | null = null;
+  /** Độ phát sáng hiện tại (0 = tắt hậu kỳ, render thẳng). Bầu trời đêm đặt giá trị này. */
+  bloom = 0;
 
   constructor(readonly canvas: HTMLCanvasElement, quality: Quality = storedQuality()) {
     this.quality = quality;
@@ -59,7 +73,12 @@ export class Engine {
 
   /** Antialias chỉ đặt được khi tạo WebGL context, nên đổi giữa thấp ↔ vừa/cao thì tạo lại renderer. */
   private createRenderer() {
-    return new THREE.WebGLRenderer({ canvas: this.canvas, antialias: PRESETS[this.quality].antialias, powerPreference: "high-performance" });
+    const r = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: PRESETS[this.quality].antialias, powerPreference: "high-performance" });
+    // Tone mapping "Neutral" giữ màu pastel của game nhưng cho vùng sáng (nắng, đèn) mềm hơn.
+    r.toneMapping = THREE.NeutralToneMapping;
+    r.toneMappingExposure = 1.05;
+    r.outputColorSpace = THREE.SRGBColorSpace;
+    return r;
   }
 
   get preset(): QualityPreset {
@@ -99,12 +118,24 @@ export class Engine {
       }
     });
     this.camera.updateProjectionMatrix();
+    this.composer?.dispose();
+    this.composer = null;
+    this.bloomPass = null;
+    if (p.bloom) {
+      this.composer = new EffectComposer(this.renderer);
+      this.composer.addPass(new RenderPass(this.scene, this.camera));
+      // Ngưỡng 1.0: chỉ bóng đèn (phát sáng mạnh) mới lóa, chữ/nhãn trắng thì không.
+      this.bloomPass = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.45, 0.35, 1.0);
+      this.composer.addPass(this.bloomPass);
+      this.composer.addPass(new OutputPass());
+    }
   }
 
   private resize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
     this.renderer.setSize(w, h, false);
+    this.composer?.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
   }
@@ -117,7 +148,10 @@ export class Engine {
   private frame() {
     const dt = Math.min(this.clock.getDelta(), 0.1);
     for (const fn of this.frameCallbacks) fn(dt);
-    this.renderer.render(this.scene, this.camera);
+    if (this.composer && this.bloomPass && this.bloom > 0.02) {
+      this.bloomPass.strength = this.bloom;
+      this.composer.render(dt);
+    } else this.renderer.render(this.scene, this.camera);
   }
 
   /** Nạp GLB có cache; mỗi lần trả về bản clone để dùng nhiều chỗ. */

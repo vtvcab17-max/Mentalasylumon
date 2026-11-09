@@ -1,5 +1,7 @@
 import type { AvatarSpec } from "@bvo/shared";
 import * as THREE from "three";
+import { Atmosphere } from "../engine/atmosphere";
+import { isShared, placeProp } from "./props";
 import { buildAvatar, type Avatar } from "../avatar/avatar";
 import { disposeLabel, makeLabel } from "../engine/label";
 import type { Engine } from "../engine/renderer";
@@ -34,11 +36,7 @@ export function buildCircleRoom(engine: Engine, maxSeats: number): CircleScene {
   engine.scene.add(root);
   engine.scene.background = new THREE.Color("#efe6d6");
 
-  root.add(new THREE.HemisphereLight("#fff6e8", "#b9a68a", 1.0));
-  const sun = new THREE.DirectionalLight("#ffe9c7", 1.0);
-  sun.position.set(-4, 9, 5);
-  sun.castShadow = engine.preset.shadows;
-  root.add(sun);
+  const atm = new Atmosphere(engine, root, { outdoor: false, span: 9, indoorLight: 1 });
 
   // Sàn gỗ tròn + thảm vòng.
   const floor = new THREE.Mesh(new THREE.CircleGeometry(ROOM_R, 48), mat("#cfa978"));
@@ -58,7 +56,9 @@ export function buildCircleRoom(engine: Engine, maxSeats: number): CircleScene {
   root.add(wall);
   for (let i = 0; i < 5; i++) {
     const a = Math.PI + (i + 0.5) * (Math.PI / 5);
-    const win = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2), new THREE.MeshBasicMaterial({ color: "#bfe3f5" }));
+    const winMat = new THREE.MeshBasicMaterial({ color: "#bfe3f5" });
+    atm.addWindow(winMat);
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2), winMat);
     win.position.set(Math.cos(a) * (ROOM_R - 0.05), 2.2, Math.sin(a) * (ROOM_R - 0.05));
     win.lookAt(0, 2.2, 0);
     root.add(win);
@@ -79,6 +79,21 @@ export function buildCircleRoom(engine: Engine, maxSeats: number): CircleScene {
   const leaves = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 12), mat("#6aa84f"));
   leaves.position.y = 0.95;
   root.add(table, pot, leaves);
+  // Đèn cây hai bên + đèn trần (bật khi tối); vài món nội thất CC0 (research.md §R19).
+  for (const [x, z] of [[-5.6, -4.2], [5.6, -4.2]] as const) {
+    void placeProp(engine, root, "lamp_standing", x, z, { height: 1.8 });
+    const bm = new THREE.MeshStandardMaterial({ color: "#fff4d6", emissive: "#ffcf8a", emissiveIntensity: 0.3 });
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 8), bm);
+    b.position.set(x, 1.55, z);
+    root.add(b);
+    atm.addLamp({ position: new THREE.Vector3(x, 1.3, z), bulb: bm, color: "#ffd9a0", range: 7 });
+  }
+  atm.addLamp({ position: new THREE.Vector3(0, 3.6, 0), color: "#ffe6c0", range: 12 });
+  void placeProp(engine, root, "cabinet_small_decorated", 0, -6.9, { width: 1.8, rotY: 0 });
+  void placeProp(engine, root, "pot_large", -3.5, -6.2, { height: 0.6 });
+  void placeProp(engine, root, "plant_bushLarge", -3.5, -6.2, { height: 1.1, y: 0.5, noShadow: true });
+  void placeProp(engine, root, "pot_large", 3.5, -6.2, { height: 0.6 });
+  void placeProp(engine, root, "plant_bushLarge", 3.5, -6.2, { height: 1.1, y: 0.5, noShadow: true });
 
   // Ghế xếp vòng.
   const chairMat = mat("#8fc1b5");
@@ -197,9 +212,10 @@ export function buildCircleRoom(engine: Engine, maxSeats: number): CircleScene {
       stop();
       for (const s of [...occupants.keys()]) clearSeat(s);
       this.setFacilitator(false);
+      atm.dispose();
       root.traverse((o) => {
         const m = o as THREE.Mesh;
-        if (m.isMesh) m.geometry.dispose();
+        if (m.isMesh && !isShared(m)) m.geometry.dispose();
       });
       engine.scene.remove(root);
     },
