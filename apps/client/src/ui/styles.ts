@@ -18,6 +18,7 @@ export const STYLES = `
 .bvo-chips{display:flex;gap:8px;flex-wrap:wrap}
 .bvo-chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font:inherit;cursor:pointer}
 .bvo-chip[aria-pressed=true]{border-color:var(--accent);background:#e6f2ef}
+.bvo-floor{min-width:44px;min-height:44px;padding:6px 10px;font-weight:600}
 .bvo-swatch{width:34px;height:34px;border-radius:50%;padding:0}
 .bvo-error{color:#a33;font-size:14px;min-height:20px}
 .bvo-section{margin:12px 0}.bvo-section h3{font-size:16px;margin:0 0 4px}
@@ -25,7 +26,7 @@ export const STYLES = `
 .bvo-pill{background:rgba(255,253,248,.92);border-radius:999px;padding:8px 14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .bvo-hud .bvo-btn{width:auto;margin:0;padding:10px 14px}
 .bvo-dock{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom))}
-.bvo-dock .bvo-btn{width:auto;padding:14px 22px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.bvo-dock .bvo-btn{width:auto;flex:none;min-width:0;padding:14px 22px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 .bvo-panel{position:absolute;right:0;top:0;bottom:0;width:min(440px,100%);background:var(--card);box-shadow:-6px 0 24px rgba(0,0,0,.12);display:flex;flex-direction:column}
 .bvo-panel header{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}
 .bvo-panel header h2{flex:1;font-size:17px;margin:0}
@@ -79,10 +80,32 @@ export const STYLES = `
 .bvo-confetti i{position:absolute;top:-12px;width:8px;height:14px;border-radius:2px;animation:bvo-fall 2.6s linear forwards}
 @keyframes bvo-fall{to{transform:translateY(110vh) rotate(540deg)}}
 @media (prefers-reduced-motion:reduce){.bvo-confetti{display:none}.bvo-breath-circle{transition:none}}
+.bvo-hud{align-items:flex-start}.bvo-hud-btns > .bvo-btn{flex:none;min-width:0}.bvo-hud-title{min-width:0;flex:1}.bvo-hud-btns{flex-wrap:nowrap;flex:none}
+.bvo-hud-title .bvo-row{flex-wrap:wrap}
 @media (max-width:600px){.bvo-panel{width:100%}
+.bvo-hud{left:8px;right:8px;top:calc(8px + env(safe-area-inset-top));gap:6px}
+.bvo-hud .bvo-pill{font-size:13px;padding:6px 10px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.bvo-hud .bvo-btn{padding:0;width:44px;height:44px;font-size:20px;flex:none;min-width:0}
+.bvo-lbl{display:none}
+.bvo-dock{left:8px;right:8px;transform:none;justify-content:center;bottom:calc(64px + env(safe-area-inset-bottom))}
+.bvo-dock .bvo-btn{padding:12px 14px;font-size:15px;white-space:nowrap;flex:0 1 auto;min-width:0}
 .bvo-circle-chat{top:auto;height:48%;width:100%;border-radius:16px 16px 0 0}
 .bvo-circle-dock{bottom:calc(48% + 8px);left:8px;right:8px}
 .bvo-circle-dock .bvo-btn{padding:10px 12px;font-size:14px;white-space:nowrap;min-width:0}}
+/* Điện thoại xoay ngang (màn thấp): bảng chat sang trái để nút SOS (góc phải dưới) không đè ô gõ,
+   nút hành động xuống sát đáy bên trái để không che nhân vật. */
+@media (max-height:500px) and (orientation:landscape){
+.bvo-panel{right:auto;left:0;width:min(440px,60%);}
+.bvo-circle-chat{width:min(360px,44%);box-shadow:6px 0 24px rgba(0,0,0,.12)}
+.bvo-panel header{padding:6px 12px}
+.bvo-compose,.bvo-circle-chat .bvo-compose{padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+.bvo-doctors{padding-bottom:12px}
+.bvo-panel .bvo-row > .bvo-btn{padding:8px 10px;margin:4px 0}
+.bvo-dock{left:50%;right:auto;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom))}
+.bvo-circle-dock{left:auto;right:16px;transform:none;bottom:calc(64px + env(safe-area-inset-bottom))}
+.bvo-dock .bvo-btn{padding:10px 14px;white-space:nowrap}
+.bvo-hud{top:calc(6px + env(safe-area-inset-top))}
+.bvo-announce{top:calc(52px + env(safe-area-inset-top))}}
 `;
 
 export function injectStyles() {

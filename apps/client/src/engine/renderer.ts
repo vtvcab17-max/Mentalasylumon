@@ -137,7 +137,18 @@ export class Engine {
     this.renderer.setSize(w, h, false);
     this.composer?.setSize(w, h);
     this.camera.aspect = w / h;
+    this.camera.fov = Engine.fovFor(w / h);
     this.camera.updateProjectionMatrix();
+  }
+
+  /**
+   * Màn dọc (điện thoại) hẹp ngang: giữ góc nhìn ngang tối thiểu ~58° bằng cách mở góc dọc (tối đa 80° để
+   * không méo hình), nếu không cảnh trong phòng chỉ thấy một nửa nhân vật.
+   */
+  static fovFor(aspect: number) {
+    const minH = (58 * Math.PI) / 180;
+    const v = (2 * Math.atan(Math.tan(minH / 2) / aspect) * 180) / Math.PI;
+    return Math.min(80, Math.max(50, v));
   }
 
   onFrame(fn: (dt: number) => void) {

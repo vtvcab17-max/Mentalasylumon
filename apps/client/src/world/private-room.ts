@@ -108,13 +108,25 @@ export function buildPrivateRoom(engine: Engine, avatar: AvatarSpec): PrivateRoo
   root.add(player.group);
 
   let doctor: Avatar | null = null;
+  // Màn ngang nhìn ngang tầm; màn dọc (điện thoại) lùi xa và cao hơn để thấy cả hai ghế lẫn giường.
+  let aspect = 0;
+  const placeCamera = () => {
+    if (engine.camera.aspect === aspect) return;
+    aspect = engine.camera.aspect;
+    if (aspect >= 1) {
+      engine.camera.position.set(0.2, 2.4, 4.2);
+      engine.camera.lookAt(-0.3, 0.9, 0);
+    } else {
+      engine.camera.position.set(0.1, 3.6, 5.6);
+      engine.camera.lookAt(-0.2, 0.5, -0.2);
+    }
+  };
+  placeCamera();
   const stop = engine.onFrame((dt) => {
+    placeCamera();
     player.update(dt);
     doctor?.update(dt);
   });
-
-  engine.camera.position.set(0.2, 2.4, 4.2);
-  engine.camera.lookAt(-0.3, 0.9, 0);
 
   return {
     player,

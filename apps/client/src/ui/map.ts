@@ -83,7 +83,35 @@ export function openMap(root: HTMLElement, opts: { layout: Layout; current: Plac
         h("div", { class: "bvo-muted" }, t("council.mapHint")),
       ),
       others.length ? h("h3", { style: "margin:16px 0 4px" }, t("world.otherFloors")) : null,
-      ...others.map((f) => item({ kind: "floor", ...f }, placeName({ kind: "floor", ...f }))),
+      // Mỗi khu một dòng ô số tầng (thay cho 50 nút dài), bấm số để đi.
+      ...opts.layout.wings.map((w) => {
+        const floors = others.filter((f) => f.wing === w.name);
+        if (!floors.length) return null;
+        return h(
+          "div",
+          { class: "bvo-section" },
+          h("div", { class: "bvo-muted" }, placeName({ kind: "floor", wing: w.name, floor: floors[0].floor }).split("·")[0].trim()),
+          h(
+            "div",
+            { class: "bvo-chips" },
+            ...floors.map((f) => {
+              const p: Place = { kind: "floor", ...f };
+              const here = same(p, opts.current);
+              return h(
+                "button",
+                {
+                  class: "bvo-chip bvo-floor",
+                  type: "button",
+                  "aria-label": placeName(p),
+                  "aria-pressed": here ? "true" : undefined,
+                  on: { click: () => (close(), opts.go(p)) },
+                },
+                String(f.floor),
+              );
+            }),
+          ),
+        );
+      }),
     ),
   );
   root.append(panel);

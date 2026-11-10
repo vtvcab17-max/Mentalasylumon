@@ -157,11 +157,12 @@ class Navigator {
   private topBar(title: HTMLElement, place: Place) {
     const bookBtn = h("button", { class: "bvo-btn secondary", type: "button", "aria-label": t("progress.book") }, "📒");
     bookBtn.addEventListener("click", () => this.openBook(place));
-    const mapBtn = h("button", { class: "bvo-btn secondary", type: "button" }, `🗺 ${t("world.map")}`);
-    const settingsBtn = h("button", { class: "bvo-btn secondary", type: "button" }, `⚙ ${t("room.settings")}`);
+    // Màn hẹp chỉ hiện biểu tượng (chữ ẩn bằng CSS .bvo-lbl), aria-label giữ tên cho trình đọc màn hình.
+    const mapBtn = h("button", { class: "bvo-btn secondary", type: "button", "aria-label": t("world.map") }, "🗺", h("span", { class: "bvo-lbl" }, ` ${t("world.map")}`));
+    const settingsBtn = h("button", { class: "bvo-btn secondary", type: "button", "aria-label": t("room.settings") }, "⚙", h("span", { class: "bvo-lbl" }, ` ${t("room.settings")}`));
     mapBtn.addEventListener("click", () => this.layout && openMap(this.ui, this.mapOpts(place)));
     settingsBtn.addEventListener("click", () => openSettings(this.ui, this.engine, { onLocale: () => this.go(place) }));
-    return h("div", { class: "bvo-hud" }, title, h("div", { class: "bvo-row", style: "flex-wrap:nowrap" }, bookBtn, mapBtn, settingsBtn));
+    return h("div", { class: "bvo-hud" }, h("div", { class: "bvo-hud-title" }, title), h("div", { class: "bvo-row bvo-hud-btns" }, bookBtn, mapBtn, settingsBtn));
   }
 
   // ── Phòng riêng (US1) ───────────────────────────────────────────────
