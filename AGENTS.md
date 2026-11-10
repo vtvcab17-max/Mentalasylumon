@@ -86,7 +86,7 @@ Khi làm một task: đọc task trong `tasks.md` → viết test trước (bắ
   (`apps/client/dist`), API (Hono), WebSocket → Durable Objects.
 - **Durable Objects:** `PatientRecord` (lịch sử chat từng người, giới hạn lượt/ngày), `KeyVault` (khóa mã hóa tự tạo —
   **không bao giờ xóa**, mất khóa = mất lịch sử), `WorldZone`, `CircleRoom` (tin nhắn trong SQLite của DO, tự xóa sau 30 ngày), `LectureHall` (chưa làm).
-- **D1** `benh-vien-dev` (id `1c8ae363-563b-4881-9f5d-8ba99adec4ce`, APAC): migration 0001–0006 đã áp lên bản thật; `pnpm --filter worker deploy` tự áp migration mới (0007+) trước khi deploy.
+- **D1** `benh-vien-dev` (id `1c8ae363-563b-4881-9f5d-8ba99adec4ce`, APAC): migration 0001–0006 đã áp lên bản thật; `pnpm --filter worker run deploy` tự áp migration mới (0007+) trước khi deploy.
 - **R2: đang tắt** vì tài khoản chưa bật R2 — bật lại binding trong `wrangler.jsonc` khi cần tài sản 3D/audio.
 - **Đăng nhập:** Google Identity Services (nút "Sign in with Google") → ID token → `POST /auth/google/token`, server
   kiểm RS256 bằng JWKS của Google. Chỉ cần `GOOGLE_CLIENT_ID` (công khai, nằm trong `vars`). **Không có client secret.**
@@ -124,7 +124,7 @@ Migration mới lên bản thật: `npx wrangler d1 migrations apply benh-vien-d
 
 ## Deploy
 
-Push lên `main` ⇒ Cloudflare Workers Builds tự build (`pnpm install && pnpm build`) và deploy (`npx wrangler deploy`
+Push lên `main` ⇒ Cloudflare Workers Builds tự build (`pnpm build`) và deploy (`pnpm --filter worker run deploy` — phải có `run`, nếu không pnpm chạy lệnh `pnpm deploy` có sẵn và báo ERR_PNPM_INVALID_DEPLOY_TARGET;
 ở thư mục gốc). Không deploy tay trừ khi người dùng yêu cầu.
 
 ## Bẫy đã gặp
